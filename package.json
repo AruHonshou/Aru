@@ -1,12 +1,13 @@
 {
-  "name": "tomari-guruguru",
+  "name": "aru",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:character": "node scripts/generate-character-slices.mjs",
     "build": "vite build",
-    "preview": "vite preview --base /tomari-guruguru/",
+    "preview": "vite preview --base /aru/",
     "verify:pages": "node scripts/verify-pages-build.mjs"
   },
   "engines": {
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.2",
+    "sharp": "^0.35.1",
     "vite": "^8.0.16"
   }
 }

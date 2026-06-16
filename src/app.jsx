@@ -8,7 +8,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "followRange": 340,
   "smoothing": 0.3,
   "charSize": 64,
-  "bgColor": "#FFF8EE",
+  "bgColor": "#FFEAD3",
   "showDebug": false
 }/*EDITMODE-END*/;
 
@@ -16,12 +16,10 @@ const { rows: ROWS, cols: COLS } = charConfig;
 const SRC = (r, c) => charConfig.src(charConfig.sheets.eyesOpen.close, r, c);
 const BLINK_SRC = (r, c) => charConfig.src(charConfig.sheets.eyesClosed.close, r, c);
 
-const BG_OPTIONS = ['#FFF8EE', '#FDEFEF', '#EEF4FB', '#2B2926'];
-
 function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
 
 function App() {
-  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [t, setTweak] = useAjustes(TWEAK_DEFAULTS);
   const [cell, setCell] = useState({ r: 2, c: 2 });
   const [pressed, setPressed] = useState(false);
   const [blink, setBlink] = useState(false);
@@ -70,7 +68,7 @@ function App() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // 自動まばたき（自然なゆらぎ: 不規則な間隔 + 二度瞬き + ゆっくり瞬き）
+  // Parpadeo automatico con variacion natural.
   useEffect(() => {
     let alive = true;
     let timer;
@@ -87,10 +85,10 @@ function App() {
       if (!alive) return;
       const roll = Math.random();
       if (roll < 0.22) {
-        // 二度瞬き（パチパチ）
+        // Doble parpadeo.
         blinkOnce(rand(80, 120), () => { if (alive) blinkOnce(rand(70, 110), schedule); });
       } else if (roll < 0.28) {
-        // ゆっくり瞬き
+        // Parpadeo lento.
         blinkOnce(rand(260, 420), schedule);
       } else {
         blinkOnce(rand(90, 150), schedule);
@@ -100,9 +98,9 @@ function App() {
       if (!alive) return;
       const u = Math.random();
       let wait;
-      if (u < 0.12) wait = rand(700, 1500);        // たまに間隔が詰まる
-      else if (u < 0.82) wait = rand(1800, 4500);  // 通常
-      else wait = rand(4500, 9000);                // ぼーっとする間
+      if (u < 0.12) wait = rand(700, 1500);        // A veces parpadea de nuevo rapido.
+      else if (u < 0.82) wait = rand(1800, 4500);  // Intervalo normal.
+      else wait = rand(4500, 9000);                // Intervalo largo en reposo.
       timer = setTimeout(doBlink, wait);
     }
     schedule();
@@ -115,9 +113,8 @@ function App() {
     return arr;
   }, []);
 
-  const dark = t.bgColor === '#2B2926';
-  const inkColor = dark ? 'rgba(255,248,238,0.85)' : 'rgba(60,48,38,0.8)';
-  const subColor = dark ? 'rgba(255,248,238,0.45)' : 'rgba(60,48,38,0.45)';
+  const inkColor = 'rgba(60,48,38,0.8)';
+  const subColor = 'rgba(60,48,38,0.45)';
 
   return (
     <div
@@ -175,14 +172,14 @@ function App() {
         position: 'absolute', bottom: '4.5vh', left: 0, right: 0,
         textAlign: 'center', pointerEvents: 'none'
       }}>
-        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>トマリぐるぐる</div>
-        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 6, letterSpacing: '0.08em' }}>マウスを動かすと こっちを見るよ</div>
+        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>Aru</div>
+        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 6, letterSpacing: '0.08em' }}>Mueve el mouse y Aru mirara hacia ahi</div>
       </div>
 
-      <a href="talk.html" style={{
+      <a href="voz.html" style={{
         position: 'absolute', top: 18, right: 18, fontSize: 13, fontWeight: 700,
         color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
-      }}>口パク版 →</a>
+      }}>Version con voz &gt;</a>
 
       {t.showDebug ? (
         <div style={{
@@ -203,21 +200,19 @@ function App() {
         </div>
       ) : null}
 
-      <TweaksPanel>
-        <TweakSection label="動き"></TweakSection>
-        <TweakSlider label="追従範囲" value={t.followRange} min={120} max={1200} step={10} unit="px"
+      <PanelAjustes>
+        <TweakSection label="Movimiento"></TweakSection>
+        <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
           onChange={(v) => setTweak('followRange', v)}></TweakSlider>
-        <TweakSlider label="追従速度" value={t.smoothing} min={0.04} max={0.5} step={0.01}
+        <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
           onChange={(v) => setTweak('smoothing', v)}></TweakSlider>
-        <TweakSection label="見た目"></TweakSection>
-        <TweakSlider label="キャラサイズ" value={t.charSize} min={30} max={92} unit="vmin"
+        <TweakSection label="Apariencia"></TweakSection>
+        <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
           onChange={(v) => setTweak('charSize', v)}></TweakSlider>
-        <TweakColor label="背景色" value={t.bgColor} options={BG_OPTIONS}
-          onChange={(v) => setTweak('bgColor', v)}></TweakColor>
-        <TweakSection label="デバッグ"></TweakSection>
-        <TweakToggle label="グリッド表示" value={t.showDebug}
+        <TweakSection label="Depuracion"></TweakSection>
+        <TweakToggle label="Mostrar cuadricula" value={t.showDebug}
           onChange={(v) => setTweak('showDebug', v)}></TweakToggle>
-      </TweaksPanel>
+      </PanelAjustes>
     </div>
   );
 }

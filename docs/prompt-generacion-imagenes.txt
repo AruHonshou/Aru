@@ -1,0 +1,66 @@
+Usa este texto como base para crear hojas 5x5 de un personaje compatible con Aru.
+
+Adjunta una imagen de referencia del personaje y la plantilla `docs/plantilla-generacion-imagen.png`.
+
+## Prompt Base
+
+Crea una hoja cuadrada con 25 versiones del mismo personaje en una grilla de 5 columnas por 5 filas.
+
+Manten el mismo peinado, accesorios, ojos, ropa, colores, estilo de dibujo, grosor de linea y sombreado. Cambia solo la direccion de la cabeza.
+
+Columnas:
+
+1. Perfil izquierdo.
+2. Diagonal izquierda.
+3. Frente.
+4. Diagonal derecha.
+5. Perfil derecho.
+
+Filas:
+
+1. Mira muy arriba.
+2. Mira un poco arriba.
+3. Mira al frente.
+4. Mira un poco abajo.
+5. Mira muy abajo.
+
+Usa fondo uniforme `#FFEAD3`. No agregues texto, numeros, logos, marcas de agua ni elementos de fondo.
+
+Expresion base:
+
+- Ojos abiertos.
+- Boca cerrada.
+- Expresion neutral y linda.
+
+## Variantes
+
+Despues de elegir la mejor hoja base, crea estas variaciones sin cambiar posicion, tamano ni angulos:
+
+```text
+Cambia solo la boca a una boca semiabierta pequena. No cambies nada mas.
+```
+
+```text
+Cambia solo la boca a una boca abierta. No cambies nada mas.
+```
+
+```text
+Cambia solo los ojos a ojos cerrados. No cambies nada mas.
+```
+
+Repite las variaciones necesarias para obtener las seis hojas:
+
+```text
+A_OjosAbiertos_BocaCerrada.png
+B_OjosAbiertos_BocaMedia.png
+C_OjosAbiertos_BocaAbierta.png
+D_OjosCerrados_BocaCerrada.png
+E_OjosCerrados_BocaMedia.png
+F_OjosCerrados_BocaAbierta.png
+```
+
+Guarda las hojas finales en `imagenes/` y ejecuta:
+
+```bash
+npm run generate:character
+```

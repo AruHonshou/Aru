@@ -1,24 +1,24 @@
-// キャラクター設定 — スライス画像の参照先を一元管理
-// 新キャラ差し替え時はこのファイルを書き換えるだけ
+// Configuracion del personaje: referencias centralizadas a los frames.
+// Al cambiar de personaje, normalmente solo hace falta ajustar este archivo.
 
 export default {
-  // スライス画像のベースパス（public/ からの相対パス）
+  // Ruta base de los frames, relativa a public/.
   basePath: 'slices2',
 
-  // 画像フォーマット（webp / png）
+  // Formato de imagen (webp / png).
   ext: 'webp',
 
-  // グリッド構成: rows = 上下（0:上向き → 4:下向き）、cols = 左右（0:左向き → 4:右向き）
+  // Grilla: filas para direccion vertical (0 arriba a 4 abajo), columnas para horizontal (0 izquierda a 4 derecha).
   rows: 5,
   cols: 5,
 
-  // シート定義: 目開け×口[とじ/中間/開け] = A/B/C、目閉じ×口[とじ/中間/開け] = D/E/F
+  // Hojas: ojos abiertos x boca [cerrada/media/abierta] = A/B/C, ojos cerrados x boca [cerrada/media/abierta] = D/E/F.
   sheets: {
     eyesOpen:   { close: 'A', half: 'B', open: 'C' },
     eyesClosed: { close: 'D', half: 'E', open: 'F' },
   },
 
-  // ファイル名パターンを生成
+  // Construye la ruta de cada frame.
   src(sheet, r, c) {
     return `${this.basePath}/${sheet}/r${r}c${c}.${this.ext}`;
   },

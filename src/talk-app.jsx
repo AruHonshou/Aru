@@ -8,7 +8,7 @@ const TALK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "followRange": 340,
   "smoothing": 0.3,
   "charSize": 64,
-  "bgColor": "#FFF8EE",
+  "bgColor": "#FFEAD3",
   "micGain": 1.6,
   "thHalf": 0.07,
   "thFull": 0.2,
@@ -17,7 +17,7 @@ const TALK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 const { rows: ROWS, cols: COLS } = charConfig;
-// シート: 目開け×口[とじ/中間/開け] = A/B/C, 目閉じ×口[とじ/中間/開け] = D/E/F
+// Hojas: ojos abiertos x boca [cerrada/media/abierta] = A/B/C, ojos cerrados x boca [cerrada/media/abierta] = D/E/F.
 const SHEETS = [
   charConfig.sheets.eyesOpen.close,   // A
   charConfig.sheets.eyesOpen.half,    // B
@@ -28,11 +28,9 @@ const SHEETS = [
 ];
 const sheetFor = (eyesClosed, mouth) => SHEETS[(eyesClosed ? 3 : 0) + mouth];
 const SRC = (sheet, r, c) => charConfig.src(sheet, r, c);
-const BG_OPTIONS = ['#FFF8EE', '#FDEFEF', '#EEF4FB', '#2B2926'];
-
 function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
 
-// ---- 音声エンジン ----
+// ---- Motor de audio ----
 function makeAudioEngine() {
   const st = {
     ctx: null, micAnalyser: null, micStream: null,
@@ -85,9 +83,9 @@ function makeAudioEngine() {
 }
 
 function App() {
-  const [t, setTweak] = useTweaks(TALK_DEFAULTS);
+  const [t, setTweak] = useAjustes(TALK_DEFAULTS);
   const [cell, setCell] = useState({ r: 2, c: 2 });
-  const [mouth, setMouth] = useState(0);        // 0:とじ 1:中間 2:開け
+  const [mouth, setMouth] = useState(0);        // 0: cerrada, 1: media, 2: abierta
   const [blink, setBlink] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const [micErr, setMicErr] = useState('');
@@ -103,7 +101,7 @@ function App() {
   const tweaksRef = useRef(t);
   tweaksRef.current = t;
 
-  // マウス追従
+  // Seguimiento del mouse.
   useEffect(() => {
     function onMove(e) {
       const el = charRef.current;
@@ -123,7 +121,7 @@ function App() {
     };
   }, []);
 
-  // メインループ: 追従 + 音声レベル → 口段階
+  // Bucle principal: seguimiento + nivel de audio -> estado de la boca.
   useEffect(() => {
     let raf;
     let last = { r: 2, c: 2 };
@@ -153,7 +151,7 @@ function App() {
     return () => cancelAnimationFrame(raf);
   }, [engine]);
 
-  // 自動まばたき（自然なゆらぎ: 不規則な間隔 + 二度瞬き + ゆっくり瞬き）
+  // Parpadeo automatico con variacion natural.
   useEffect(() => {
     if (!t.autoBlink) { setBlink(false); return; }
     let alive = true;
@@ -171,10 +169,10 @@ function App() {
       if (!alive) return;
       const roll = Math.random();
       if (roll < 0.22) {
-        // 二度瞬き（パチパチ）
+        // Doble parpadeo.
         blinkOnce(rand(80, 120), () => { if (alive) blinkOnce(rand(70, 110), schedule); });
       } else if (roll < 0.28) {
-        // ゆっくり瞬き
+        // Parpadeo lento.
         blinkOnce(rand(260, 420), schedule);
       } else {
         blinkOnce(rand(90, 150), schedule);
@@ -184,9 +182,9 @@ function App() {
       if (!alive) return;
       const u = Math.random();
       let wait;
-      if (u < 0.12) wait = rand(700, 1500);        // たまに間隔が詰まる
-      else if (u < 0.82) wait = rand(1800, 4500);  // 通常
-      else wait = rand(4500, 9000);                // ぼーっとする間
+      if (u < 0.12) wait = rand(700, 1500);        // A veces parpadea de nuevo rapido.
+      else if (u < 0.82) wait = rand(1800, 4500);  // Intervalo normal.
+      else wait = rand(4500, 9000);                // Intervalo largo en reposo.
       timer = setTimeout(doBlink, wait);
     }
     schedule();
@@ -200,7 +198,7 @@ function App() {
       await engine.startMic();
       setMicOn(true);
     } catch (e) {
-      setMicErr('マイクを使用できません（権限を確認してください）');
+      setMicErr('No se puede usar el microfono. Revisa los permisos.');
     }
   }
 
@@ -222,11 +220,10 @@ function App() {
   }, []);
   const activeSheet = sheetFor(blink, mouth);
 
-  const dark = t.bgColor === '#2B2926';
-  const inkColor = dark ? 'rgba(255,248,238,0.85)' : 'rgba(60,48,38,0.8)';
-  const subColor = dark ? 'rgba(255,248,238,0.45)' : 'rgba(60,48,38,0.45)';
-  const panelBg = dark ? 'rgba(48,45,42,0.92)' : 'rgba(255,255,255,0.88)';
-  const lineColor = dark ? 'rgba(255,248,238,0.14)' : 'rgba(60,48,38,0.12)';
+  const inkColor = 'rgba(60,48,38,0.8)';
+  const subColor = 'rgba(60,48,38,0.45)';
+  const panelBg = 'rgba(255,255,255,0.88)';
+  const lineColor = 'rgba(60,48,38,0.12)';
 
   const sizeVmin = t.charSize * 4 / 3;
 
@@ -253,8 +250,8 @@ function App() {
       </div>
 
       <div style={{ position: 'absolute', top: '3.5vh', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none' }}>
-        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>トマリトーク</div>
-        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 4, letterSpacing: '0.08em' }}>音声に合わせて口パク・まばたきするよ</div>
+        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>Aru</div>
+        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 4, letterSpacing: '0.08em' }}>Sincroniza la boca y los parpadeos con el audio</div>
       </div>
 
       <div style={{
@@ -279,7 +276,7 @@ function App() {
             background: micOn ? '#fff' : '#D96C4F',
             animation: micOn ? 'pulse 1.2s ease-in-out infinite' : 'none'
           }}></span>
-          {micOn ? 'マイク停止' : 'マイク開始'}
+          {micOn ? 'Detener microfono' : 'Iniciar microfono'}
         </button>
 
         <label style={{
@@ -288,14 +285,14 @@ function App() {
           border: `1.5px solid ${lineColor}`, borderRadius: 12,
           padding: '9px 16px', cursor: 'pointer', minHeight: 44, boxSizing: 'border-box'
         }}>
-          ♪ 音声ファイル
+          Archivo de audio
           <input type="file" accept="audio/*" onChange={onFilePick} style={{ display: 'none' }}></input>
         </label>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 150 }}>
           <div style={{ fontSize: 11, color: subColor, letterSpacing: '0.06em', display: 'flex', justifyContent: 'space-between' }}>
-            <span>音量</span>
-            <span>{['とじ', 'はんびらき', 'ぜんかい'][mouth]}</span>
+            <span>Volumen</span>
+            <span>{['cerrada', 'semiabierta', 'abierta'][mouth]}</span>
           </div>
           <div style={{ position: 'relative', height: 10, borderRadius: 5, background: lineColor, overflow: 'hidden' }}>
             <div ref={meterRef} style={{
@@ -315,34 +312,32 @@ function App() {
         display: fileName ? 'block' : 'none', cursor: 'default'
       }}></audio>
 
-      <a href="guruguru.html" style={{
+      <a href="simple.html" style={{
         position: 'absolute', top: 18, left: 18, fontSize: 13, fontWeight: 700,
         color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
-      }}>← ぐるぐる版</a>
+      }}>&lt;- Version simple</a>
 
-      <TweaksPanel>
-        <TweakSection label="口パク"></TweakSection>
-        <TweakSlider label="マイク感度" value={t.micGain} min={0.3} max={5} step={0.1}
+      <PanelAjustes>
+        <TweakSection label="Boca"></TweakSection>
+        <TweakSlider label="Sensibilidad del microfono" value={t.micGain} min={0.3} max={5} step={0.1}
           onChange={(v) => setTweak('micGain', v)}></TweakSlider>
-        <TweakSlider label="しきい値（はんびらき）" value={t.thHalf} min={0.01} max={0.3} step={0.005}
+        <TweakSlider label="Umbral semiabierta" value={t.thHalf} min={0.01} max={0.3} step={0.005}
           onChange={(v) => setTweak('thHalf', v)}></TweakSlider>
-        <TweakSlider label="しきい値（ぜんかい）" value={t.thFull} min={0.05} max={0.4} step={0.005}
+        <TweakSlider label="Umbral abierta" value={t.thFull} min={0.05} max={0.4} step={0.005}
           onChange={(v) => setTweak('thFull', v)}></TweakSlider>
-        <TweakSlider label="口を閉じる速さ" value={t.release} min={0.03} max={0.4} step={0.01}
+        <TweakSlider label="Velocidad de cierre" value={t.release} min={0.03} max={0.4} step={0.01}
           onChange={(v) => setTweak('release', v)}></TweakSlider>
-        <TweakToggle label="自動まばたき" value={t.autoBlink}
+        <TweakToggle label="Parpadeo automatico" value={t.autoBlink}
           onChange={(v) => setTweak('autoBlink', v)}></TweakToggle>
-        <TweakSection label="動き"></TweakSection>
-        <TweakSlider label="追従範囲" value={t.followRange} min={120} max={1200} step={10} unit="px"
+        <TweakSection label="Movimiento"></TweakSection>
+        <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
           onChange={(v) => setTweak('followRange', v)}></TweakSlider>
-        <TweakSlider label="追従速度" value={t.smoothing} min={0.04} max={0.5} step={0.01}
+        <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
           onChange={(v) => setTweak('smoothing', v)}></TweakSlider>
-        <TweakSection label="見た目"></TweakSection>
-        <TweakSlider label="キャラサイズ" value={t.charSize} min={30} max={92} unit="vmin"
+        <TweakSection label="Apariencia"></TweakSection>
+        <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
           onChange={(v) => setTweak('charSize', v)}></TweakSlider>
-        <TweakColor label="背景色" value={t.bgColor} options={BG_OPTIONS}
-          onChange={(v) => setTweak('bgColor', v)}></TweakColor>
-      </TweaksPanel>
+      </PanelAjustes>
     </div>
   );
 }
