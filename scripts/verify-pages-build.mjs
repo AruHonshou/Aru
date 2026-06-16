@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, posix } from 'node:path';
 
 const DIST = 'dist';
-const BASE = '/aru/';
+const BASE = '/Aru/';
 const HTML_FILES = ['index.html', 'voz.html', 'simple.html'];
 const SHEETS = ['A', 'B', 'C', 'D', 'E', 'F'];
 

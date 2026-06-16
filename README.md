@@ -56,7 +56,7 @@ npm run verify:pages
 npm run preview
 ```
 
-El build usa base path `/aru/`, listo para GitHub Pages si el repositorio se llama `aru`.
+El build usa base path `/Aru/`, listo para GitHub Pages con este repositorio.
 
 ## Estructura
 
