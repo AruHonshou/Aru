@@ -31,6 +31,11 @@ const sheetFor = (eyesClosed, mouth) => SHEETS[(eyesClosed ? 3 : 0) + mouth];
 const SRC = (sheet, r, c) => charConfig.src(sheet, r, c);
 function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
 
+function goToSimplePage(event) {
+  if (event) event.preventDefault();
+  window.location.href = SIMPLE_PAGE;
+}
+
 // ---- Motor de audio ----
 function makeAudioEngine() {
   const st = {
@@ -313,12 +318,20 @@ function App() {
         display: fileName ? 'block' : 'none', cursor: 'default'
       }}></audio>
 
-      <a href={SIMPLE_PAGE} onClick={(e) => {
-        e.preventDefault();
-        window.location.assign(SIMPLE_PAGE);
-      }} style={{
-        position: 'absolute', top: 18, left: 18, fontSize: 13, fontWeight: 700,
-        color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
+      <a href={SIMPLE_PAGE}
+        onPointerDown={goToSimplePage}
+        onMouseDown={goToSimplePage}
+        onClick={goToSimplePage}
+        style={{
+        position: 'fixed', top: 16, left: 16, zIndex: 1000,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: 42, padding: '0 14px',
+        fontSize: 13, fontWeight: 800,
+        color: inkColor, background: 'rgba(255,255,255,0.72)',
+        border: `1.5px solid ${lineColor}`, borderRadius: 999,
+        boxShadow: '0 6px 18px rgba(60,48,38,0.10)',
+        textDecoration: 'none', letterSpacing: '0.06em',
+        cursor: 'pointer', pointerEvents: 'auto'
       }}>&lt;- Version simple</a>
 
       <PanelAjustes>
