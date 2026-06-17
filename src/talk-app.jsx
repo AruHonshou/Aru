@@ -312,10 +312,10 @@ function App() {
         display: fileName ? 'block' : 'none', cursor: 'default'
       }}></audio>
 
-      <a href="simple.html" style={{
+      <a href="index.html" style={{
         position: 'absolute', top: 18, left: 18, fontSize: 13, fontWeight: 700,
         color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
-      }}>&lt;- Version simple</a>
+      }}>&lt;- Portfolio</a>
 
       <PanelAjustes>
         <TweakSection label="Boca"></TweakSection>
