@@ -17,6 +17,7 @@ const TALK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 const { rows: ROWS, cols: COLS } = charConfig;
+const SIMPLE_PAGE = `${import.meta.env.BASE_URL}simple.html`;
 // Hojas: ojos abiertos x boca [cerrada/media/abierta] = A/B/C, ojos cerrados x boca [cerrada/media/abierta] = D/E/F.
 const SHEETS = [
   charConfig.sheets.eyesOpen.close,   // A
@@ -312,7 +313,10 @@ function App() {
         display: fileName ? 'block' : 'none', cursor: 'default'
       }}></audio>
 
-      <a href="simple.html" style={{
+      <a href={SIMPLE_PAGE} onClick={(e) => {
+        e.preventDefault();
+        window.location.assign(SIMPLE_PAGE);
+      }} style={{
         position: 'absolute', top: 18, left: 18, fontSize: 13, fontWeight: 700,
         color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
       }}>&lt;- Version simple</a>
