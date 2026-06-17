@@ -1,6 +1,6 @@
-# Aru Portfolio
+# Aru
 
-Portfolio interactivo de **Kendall Valverde** con identidad visual de **Aru**. La entrada principal presenta informacion profesional, skills, experiencia, proyectos, certificaciones y contacto con estetica anime/manga/chibi. La version con voz sigue disponible como experiencia separada.
+Aplicacion web de avatar para **Aru**. El personaje sigue el mouse en 25 direcciones, parpadea automaticamente y puede mover la boca segun el microfono o un archivo de audio.
 
 ## Instalacion
 
@@ -42,12 +42,11 @@ npm run dev
 Entradas:
 
 ```text
-http://localhost:5173/index.html
-http://localhost:5173/simple.html
 http://localhost:5173/voz.html
+http://localhost:5173/simple.html
 ```
 
-`index.html` es el portfolio principal. `simple.html` redirige al portfolio para mantener compatibilidad con enlaces anteriores. `voz.html` conserva la version con microfono y archivo de audio.
+`index.html` redirige automaticamente a la version con voz.
 
 ## Build
 
@@ -71,9 +70,6 @@ El build usa base path `/Aru/`, listo para GitHub Pages con este repositorio.
 |   `-- verify-pages-build.mjs
 |-- src/
 |   |-- app.jsx
-|   |-- AruAvatar.jsx
-|   |-- portfolio-data.js
-|   |-- portfolio.css
 |   |-- talk-app.jsx
 |   |-- ajustes-panel.jsx
 |   `-- character-config.js
@@ -100,11 +96,13 @@ Las filas y columnas representan las 25 direcciones de mirada:
 
 ## Publicacion En GitHub
 
-El build usa GitHub Pages con base path `/Aru/`. La URL publica esperada es:
+Antes de subir:
 
-```text
-https://aruhonshou.github.io/Aru/
-```
+1. Crea un repositorio vacio llamado `aru`.
+2. No agregues README, `.gitignore` ni licencia desde GitHub.
+3. Pasa la URL HTTPS del repositorio para conectar el remoto.
+
+No se hara commit ni push hasta tener esa URL.
 
 ## Licencia
 

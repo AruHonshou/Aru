@@ -37,7 +37,7 @@ function assertBaseAssetReference(file, html) {
 }
 
 function assertReferencedBaseAssetsExist(file, html) {
-  const attrPattern = /\b(?:src|href)="(\/Aru\/[^"]+)"/g;
+  const attrPattern = /\b(?:src|href)="(\/aru\/[^"]+)"/g;
   for (const match of html.matchAll(attrPattern)) {
     const urlPath = match[1];
     if (!urlPath.startsWith(BASE)) continue;
@@ -66,7 +66,7 @@ for (const file of HTML_FILES) {
   const html = readDistHtml(file);
   assertNoRootAssetReference(file, html);
   assertReferencedBaseAssetsExist(file, html);
-  if (file !== 'simple.html') assertBaseAssetReference(file, html);
+  if (file !== 'index.html') assertBaseAssetReference(file, html);
 }
 
 assertSliceImages();

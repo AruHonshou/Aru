@@ -1,339 +1,220 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { motion, useReducedMotion } from 'framer-motion';
-import {
-  Award,
-  BriefcaseBusiness,
-  Code2,
-  ExternalLink,
-  GitBranch,
-  Mail,
-  MessageCircle,
-  Mic2,
-  Rocket,
-  Sparkles,
-  UserRound,
-} from 'lucide-react';
-import AruAvatar from './AruAvatar';
-import { certifications, experience, profile, projects, skills } from './portfolio-data';
-import './portfolio.css';
+import charConfig from './character-config';
 
-const navItems = [
-  { id: 'skills', label: 'Skills', icon: Code2 },
-  { id: 'experiencia', label: 'Experiencia', icon: BriefcaseBusiness },
-  { id: 'proyectos', label: 'Proyectos', icon: Rocket },
-  { id: 'certificaciones', label: 'Certificaciones', icon: Award },
-  { id: 'contacto', label: 'Contacto', icon: Mail },
-];
+const { useState, useEffect, useRef, useMemo } = React;
 
-function MotionSection({ id, icon: Icon, title, children }) {
-  return (
-    <motion.section
-      id={id}
-      className="content-section"
-      initial={{ opacity: 0, y: 34 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="section-heading">
-        <Icon aria-hidden="true" />
-        <h2>{title}</h2>
-      </div>
-      {children}
-    </motion.section>
-  );
-}
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "followRange": 340,
+  "smoothing": 0.3,
+  "charSize": 64,
+  "bgColor": "#FFEAD3",
+  "showDebug": false
+}/*EDITMODE-END*/;
 
-function goToSection(event, id) {
-  if (event) event.preventDefault();
-  const target = document.getElementById(id);
-  const scroller = document.querySelector('.portfolio-page');
-  if (target) {
-    const top = scroller
-      ? target.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 24
-      : 0;
-    if (scroller) scroller.scrollTop = top;
-  }
-  window.history.replaceState(null, '', `#${id}`);
-}
+const { rows: ROWS, cols: COLS } = charConfig;
+const SRC = (r, c) => charConfig.src(charConfig.sheets.eyesOpen.close, r, c);
+const BLINK_SRC = (r, c) => charConfig.src(charConfig.sheets.eyesClosed.close, r, c);
 
-function CustomCursor() {
-  const [position, setPosition] = React.useState({ x: -80, y: -80 });
-  const prefersReducedMotion = useReducedMotion();
-
-  React.useEffect(() => {
-    if (prefersReducedMotion) return undefined;
-    function onMove(event) {
-      setPosition({ x: event.clientX, y: event.clientY });
-    }
-    window.addEventListener('pointermove', onMove);
-    return () => window.removeEventListener('pointermove', onMove);
-  }, [prefersReducedMotion]);
-
-  if (prefersReducedMotion) return null;
-
-  return (
-    <>
-      <motion.div className="portfolio-cursor" animate={{ x: position.x, y: position.y }} transition={{ duration: 0 }} />
-      <motion.div
-        className="portfolio-cursor-ring"
-        animate={{ x: position.x, y: position.y }}
-        transition={{ type: 'spring', stiffness: 260, damping: 24, mass: 0.45 }}
-      />
-    </>
-  );
-}
-
-function Hero() {
-  return (
-    <header className="hero" id="inicio">
-      <motion.article
-        className="manga-panel"
-        initial={{ opacity: 0, x: -42, rotate: -1.4 }}
-        animate={{ opacity: 1, x: 0, rotate: 0 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <p className="eyebrow">{profile.availability}</p>
-        <h1 className="hero-title">
-          Kendall
-          <span>Valverde</span>
-        </h1>
-        <p className="hero-role">{profile.role}</p>
-        <p className="hero-summary">{profile.summary}</p>
-        <div className="stat-grid" aria-label="Metricas profesionales">
-          {profile.stats.map((stat) => (
-            <motion.div key={stat.label} className="stat-card" whileHover={{ y: -4, rotate: -0.6 }}>
-              <strong>{stat.value}</strong>
-              <span>{stat.label}</span>
-            </motion.div>
-          ))}
-        </div>
-      </motion.article>
-
-      <motion.div
-        className="avatar-stage"
-        initial={{ opacity: 0, scale: 0.88 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <AruAvatar />
-      </motion.div>
-
-      <nav className="nav-stack" aria-label="Secciones del portfolio">
-        {navItems.map((item, index) => {
-          const Icon = item.icon;
-          return (
-            <motion.a
-              key={item.id}
-              href={`#${item.id}`}
-              className="nav-button"
-              onClick={(event) => goToSection(event, item.id)}
-              onPointerDown={(event) => goToSection(event, item.id)}
-              initial={{ opacity: 0, x: 46 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 + index * 0.08, duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ x: 8, rotate: index % 2 === 0 ? 1.2 : -1.2, scale: 1.035 }}
-              whileTap={{ scale: 0.96 }}
-            >
-              <Icon aria-hidden="true" />
-              <span>{item.label}</span>
-            </motion.a>
-          );
-        })}
-      </nav>
-    </header>
-  );
-}
-
-function AboutSection() {
-  return (
-    <MotionSection id="sobre-mi" title="Sobre mi" icon={UserRound}>
-      <div className="about-grid">
-        <div className="about-copy">
-          {profile.about.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-        <aside className="fact-list" aria-label="Datos clave">
-          <span className="fact-pill">{profile.fullName}</span>
-          <span className="fact-pill">{profile.location}</span>
-          <span className="fact-pill">{profile.email}</span>
-          <span className="fact-pill">{profile.phone}</span>
-          {profile.facts.map((fact) => (
-            <span key={fact} className="fact-pill">{fact}</span>
-          ))}
-        </aside>
-      </div>
-    </MotionSection>
-  );
-}
-
-function SkillsSection() {
-  return (
-    <MotionSection id="skills" title="Skills" icon={Code2}>
-      <div className="skill-grid">
-        {skills.map((group) => (
-          <motion.article key={group.title} className="skill-card" whileHover={{ y: -6 }}>
-            <h3>{group.title}</h3>
-            <div className="tag-row">
-              {group.items.map((skill) => <span key={skill} className="tag">{skill}</span>)}
-            </div>
-          </motion.article>
-        ))}
-      </div>
-    </MotionSection>
-  );
-}
-
-function ExperienceSection() {
-  return (
-    <MotionSection id="experiencia" title="Experiencia" icon={BriefcaseBusiness}>
-      <div className="timeline">
-        {experience.map((job) => (
-          <article key={job.role} className="timeline-card">
-            <p className="timeline-meta">{job.period}</p>
-            <h3>{job.role}</h3>
-            <p><strong>{job.company}</strong></p>
-            <p>{job.description}</p>
-            <ul>
-              {job.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-            </ul>
-            <div className="tag-row">
-              {job.stack.map((item) => <span key={item} className="tag">{item}</span>)}
-            </div>
-          </article>
-        ))}
-      </div>
-    </MotionSection>
-  );
-}
-
-function ProjectsSection() {
-  return (
-    <MotionSection id="proyectos" title="Proyectos" icon={Rocket}>
-      <div className="project-grid">
-        {projects.map((project) => (
-          <motion.article key={project.title} className="project-card" whileHover={{ y: -6 }}>
-            <p className="project-status">{project.status}</p>
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-            <div className="tag-row">
-              {project.highlights.map((item) => <span key={item} className="tag">{item}</span>)}
-            </div>
-            <div className="tag-row">
-              {project.stack.map((item) => <span key={item} className="tag">{item}</span>)}
-            </div>
-            <div className="project-links">
-              {project.links.map((link) => (
-                <a key={link.href} className="project-link" href={link.href} target="_blank" rel="noreferrer">
-                  {link.label}
-                  <ExternalLink aria-hidden="true" size={14} />
-                </a>
-              ))}
-            </div>
-          </motion.article>
-        ))}
-      </div>
-    </MotionSection>
-  );
-}
-
-function CertificationsSection() {
-  return (
-    <MotionSection id="certificaciones" title="Certificaciones" icon={Award}>
-      <div className="cert-grid">
-        {certifications.map((cert) => (
-          <article key={`${cert.title}-${cert.issuer}`} className="cert-card">
-            <p className="cert-meta">{cert.status}{cert.period ? ` · ${cert.period}` : ''}</p>
-            <h3>{cert.title}</h3>
-            <p>{cert.issuer}</p>
-          </article>
-        ))}
-      </div>
-    </MotionSection>
-  );
-}
-
-function ContactSection() {
-  return (
-    <MotionSection id="contacto" title="Contacto" icon={MessageCircle}>
-      <div className="contact-grid">
-        <article className="contact-card">
-          <p className="eyebrow">Trabajemos juntos</p>
-          <h3>Disponible para roles fullstack, frontend, QA o IA</h3>
-          <p>Remoto o presencial en Costa Rica. Respondo en espanol e ingles.</p>
-          <div className="contact-actions">
-            <a className="contact-link" href={`mailto:${profile.email}`}><Mail size={16} /> Email</a>
-            <a className="contact-link" href={profile.whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a>
-            <a className="contact-link" href={profile.github} target="_blank" rel="noreferrer"><GitBranch size={16} /> GitHub</a>
-            <a className="contact-link" href={profile.linkedin} target="_blank" rel="noreferrer"><ExternalLink size={16} /> LinkedIn</a>
-          </div>
-        </article>
-        <article className="contact-card">
-          <p className="eyebrow">Aru</p>
-          <h3>Tambien puedes probar la version con voz</h3>
-          <p>La pantalla de voz conserva el avatar interactivo con microfono, archivo de audio, parpadeos y sincronizacion de boca.</p>
-          <a className="contact-link" href="voz.html"><Mic2 size={16} /> Abrir version con voz</a>
-        </article>
-      </div>
-    </MotionSection>
-  );
-}
+function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
 
 function App() {
-  React.useEffect(() => {
-    function scrollToHash() {
-      if (!window.location.hash) return;
-      const id = window.location.hash.slice(1);
-      const target = document.getElementById(id);
-      const scroller = document.querySelector('.portfolio-page');
-      if (!target) return;
-      const top = scroller
-        ? target.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 24
-        : 0;
-      if (scroller) scroller.scrollTop = top;
-    }
+  const [t, setTweak] = useAjustes(TWEAK_DEFAULTS);
+  const [cell, setCell] = useState({ r: 2, c: 2 });
+  const [pressed, setPressed] = useState(false);
+  const [blink, setBlink] = useState(false);
+  const stageRef = useRef(null);
+  const charRef = useRef(null);
+  const target = useRef({ x: 0, y: 0 });   // -1..1
+  const current = useRef({ x: 0, y: 0 });
+  const tweaksRef = useRef(t);
+  tweaksRef.current = t;
 
-    window.setTimeout(scrollToHash, 80);
-    window.addEventListener('hashchange', scrollToHash);
-    function onNativeNavActivate(event) {
-      const link = event.target?.closest?.('.nav-button[href^="#"]');
-      if (!link) return;
-      goToSection(event, link.getAttribute('href').slice(1));
+  useEffect(() => {
+    function onMove(e) {
+      const el = charRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height * 0.45;
+      const range = tweaksRef.current.followRange;
+      target.current.x = clamp((e.clientX - cx) / range, -1, 1);
+      target.current.y = clamp((e.clientY - cy) / range, -1, 1);
     }
-    document.addEventListener('pointerdown', onNativeNavActivate, true);
-    document.addEventListener('click', onNativeNavActivate, true);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerdown', onMove);
     return () => {
-      window.removeEventListener('hashchange', scrollToHash);
-      document.removeEventListener('pointerdown', onNativeNavActivate, true);
-      document.removeEventListener('click', onNativeNavActivate, true);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onMove);
     };
   }, []);
 
+  useEffect(() => {
+    let raf;
+    let last = { r: 2, c: 2 };
+    function tick() {
+      const k = tweaksRef.current.smoothing;
+      current.current.x += (target.current.x - current.current.x) * k;
+      current.current.y += (target.current.y - current.current.y) * k;
+      const c = clamp(Math.round((current.current.x + 1) / 2 * (COLS - 1)), 0, COLS - 1);
+      const r = clamp(Math.round((current.current.y + 1) / 2 * (ROWS - 1)), 0, ROWS - 1);
+      if (r !== last.r || c !== last.c) {
+        last = { r, c };
+        setCell(last);
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Parpadeo automatico con variacion natural.
+  useEffect(() => {
+    let alive = true;
+    let timer;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    function blinkOnce(dur, after) {
+      setBlink(true);
+      timer = setTimeout(() => {
+        if (!alive) return;
+        setBlink(false);
+        timer = setTimeout(after, rand(120, 220));
+      }, dur);
+    }
+    function doBlink() {
+      if (!alive) return;
+      const roll = Math.random();
+      if (roll < 0.22) {
+        // Doble parpadeo.
+        blinkOnce(rand(80, 120), () => { if (alive) blinkOnce(rand(70, 110), schedule); });
+      } else if (roll < 0.28) {
+        // Parpadeo lento.
+        blinkOnce(rand(260, 420), schedule);
+      } else {
+        blinkOnce(rand(90, 150), schedule);
+      }
+    }
+    function schedule() {
+      if (!alive) return;
+      const u = Math.random();
+      let wait;
+      if (u < 0.12) wait = rand(700, 1500);        // A veces parpadea de nuevo rapido.
+      else if (u < 0.82) wait = rand(1800, 4500);  // Intervalo normal.
+      else wait = rand(4500, 9000);                // Intervalo largo en reposo.
+      timer = setTimeout(doBlink, wait);
+    }
+    schedule();
+    return () => { alive = false; clearTimeout(timer); };
+  }, []);
+
+  const frames = useMemo(() => {
+    const arr = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) arr.push({ r, c });
+    return arr;
+  }, []);
+
+  const inkColor = 'rgba(60,48,38,0.8)';
+  const subColor = 'rgba(60,48,38,0.45)';
+
   return (
-    <main className="portfolio-page">
-      <CustomCursor />
-      <motion.a
-        href="voz.html"
-        className="voice-link"
-        whileHover={{ y: -2, scale: 1.03 }}
-        whileTap={{ scale: 0.96 }}
+    <div
+      ref={stageRef}
+      style={{
+        position: 'fixed', inset: 0, background: t.bgColor,
+        overflow: 'hidden', transition: 'background 0.4s ease',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexDirection: 'column', cursor: 'crosshair',
+        fontFamily: "'Zen Maru Gothic', sans-serif"
+      }}
+    >
+      <div
+        ref={charRef}
+        onPointerDown={() => setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        className="bob"
+        style={{
+          position: 'relative',
+          width: `${t.charSize * 4 / 3}vmin`, height: `${t.charSize * 4 / 3}vmin`,
+          maxWidth: 1200, maxHeight: 1200,
+          transform: pressed ? 'scale(0.94)' : 'scale(1)',
+          transition: 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          userSelect: 'none', touchAction: 'none'
+        }}
       >
-        <Mic2 size={16} />
-        Version con voz
-      </motion.a>
-      <Hero />
-      <div className="content">
-        <AboutSection />
-        <SkillsSection />
-        <ExperienceSection />
-        <ProjectsSection />
-        <CertificationsSection />
-        <ContactSection />
+        {frames.map(({ r, c }) => (
+          <img
+            key={`${r}-${c}`}
+            src={SRC(r, c)}
+            alt=""
+            draggable="false"
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              opacity: r === cell.r && c === cell.c ? 1 : 0,
+              pointerEvents: 'none'
+            }}
+          ></img>
+        ))}
+        {blink ? (
+          <img
+            src={BLINK_SRC(cell.r, cell.c)}
+            alt=""
+            draggable="false"
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              pointerEvents: 'none'
+            }}
+          ></img>
+        ) : null}
       </div>
-    </main>
+
+      <div style={{
+        position: 'absolute', bottom: '4.5vh', left: 0, right: 0,
+        textAlign: 'center', pointerEvents: 'none'
+      }}>
+        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>Aru</div>
+        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 6, letterSpacing: '0.08em' }}>Mueve el mouse y Aru mirara hacia ahi</div>
+      </div>
+
+      <a href="voz.html" style={{
+        position: 'absolute', top: 18, right: 18, fontSize: 13, fontWeight: 700,
+        color: subColor, textDecoration: 'none', letterSpacing: '0.06em'
+      }}>Version con voz &gt;</a>
+
+      {t.showDebug ? (
+        <div style={{
+          position: 'absolute', top: 16, left: 16,
+          background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: 10,
+          padding: '10px 12px', fontSize: 12, fontFamily: 'ui-monospace, monospace',
+          pointerEvents: 'none', lineHeight: 1.5
+        }}>
+          <div>row {cell.r} / col {cell.c}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 14px)', gap: 3, marginTop: 6 }}>
+            {frames.map(({ r, c }) => (
+              <div key={`d${r}-${c}`} style={{
+                width: 14, height: 14, borderRadius: 3,
+                background: r === cell.r && c === cell.c ? '#FFB13D' : 'rgba(255,255,255,0.22)'
+              }}></div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <PanelAjustes>
+        <TweakSection label="Movimiento"></TweakSection>
+        <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
+          onChange={(v) => setTweak('followRange', v)}></TweakSlider>
+        <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
+          onChange={(v) => setTweak('smoothing', v)}></TweakSlider>
+        <TweakSection label="Apariencia"></TweakSection>
+        <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
+          onChange={(v) => setTweak('charSize', v)}></TweakSlider>
+        <TweakSection label="Depuracion"></TweakSection>
+        <TweakToggle label="Mostrar cuadricula" value={t.showDebug}
+          onChange={(v) => setTweak('showDebug', v)}></TweakToggle>
+      </PanelAjustes>
+    </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App></App>);

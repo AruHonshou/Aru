@@ -7,7 +7,7 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
   server: {
     host: '127.0.0.1',
-    open: '/index.html',
+    open: '/voz.html',
   },
   build: {
     rollupOptions: {
