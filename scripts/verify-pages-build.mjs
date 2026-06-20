@@ -4,7 +4,7 @@ import { join, posix } from 'node:path';
 const DIST = 'dist';
 const BASE = '/Aru/';
 const HTML_FILES = ['index.html', 'voz.html', 'simple.html'];
-const SHEETS = ['A', 'B', 'C', 'D', 'E', 'F'];
+const SHEETS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
 function fail(message) {
   console.error(`La verificacion del build fallo: ${message}`);
