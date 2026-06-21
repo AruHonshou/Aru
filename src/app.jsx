@@ -1,301 +1,294 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import charConfig from './character-config';
+import AruAvatar from './components/AruAvatar';
+import { useAudioMouthSync } from './hooks/useAudioMouthSync';
+import { createAudioEngine } from './lib/audio-engine';
+import { mouthLabel } from './lib/aru-frames';
+import './styles/aru-pages.css';
 
-const { useState, useEffect, useRef, useMemo } = React;
+const {
+  useAjustes,
+  PanelAjustes,
+  TweakSection,
+  TweakSlider,
+  TweakColor,
+  TweakToggle,
+} = window;
 
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
   "followRange": 340,
   "smoothing": 0.3,
-  "charSize": 64,
+  "charSize": 78,
   "bgColor": "#FFEAD3",
-  "showDebug": false
+  "bgSoftColor": "#FFE8F1",
+  "bgAccentColor": "#FF9FC8",
+  "bgDecorColor": "#9BE7D1",
+  "bgDecorEnabled": true,
+  "bgMotion": 0.7,
+  "bgDensity": 0.75,
+  "showDebug": false,
+  "micGain": 1.6,
+  "thHalf": 0.07,
+  "thFull": 0.2,
+  "release": 0.12,
+  "autoBlink": true
 }/*EDITMODE-END*/;
 
-const { rows: ROWS, cols: COLS } = charConfig;
-const SRC = (r, c) => charConfig.src(charConfig.sheets.eyesOpen.close, r, c);
-const BLINK_SRC = (r, c) => charConfig.src(charConfig.sheets.eyesClosed.close, r, c);
-const BORED_SRC = (r, c) => charConfig.src(charConfig.sheets.special.bored, r, c);
-const ANNOYED_SRC = (r, c) => charConfig.src(charConfig.sheets.special.annoyed, r, c);
-const RAGE_SRC = (r, c) => charConfig.src(charConfig.sheets.special.rage, r, c);
-const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#F2EEFF'];
-const AFK_MS = 60_000;
-const RAGE_CLICK_LIMIT = 10;
+const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#FDE7EF', '#EAF4FF'];
+const CHAT_PAGE = `${import.meta.env.BASE_URL}voz.html`;
 
-function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
-
-function getFrameSrc(mood, r, c) {
-  if (mood === 'bored') return BORED_SRC(r, c);
-  if (mood === 'annoyed') return ANNOYED_SRC(r, c);
-  if (mood === 'locked') return RAGE_SRC(r, c);
-  return SRC(r, c);
-}
-
-function getMoodMessage(mood) {
-  if (mood === 'bored') return 'Sigues aquí, me aburro 💤';
-  if (mood === 'locked') return 'YA DÉJAME EN PAZ PEDAZO DE #!@% AHORA REFRESCA LA PÁGINA, PASO DE #!@%';
-  return 'DEJA DE DARME CLICS 💢💢';
+function micErrorMessage(error) {
+  if (error?.message === 'MIC_UNSUPPORTED') return 'Este navegador no permite usar el microfono aqui.';
+  if (error?.message === 'AUDIO_CONTEXT_UNSUPPORTED') return 'Este navegador no soporta AudioContext.';
+  if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
+    return 'Permiso de microfono denegado. Revisa los permisos del navegador.';
+  }
+  return 'No se puede usar el microfono ahora.';
 }
 
 function App() {
-  const [t, setTweak] = useAjustes(TWEAK_DEFAULTS);
-  const [cell, setCell] = useState({ r: 2, c: 2 });
-  const [pressed, setPressed] = useState(false);
-  const [blink, setBlink] = useState(false);
-  const [mood, setMood] = useState('normal');
-  const [clickCount, setClickCount] = useState(0);
-  const stageRef = useRef(null);
-  const charRef = useRef(null);
-  const target = useRef({ x: 0, y: 0 });
-  const current = useRef({ x: 0, y: 0 });
-  const tweaksRef = useRef(t);
-  const moodRef = useRef(mood);
-  tweaksRef.current = t;
-  moodRef.current = mood;
+  const [t, setTweak] = useAjustes(SIMPLE_DEFAULTS);
+  const [micOn, setMicOn] = React.useState(false);
+  const [fileName, setFileName] = React.useState('');
+  const [audioMessage, setAudioMessage] = React.useState('');
+  const [audioError, setAudioError] = React.useState('');
+  const [mood, setMood] = React.useState('normal');
+  const audioElRef = React.useRef(null);
+  const fileUrlRef = React.useRef('');
+  const engine = React.useMemo(() => createAudioEngine(), []);
+  const getLevel = React.useCallback(() => engine.level(), [engine]);
+  const { level, mouth } = useAudioMouthSync({
+    getLevel,
+    enabled: true,
+    gain: t.micGain,
+    halfThreshold: t.thHalf,
+    fullThreshold: t.thFull,
+    release: t.release,
+  });
 
-  useEffect(() => {
-    function onMove(e) {
-      const el = charRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.45;
-      const range = tweaksRef.current.followRange;
-      target.current.x = clamp((e.clientX - cx) / range, -1, 1);
-      target.current.y = clamp((e.clientY - cy) / range, -1, 1);
+  React.useEffect(() => () => {
+    engine.destroy();
+    if (fileUrlRef.current) URL.revokeObjectURL(fileUrlRef.current);
+  }, [engine]);
+
+  async function startMic() {
+    setAudioError('');
+    try {
+      await engine.startMic();
+      setMicOn(true);
+      setAudioMessage('Microfono activo');
+    } catch (error) {
+      setMicOn(false);
+      setAudioError(micErrorMessage(error));
     }
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerdown', onMove);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onMove);
-    };
-  }, []);
+  }
 
-  useEffect(() => {
-    let timer;
-    function resetAfk() {
-      clearTimeout(timer);
-      if (moodRef.current === 'locked') return;
-      if (moodRef.current === 'bored') setMood('normal');
-      timer = setTimeout(() => {
-        if (moodRef.current === 'normal') setMood('bored');
-      }, AFK_MS);
+  function stopMic() {
+    engine.stopMic();
+    setMicOn(false);
+    setAudioMessage('Microfono detenido');
+  }
+
+  async function onFilePick(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setAudioError('');
+    if (!file.type.startsWith('audio/')) {
+      setFileName('');
+      setAudioError('Archivo invalido. Elige un archivo de audio.');
+      return;
     }
 
-    const events = ['keydown'];
-    for (const eventName of events) window.addEventListener(eventName, resetAfk, { passive: true });
-    resetAfk();
-    return () => {
-      clearTimeout(timer);
-      for (const eventName of events) window.removeEventListener(eventName, resetAfk);
-    };
-  }, []);
+    const element = audioElRef.current;
+    if (!element) return;
 
-  useEffect(() => {
-    let raf;
-    let last = { r: 2, c: 2 };
-    function tick() {
-      const k = tweaksRef.current.smoothing;
-      current.current.x += (target.current.x - current.current.x) * k;
-      current.current.y += (target.current.y - current.current.y) * k;
-      const c = clamp(Math.round((current.current.x + 1) / 2 * (COLS - 1)), 0, COLS - 1);
-      const r = clamp(Math.round((current.current.y + 1) / 2 * (ROWS - 1)), 0, ROWS - 1);
-      if (r !== last.r || c !== last.c) {
-        last = { r, c };
-        setCell(last);
-      }
-      raf = requestAnimationFrame(tick);
+    try {
+      engine.attachAudioElement(element);
+      await engine.resume();
+      if (fileUrlRef.current) URL.revokeObjectURL(fileUrlRef.current);
+      const url = URL.createObjectURL(file);
+      fileUrlRef.current = url;
+      element.src = url;
+      setFileName(file.name);
+      setAudioMessage('Archivo de audio cargado');
+      await element.play();
+    } catch (error) {
+      setAudioMessage('Archivo listo para reproducir');
     }
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+  }
 
-  useEffect(() => {
-    let alive = true;
-    let timer;
-    const rand = (a, b) => a + Math.random() * (b - a);
-    function blinkOnce(dur, after) {
-      setBlink(true);
-      timer = setTimeout(() => {
-        if (!alive) return;
-        setBlink(false);
-        timer = setTimeout(after, rand(120, 220));
-      }, dur);
-    }
-    function doBlink() {
-      if (!alive) return;
-      const roll = Math.random();
-      if (roll < 0.22) {
-        blinkOnce(rand(80, 120), () => { if (alive) blinkOnce(rand(70, 110), schedule); });
-      } else if (roll < 0.28) {
-        blinkOnce(rand(260, 420), schedule);
-      } else {
-        blinkOnce(rand(90, 150), schedule);
-      }
-    }
-    function schedule() {
-      if (!alive) return;
-      const u = Math.random();
-      let wait;
-      if (u < 0.12) wait = rand(700, 1500);
-      else if (u < 0.82) wait = rand(1800, 4500);
-      else wait = rand(4500, 9000);
-      timer = setTimeout(doBlink, wait);
-    }
-    schedule();
-    return () => { alive = false; clearTimeout(timer); };
-  }, []);
-
-  const frames = useMemo(() => {
-    const arr = [];
-    for (let r = 0; r < ROWS; r += 1) for (let c = 0; c < COLS; c += 1) arr.push({ r, c });
-    return arr;
-  }, []);
-
+  const listening = micOn || level > 0.04;
   const locked = mood === 'locked';
-  const inkColor = 'rgba(60,48,38,0.8)';
 
   return (
-    <div
-      ref={stageRef}
+    <main
+      className="page simple-page"
+      data-decor={t.bgDecorEnabled ? 'on' : 'off'}
       style={{
-        position: 'fixed', inset: 0, background: t.bgColor,
-        overflow: 'hidden', transition: 'background 0.4s ease',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexDirection: 'column', cursor: locked ? 'not-allowed' : 'crosshair',
-        fontFamily: "'Zen Maru Gothic', sans-serif"
+        '--page-bg': t.bgColor,
+        '--page-bg-soft': t.bgSoftColor,
+        '--page-accent': t.bgAccentColor,
+        '--page-decor': t.bgDecorColor,
+        '--decor-motion': t.bgMotion,
+        '--decor-density': t.bgDensity,
+        '--decor-speed': `${18 - (t.bgMotion * 10)}s`,
+        '--decor-speed-slow': `${24 - (t.bgMotion * 12)}s`,
       }}
     >
-      <div
-        ref={charRef}
-        onPointerDown={() => {
-          if (locked) return;
-          setPressed(true);
-          setClickCount((count) => {
-            const next = count + 1;
-            setMood(next >= RAGE_CLICK_LIMIT ? 'locked' : 'annoyed');
-            return next;
-          });
-        }}
-        onPointerUp={() => setPressed(false)}
-        onPointerLeave={() => setPressed(false)}
-        className="bob"
-        style={{
-          position: 'relative',
-          width: `${t.charSize * 4 / 3}vmin`, height: `${t.charSize * 4 / 3}vmin`,
-          maxWidth: 1200, maxHeight: 1200,
-          transform: pressed && !locked ? 'scale(0.94)' : 'scale(1)',
-          transition: 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          userSelect: 'none', touchAction: 'none'
-        }}
-      >
-        {frames.map(({ r, c }) => (
-          <img
-            key={`${r}-${c}`}
-            src={getFrameSrc(mood, r, c)}
-            alt=""
-            draggable="false"
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              opacity: r === cell.r && c === cell.c ? 1 : 0,
-              pointerEvents: 'none'
-            }}
-          ></img>
-        ))}
-        {blink && mood === 'normal' ? (
-          <img
-            src={BLINK_SRC(cell.r, cell.c)}
-            alt=""
-            draggable="false"
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              pointerEvents: 'none'
-            }}
-          ></img>
-        ) : null}
+      <div className="anime-bg" aria-hidden="true">
+        <div className="anime-bg__blob anime-bg__blob--pink" />
+        <div className="anime-bg__blob anime-bg__blob--mint" />
+        <div className="anime-bg__cloud anime-bg__cloud--one" />
+        <div className="anime-bg__cloud anime-bg__cloud--two" />
+        <div className="anime-bg__sticker anime-bg__sticker--star" />
+        <div className="anime-bg__sticker anime-bg__sticker--flower" />
+        <div className="anime-bg__petal anime-bg__petal--one" />
+        <div className="anime-bg__petal anime-bg__petal--two" />
+        <div className="anime-bg__petal anime-bg__petal--three" />
       </div>
-
-      {mood !== 'normal' ? (
-        <div style={{
-          position: 'absolute', top: '8vh', left: '50%', transform: 'translateX(-50%)',
-          display: 'grid', justifyItems: 'center', gap: 12, zIndex: 3
-        }}>
-          <div style={{
-            maxWidth: 'min(78vw, 460px)', padding: '14px 18px',
-            border: '3px solid rgba(60,48,38,0.9)', borderRadius: 18,
-            background: 'rgba(255,255,255,0.88)', color: inkColor,
-            boxShadow: '7px 8px 0 rgba(158,59,59,0.18)',
-            fontWeight: 700, textAlign: 'center', letterSpacing: '0.04em'
-          }}>{getMoodMessage(mood)}</div>
-          {mood === 'annoyed' ? (
-            <button
-              type="button"
-              onClick={() => {
-                setMood('normal');
-                setClickCount(0);
-              }}
-              style={{
-                appearance: 'none', border: '3px solid rgba(60,48,38,0.9)',
-                borderRadius: 999, padding: '10px 18px', background: '#fff',
-                color: '#9E3B3B', font: 'inherit', fontWeight: 700,
-                boxShadow: '5px 6px 0 rgba(234,123,123,0.45)', cursor: 'pointer'
-              }}
-            >LO SIENTO</button>
-          ) : null}
-        </div>
-      ) : null}
-
-      <a href={locked ? undefined : 'voz.html'} aria-disabled={locked} style={{
-        position: 'absolute', bottom: '4.5vh', left: '50%',
-        transform: 'translateX(-50%)', minHeight: 44,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        padding: '10px 18px', border: '3px solid rgba(60,48,38,0.9)',
-        borderRadius: 999, background: locked ? '#8b7a7a' : '#D25353', color: '#fff',
-        textDecoration: 'none', fontSize: 15, fontWeight: 700,
-        letterSpacing: '0.04em', boxShadow: '6px 7px 0 rgba(158,59,59,0.72)',
-        opacity: locked ? 0.62 : 1,
-        pointerEvents: locked ? 'none' : 'auto'
-      }}>Conversar con Aru</a>
-
-      {t.showDebug ? (
-        <div style={{
-          position: 'absolute', top: 16, left: 16,
-          background: 'rgba(0,0,0,0.55)', color: '#fff', borderRadius: 10,
-          padding: '10px 12px', fontSize: 12, fontFamily: 'ui-monospace, monospace',
-          pointerEvents: 'none', lineHeight: 1.5
-        }}>
-          <div>row {cell.r} / col {cell.c}</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 14px)', gap: 3, marginTop: 6 }}>
-            {frames.map(({ r, c }) => (
-              <div key={`d${r}-${c}`} style={{
-                width: 14, height: 14, borderRadius: 3,
-                background: r === cell.r && c === cell.c ? '#FFB13D' : 'rgba(255,255,255,0.22)'
-              }}></div>
-            ))}
+      <header className="topbar">
+        <div className="brand-lockup">
+          <div className="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <h1 className="brand-title">Aru</h1>
+            <p className="brand-subtitle">Modo avatar</p>
           </div>
         </div>
-      ) : null}
+        <a className="nav-link nav-link--primary" href={locked ? undefined : CHAT_PAGE} aria-disabled={locked}>
+          Conversar con Aru
+        </a>
+      </header>
+
+      <section className="simple-main" aria-label="Avatar y controles de Aru">
+        <div className="avatar-stage">
+          <AruAvatar
+            mode="simple"
+            className="simple-avatar"
+            enableAudioMouthSync
+            audioLevel={level}
+            mouth={mouth}
+            charSize={t.charSize}
+            followRange={t.followRange}
+            smoothing={t.smoothing}
+            showDebug={t.showDebug}
+            moodEnabled
+            autoBlink={t.autoBlink}
+            onMoodChange={setMood}
+          />
+        </div>
+
+        <aside className="simple-panel" aria-label="Controles de voz de Aru">
+          <div>
+            <h2 className="panel-title">Aru esta {listening ? 'escuchando' : 'lista'}</h2>
+            <p className="panel-copy">Tu companera chibi reacciona a voz, audio y movimiento.</p>
+          </div>
+
+          <div className="status-grid" aria-live="polite">
+            <div className="status-card status-card--mic">
+              <span className="status-label">Microfono</span>
+              <span className="status-value">{micOn ? 'Activo' : 'Inactivo'}</span>
+            </div>
+            <div className="status-card status-card--audio">
+              <span className="status-label">Audio</span>
+              <span className="status-value">{fileName || 'Sin archivo'}</span>
+            </div>
+            <div className="status-card status-card--mouth">
+              <span className="status-label">Boca</span>
+              <span className="status-value">{mouthLabel(mouth)}</span>
+            </div>
+            <div className="status-card status-card--mood">
+              <span className="status-label">Estado</span>
+              <span className="status-value">{audioMessage || (listening ? 'Aru esta escuchando' : 'En espera')}</span>
+            </div>
+          </div>
+
+          <div className="voice-controls">
+            <div className="control-row">
+              <button type="button" className="primary-button" onClick={startMic} disabled={micOn || locked}
+                aria-label="Iniciar microfono de Aru">
+                <span className="button-icon button-icon--mic" aria-hidden="true" />
+                Iniciar microfono
+              </button>
+              <button type="button" className="soft-button" onClick={stopMic} disabled={!micOn}
+                aria-label="Detener microfono de Aru">
+                <span className="button-icon button-icon--stop" aria-hidden="true" />
+                Detener microfono
+              </button>
+            </div>
+
+            <label className="file-button">
+              <span className="button-icon button-icon--audio" aria-hidden="true" />
+              Cargar archivo de audio
+              <input className="file-input" type="file" accept="audio/*" onChange={onFilePick} />
+            </label>
+
+            <div className="audio-meter" aria-label={`Boca ${mouthLabel(mouth)}`}>
+              <div className="meter-header">
+                <span>Volumen</span>
+                <span>{mouthLabel(mouth)}</span>
+              </div>
+              <div className="meter-track">
+                <div className="meter-fill" style={{ '--meter-level': level }} />
+              </div>
+            </div>
+
+            <audio
+              ref={audioElRef}
+              className="audio-player"
+              controls={Boolean(fileName)}
+              hidden={!fileName}
+              onPlay={() => engine.resume()}
+            />
+          </div>
+
+          {audioError ? <p className="error-note" role="alert">{audioError}</p> : null}
+        </aside>
+      </section>
 
       {!locked ? (
-        <PanelAjustes>
-          <TweakSection label="Movimiento"></TweakSection>
+        <PanelAjustes title="Ajustes de Aru">
+          <TweakSection label="Boca" />
+          <TweakSlider label="Sensibilidad del microfono" value={t.micGain} min={0.3} max={5} step={0.1}
+            onChange={(value) => setTweak('micGain', value)} />
+          <TweakSlider label="Umbral semiabierta" value={t.thHalf} min={0.01} max={0.3} step={0.005}
+            onChange={(value) => setTweak('thHalf', value)} />
+          <TweakSlider label="Umbral abierta" value={t.thFull} min={0.05} max={0.4} step={0.005}
+            onChange={(value) => setTweak('thFull', value)} />
+          <TweakSlider label="Velocidad de cierre" value={t.release} min={0.03} max={0.4} step={0.01}
+            onChange={(value) => setTweak('release', value)} />
+          <TweakToggle label="Parpadeo automatico" value={t.autoBlink}
+            onChange={(value) => setTweak('autoBlink', value)} />
+          <TweakSection label="Movimiento" />
           <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
-            onChange={(v) => setTweak('followRange', v)}></TweakSlider>
+            onChange={(value) => setTweak('followRange', value)} />
           <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
-            onChange={(v) => setTweak('smoothing', v)}></TweakSlider>
-          <TweakSection label="Apariencia"></TweakSection>
-          <TweakColor label="Color de fondo" value={t.bgColor} options={BG_OPTIONS}
-            onChange={(v) => setTweak('bgColor', v)}></TweakColor>
-          <TweakSlider label="Tamaño del personaje" value={t.charSize} min={30} max={92} unit="vmin"
-            onChange={(v) => setTweak('charSize', v)}></TweakSlider>
-          <TweakSection label="Depuración"></TweakSection>
-          <TweakToggle label="Mostrar cuadrícula" value={t.showDebug}
-            onChange={(v) => setTweak('showDebug', v)}></TweakToggle>
+            onChange={(value) => setTweak('smoothing', value)} />
+          <TweakSection label="Apariencia" />
+          <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
+            onChange={(value) => setTweak('charSize', value)} />
+          <TweakSection label="Fondo y ambiente" />
+          <TweakColor label="Color base" value={t.bgColor} options={BG_OPTIONS}
+            onChange={(value) => setTweak('bgColor', value)} />
+          <TweakColor label="Color secundario" value={t.bgSoftColor}
+            onChange={(value) => setTweak('bgSoftColor', value)} />
+          <TweakColor label="Color acento" value={t.bgAccentColor}
+            onChange={(value) => setTweak('bgAccentColor', value)} />
+          <TweakColor label="Color decoracion" value={t.bgDecorColor}
+            onChange={(value) => setTweak('bgDecorColor', value)} />
+          <TweakToggle label="Decoraciones del fondo" value={t.bgDecorEnabled}
+            onChange={(value) => setTweak('bgDecorEnabled', value)} />
+          <TweakSlider label="Intensidad de animacion" value={t.bgMotion} min={0} max={1} step={0.05}
+            onChange={(value) => setTweak('bgMotion', value)} />
+          <TweakSlider label="Densidad decorativa" value={t.bgDensity} min={0.25} max={1} step={0.05}
+            onChange={(value) => setTweak('bgDensity', value)} />
+          <TweakSection label="Depuracion" />
+          <TweakToggle label="Mostrar cuadricula" value={t.showDebug}
+            onChange={(value) => setTweak('showDebug', value)} />
         </PanelAjustes>
       ) : null}
-    </div>
+    </main>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App></App>);
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);

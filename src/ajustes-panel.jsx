@@ -16,14 +16,19 @@ import React from 'react';
 /* END USAGE */
 
 const __TWEAKS_STYLE = `
-  .twk-fab{position:fixed;right:16px;bottom:16px;z-index:2147483646;
-    appearance:none;border:0;border-radius:999px;padding:10px 14px;
-    background:rgba(41,38,27,.86);color:#fff;
-    -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
-    box-shadow:0 10px 30px rgba(0,0,0,.22),0 1px 0 rgba(255,255,255,.2) inset;
-    font:12px/1 ui-sans-serif,system-ui,-apple-system,sans-serif;font-weight:700;
-    letter-spacing:.01em;cursor:pointer}
-  .twk-fab:hover{background:rgba(41,38,27,.94)}
+  .twk-fab{position:fixed;right:18px;bottom:18px;z-index:2147483646;
+    appearance:none;border:2px solid rgba(59,43,50,.72);border-radius:999px;padding:12px 17px 12px 38px;
+    background:linear-gradient(135deg,rgba(255,250,244,.94),rgba(255,232,241,.92));color:#3b2b32;
+    -webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);
+    box-shadow:5px 6px 0 rgba(255,159,200,.26),0 14px 32px rgba(120,80,110,.18),0 1px 0 rgba(255,255,255,.55) inset;
+    font:13px/1 ui-sans-serif,system-ui,-apple-system,sans-serif;font-weight:850;
+    letter-spacing:.01em;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+  .twk-fab:before{content:"";position:absolute;left:15px;top:50%;width:14px;height:14px;
+    border:2px solid currentColor;border-radius:50%;transform:translateY(-50%)}
+  .twk-fab:after{content:"";position:absolute;left:20px;top:50%;width:4px;height:4px;
+    border-radius:50%;background:currentColor;transform:translateY(-50%)}
+  .twk-fab:hover{filter:saturate(1.08);transform:translateY(-2px);
+    box-shadow:7px 8px 0 rgba(255,159,200,.28),0 18px 36px rgba(120,80,110,.2),0 1px 0 rgba(255,255,255,.55) inset}
   .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
     max-height:calc(100vh - 32px);display:flex;flex-direction:column;
     transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;

@@ -2,6 +2,10 @@
 
 Aplicacion web de avatar para **Aru**. El personaje sigue el mouse en 25 direcciones, parpadea automaticamente y puede mover la boca segun el microfono o un archivo de audio.
 
+`simple.html` es el avatar interactivo principal con microfono, audio, ajustes y estados visuales.
+
+`voz.html` funciona como una guia local tipo FAQ sobre Kendall: responde desde datos estaticos del frontend, usa navegacion guiada y busqueda local, y no requiere backend, claves, variables de entorno ni servicios externos.
+
 ## Instalacion
 
 Requisitos:
@@ -46,7 +50,18 @@ http://localhost:5173/voz.html
 http://localhost:5173/simple.html
 ```
 
-`index.html` redirige automaticamente a la version con voz.
+`index.html` redirige automaticamente a la guia local.
+
+## Modo Local De Voz
+
+La pantalla `voz.html` no usa backend ni llamadas externas de chat. La informacion vive en:
+
+```text
+src/data/aru-guided-flow.js
+src/data/kendall-profile.md
+```
+
+La busqueda libre de `voz.html` es una busqueda local sobre esos datos. No se necesita `.env`, no se configura ninguna URL remota y no se suben claves al repositorio.
 
 ## Build
 
@@ -71,6 +86,13 @@ El build usa base path `/Aru/`, listo para GitHub Pages con este repositorio.
 |-- src/
 |   |-- app.jsx
 |   |-- talk-app.jsx
+|   |-- components/
+|   |-- hooks/
+|   |-- lib/
+|   |-- styles/
+|   |-- data/
+|   |   |-- aru-guided-flow.js
+|   |   `-- kendall-profile.md
 |   |-- ajustes-panel.jsx
 |   `-- character-config.js
 |-- public/

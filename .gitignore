@@ -10,8 +10,12 @@ __pycache__/
 *.pyc
 node_modules/
 dist/
+.env
+.env.*
+.dev.vars
 public/*
 !public/slices2/
 !public/slices2/**
 .DS_Store
 Thumbs.db
+.codex-*.log

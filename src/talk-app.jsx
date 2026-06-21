@@ -1,362 +1,456 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import charConfig from './character-config';
+import AruAvatar from './components/AruAvatar';
+import { useAruExpressionController } from './hooks/useAruExpressionController';
+import { ARU_EXPRESSION_PRIORITY } from './lib/aru-expression-map';
+import {
+  clearConversation as clearStoredConversation,
+  clearVisitorMemory,
+  getConversation,
+  getVisitorMemory,
+  rememberVisitorFromText,
+  saveConversation,
+  saveVisitorMemory,
+} from './lib/aru-memory-store';
+import {
+  getGuidedNode,
+  HOME_NODE_ID,
+  NOT_FOUND_NODE_ID,
+  searchGuidedFlow,
+} from './data/aru-guided-flow';
+import './styles/aru-pages.css';
+import './styles/voz-page.css';
 
-const { useState, useEffect, useRef, useMemo } = React;
-
-const TALK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "followRange": 340,
-  "smoothing": 0.3,
-  "charSize": 64,
-  "bgColor": "#FFEAD3",
-  "micGain": 1.6,
-  "thHalf": 0.07,
-  "thFull": 0.2,
-  "release": 0.12,
-  "autoBlink": true
-}/*EDITMODE-END*/;
-
-const { rows: ROWS, cols: COLS } = charConfig;
 const SIMPLE_PAGE = `${import.meta.env.BASE_URL}simple.html`;
-// Hojas: ojos abiertos x boca [cerrada/media/abierta] = A/B/C, ojos cerrados x boca [cerrada/media/abierta] = D/E/F.
-const SHEETS = [
-  charConfig.sheets.eyesOpen.close,   // A
-  charConfig.sheets.eyesOpen.half,    // B
-  charConfig.sheets.eyesOpen.open,    // C
-  charConfig.sheets.eyesClosed.close, // D
-  charConfig.sheets.eyesClosed.half,  // E
-  charConfig.sheets.eyesClosed.open,  // F
-];
-const sheetFor = (eyesClosed, mouth) => SHEETS[(eyesClosed ? 3 : 0) + mouth];
-const SRC = (sheet, r, c) => charConfig.src(sheet, r, c);
-function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
 
-function goToSimplePage(event) {
-  if (event) event.preventDefault();
-  window.location.href = SIMPLE_PAGE;
-}
-
-// ---- Motor de audio ----
-function makeAudioEngine() {
-  const st = {
-    ctx: null, micAnalyser: null, micStream: null,
-    fileAnalyser: null, fileSourceMade: false, buf: null
-  };
-  function ctx() {
-    if (!st.ctx) st.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    return st.ctx;
-  }
-  function levelOf(analyser) {
-    if (!analyser) return 0;
-    if (!st.buf || st.buf.length !== analyser.fftSize) st.buf = new Float32Array(analyser.fftSize);
-    analyser.getFloatTimeDomainData(st.buf);
-    let sum = 0;
-    for (let i = 0; i < st.buf.length; i++) sum += st.buf[i] * st.buf[i];
-    return Math.sqrt(sum / st.buf.length);
-  }
+function createMessage(role, content, meta = {}) {
   return {
-    async startMic() {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const c = ctx();
-      await c.resume();
-      const src = c.createMediaStreamSource(stream);
-      const an = c.createAnalyser();
-      an.fftSize = 1024;
-      src.connect(an);
-      st.micStream = stream;
-      st.micAnalyser = an;
-    },
-    stopMic() {
-      if (st.micStream) st.micStream.getTracks().forEach((t) => t.stop());
-      st.micStream = null;
-      st.micAnalyser = null;
-    },
-    attachAudioEl(el) {
-      if (st.fileSourceMade) return;
-      const c = ctx();
-      const src = c.createMediaElementSource(el);
-      const an = c.createAnalyser();
-      an.fftSize = 1024;
-      src.connect(an);
-      an.connect(c.destination);
-      st.fileAnalyser = an;
-      st.fileSourceMade = true;
-    },
-    resume() { if (st.ctx) st.ctx.resume(); },
-    level() { return Math.max(levelOf(st.micAnalyser), levelOf(st.fileAnalyser)); },
-    micOn() { return !!st.micAnalyser; }
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    role,
+    content,
+    createdAt: new Date().toISOString(),
+    ...meta,
   };
 }
 
-function App() {
-  const [t, setTweak] = useAjustes(TALK_DEFAULTS);
-  const [cell, setCell] = useState({ r: 2, c: 2 });
-  const [mouth, setMouth] = useState(0);        // 0: cerrada, 1: media, 2: abierta
-  const [blink, setBlink] = useState(false);
-  const [micOn, setMicOn] = useState(false);
-  const [micErr, setMicErr] = useState('');
-  const [fileName, setFileName] = useState('');
+function expressionForNode(node) {
+  if (!node) return 'A';
+  if (node.id === HOME_NODE_ID) return 'G';
+  if (node.id === NOT_FOUND_NODE_ID || node.id === 'free_question') return 'H';
+  if (node.id === 'projects' || node.id.startsWith('project_')) return 'C';
+  if (node.id === 'skills') return 'B';
+  if (node.id === 'experience') return 'A';
+  if (node.id === 'certifications') return 'G';
+  if (node.id === 'contact') return 'B';
+  return node.expression || 'G';
+}
 
-  const charRef = useRef(null);
-  const audioElRef = useRef(null);
-  const meterRef = useRef(null);
-  const engine = useMemo(() => makeAudioEngine(), []);
-  const target = useRef({ x: 0, y: 0 });
-  const current = useRef({ x: 0, y: 0 });
-  const env = useRef(0);
-  const tweaksRef = useRef(t);
-  tweaksRef.current = t;
+function createNodeMessage(nodeId) {
+  const node = getGuidedNode(nodeId);
+  return createMessage('assistant', node.message, {
+    nodeId: node.id,
+    emotion: node.emotion,
+    expression: expressionForNode(node),
+  });
+}
 
-  // Seguimiento del mouse.
-  useEffect(() => {
-    function onMove(e) {
-      const el = charRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.45;
-      const range = tweaksRef.current.followRange;
-      target.current.x = clamp((e.clientX - cx) / range, -1, 1);
-      target.current.y = clamp((e.clientY - cy) / range, -1, 1);
-    }
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerdown', onMove);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onMove);
-    };
-  }, []);
+function initialMessages() {
+  return [createNodeMessage(HOME_NODE_ID)];
+}
 
-  // Bucle principal: seguimiento + nivel de audio -> estado de la boca.
-  useEffect(() => {
-    let raf;
-    let last = { r: 2, c: 2 };
-    let lastMouth = 0;
-    let lastSwitch = 0;
-    function tick(now) {
-      const tw = tweaksRef.current;
-      current.current.x += (target.current.x - current.current.x) * tw.smoothing;
-      current.current.y += (target.current.y - current.current.y) * tw.smoothing;
-      const c = clamp(Math.round((current.current.x + 1) / 2 * (COLS - 1)), 0, COLS - 1);
-      const r = clamp(Math.round((current.current.y + 1) / 2 * (ROWS - 1)), 0, ROWS - 1);
-      if (r !== last.r || c !== last.c) { last = { r, c }; setCell(last); }
-      const raw = engine.level() * tw.micGain;
-      if (raw > env.current) env.current += (raw - env.current) * 0.6;
-      else env.current += (raw - env.current) * tw.release;
-      if (meterRef.current) {
-        meterRef.current.style.width = `${clamp(env.current / 0.4, 0, 1) * 100}%`;
-      }
-      const lv = env.current;
-      const m = lv >= tw.thFull ? 2 : lv >= tw.thHalf ? 1 : 0;
-      if (m !== lastMouth && now - lastSwitch > 70) {
-        lastMouth = m; lastSwitch = now; setMouth(m);
-      }
-      raf = requestAnimationFrame(tick);
-    }
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [engine]);
+function loadMessages() {
+  const stored = getConversation();
+  return stored.length ? stored : initialMessages();
+}
 
-  // Parpadeo automatico con variacion natural.
-  useEffect(() => {
-    if (!t.autoBlink) { setBlink(false); return; }
-    let alive = true;
-    let timer;
-    const rand = (a, b) => a + Math.random() * (b - a);
-    function blinkOnce(dur, after) {
-      setBlink(true);
-      timer = setTimeout(() => {
-        if (!alive) return;
-        setBlink(false);
-        timer = setTimeout(after, rand(120, 220));
-      }, dur);
-    }
-    function doBlink() {
-      if (!alive) return;
-      const roll = Math.random();
-      if (roll < 0.22) {
-        // Doble parpadeo.
-        blinkOnce(rand(80, 120), () => { if (alive) blinkOnce(rand(70, 110), schedule); });
-      } else if (roll < 0.28) {
-        // Parpadeo lento.
-        blinkOnce(rand(260, 420), schedule);
-      } else {
-        blinkOnce(rand(90, 150), schedule);
-      }
-    }
-    function schedule() {
-      if (!alive) return;
-      const u = Math.random();
-      let wait;
-      if (u < 0.12) wait = rand(700, 1500);        // A veces parpadea de nuevo rapido.
-      else if (u < 0.82) wait = rand(1800, 4500);  // Intervalo normal.
-      else wait = rand(4500, 9000);                // Intervalo largo en reposo.
-      timer = setTimeout(doBlink, wait);
-    }
-    schedule();
-    return () => { alive = false; clearTimeout(timer); };
-  }, [t.autoBlink]);
+function lastAssistantNodeId(messages) {
+  return [...messages].reverse().find((message) => message.role === 'assistant' && message.nodeId)?.nodeId || HOME_NODE_ID;
+}
 
-  async function toggleMic() {
-    setMicErr('');
-    if (micOn) { engine.stopMic(); setMicOn(false); return; }
-    try {
-      await engine.startMic();
-      setMicOn(true);
-    } catch (e) {
-      setMicErr('No se puede usar el microfono. Revisa los permisos.');
-    }
+function previousAssistantNodeId(messages) {
+  const assistantNodes = messages
+    .filter((message) => message.role === 'assistant' && message.nodeId)
+    .map((message) => message.nodeId);
+  const current = assistantNodes[assistantNodes.length - 1];
+
+  for (let index = assistantNodes.length - 2; index >= 0; index -= 1) {
+    if (assistantNodes[index] !== current) return assistantNodes[index];
   }
 
-  function onFilePick(e) {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-    const el = audioElRef.current;
-    engine.attachAudioEl(el);
-    engine.resume();
-    el.src = URL.createObjectURL(f);
-    el.play().catch(() => {});
-    setFileName(f.name);
+  return null;
+}
+
+function latestAssistantIndex(messages) {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    if (messages[index].role === 'assistant') return index;
   }
 
-  const allFrames = useMemo(() => {
-    const arr = [];
-    for (const s of SHEETS) for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) arr.push({ s, r, c });
-    return arr;
-  }, []);
-  const activeSheet = sheetFor(blink, mouth);
+  return -1;
+}
 
-  const inkColor = 'rgba(60,48,38,0.8)';
-  const subColor = 'rgba(60,48,38,0.45)';
-  const panelBg = 'rgba(255,255,255,0.88)';
-  const lineColor = 'rgba(60,48,38,0.12)';
+function compactStatusForNode(node) {
+  if (!node) return 'Lista';
+  if (node.id === HOME_NODE_ID) return 'Lista';
+  if (node.id === NOT_FOUND_NODE_ID) return 'Sin datos';
+  if (node.id === 'free_question') return 'Busqueda';
+  if (node.id === 'about') return 'Perfil';
+  if (node.id === 'projects') return 'Proyectos';
+  if (node.id.startsWith('project_')) return 'Proyecto';
+  if (node.id === 'certifications') return 'Certificados';
+  return node.statusLabel || node.title;
+}
 
-  const sizeVmin = t.charSize * 4 / 3;
+function optionClassName(kind = 'secondary') {
+  return [
+    'flow-option',
+    kind ? `flow-option--${kind}` : '',
+  ].filter(Boolean).join(' ');
+}
+
+function optionsForNode(node, backNodeId) {
+  const options = node.options || [];
+  if (!backNodeId || node.id === HOME_NODE_ID || options.some((option) => option.next === backNodeId)) {
+    return options;
+  }
+
+  return [
+    {
+      label: `Volver a ${getGuidedNode(backNodeId).title}`,
+      next: backNodeId,
+      kind: 'backSmart',
+    },
+    ...options,
+  ];
+}
+
+function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
+  const options = isLatest ? optionsForNode(node, backNodeId) : [];
+  const isProject = node.id.startsWith('project_');
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: t.bgColor,
-      overflow: 'hidden', transition: 'background 0.4s ease',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      cursor: 'crosshair', fontFamily: "'Zen Maru Gothic', sans-serif"
-    }}>
-      <div ref={charRef} className="bob" style={{
-        position: 'relative',
-        width: `${sizeVmin}vmin`, height: `${sizeVmin}vmin`,
-        maxWidth: 1200, maxHeight: 1200,
-        userSelect: 'none', touchAction: 'none'
-      }}>
-        {allFrames.map(({ s, r, c }) => (
-          <img key={`${s}${r}${c}`} src={SRC(s, r, c)} alt="" draggable="false" style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            opacity: s === activeSheet && r === cell.r && c === cell.c ? 1 : 0,
-            pointerEvents: 'none'
-          }}></img>
-        ))}
-      </div>
-
-      <div style={{ position: 'absolute', top: '3.5vh', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none' }}>
-        <div style={{ fontSize: 'clamp(18px, 2.4vmin, 26px)', fontWeight: 700, color: inkColor, letterSpacing: '0.18em' }}>Aru</div>
-        <div style={{ fontSize: 'clamp(12px, 1.6vmin, 16px)', color: subColor, marginTop: 4, letterSpacing: '0.08em' }}>Sincroniza la boca y los parpadeos con el audio</div>
-      </div>
-
-      <div style={{
-        position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-        display: 'flex', alignItems: 'center', gap: 14,
-        background: panelBg, backdropFilter: 'blur(10px)',
-        border: `1px solid ${lineColor}`, borderRadius: 18,
-        padding: '12px 18px', cursor: 'default',
-        boxShadow: '0 6px 24px rgba(60,48,38,0.10)'
-      }}>
-        <button onClick={toggleMic} style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          fontFamily: 'inherit', fontWeight: 700, fontSize: 14,
-          color: micOn ? '#fff' : inkColor,
-          background: micOn ? '#D96C4F' : 'transparent',
-          border: `1.5px solid ${micOn ? '#D96C4F' : lineColor}`,
-          borderRadius: 12, padding: '9px 16px', cursor: 'pointer',
-          minHeight: 44
-        }}>
-          <span style={{
-            width: 9, height: 9, borderRadius: '50%',
-            background: micOn ? '#fff' : '#D96C4F',
-            animation: micOn ? 'pulse 1.2s ease-in-out infinite' : 'none'
-          }}></span>
-          {micOn ? 'Detener microfono' : 'Iniciar microfono'}
-        </button>
-
-        <label style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          fontWeight: 700, fontSize: 14, color: inkColor,
-          border: `1.5px solid ${lineColor}`, borderRadius: 12,
-          padding: '9px 16px', cursor: 'pointer', minHeight: 44, boxSizing: 'border-box'
-        }}>
-          Archivo de audio
-          <input type="file" accept="audio/*" onChange={onFilePick} style={{ display: 'none' }}></input>
-        </label>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 150 }}>
-          <div style={{ fontSize: 11, color: subColor, letterSpacing: '0.06em', display: 'flex', justifyContent: 'space-between' }}>
-            <span>Volumen</span>
-            <span>{['cerrada', 'semiabierta', 'abierta'][mouth]}</span>
-          </div>
-          <div style={{ position: 'relative', height: 10, borderRadius: 5, background: lineColor, overflow: 'hidden' }}>
-            <div ref={meterRef} style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0, width: '0%',
-              borderRadius: 5, background: 'linear-gradient(90deg, #8FBC8F, #E8B04B, #D96C4F)'
-            }}></div>
-            <div style={{ position: 'absolute', top: 0, bottom: 0, width: 2, background: inkColor, opacity: 0.5, left: `${clamp(t.thHalf / 0.4, 0, 1) * 100}%` }}></div>
-            <div style={{ position: 'absolute', top: 0, bottom: 0, width: 2, background: inkColor, opacity: 0.5, left: `${clamp(t.thFull / 0.4, 0, 1) * 100}%` }}></div>
-          </div>
+    <div className={isProject ? 'flow-card flow-card--project' : 'flow-card'}>
+      <div className="flow-card__header">
+        <span className="flow-card__kicker">{isProject ? 'Ficha de proyecto' : 'Aru responde'}</span>
+        <div className="flow-card__title-row">
+          <h3>{node.title}</h3>
+          {isProject ? <span className="flow-card__tag">Proyecto</span> : null}
         </div>
       </div>
-      {micErr ? (
-        <div style={{ position: 'absolute', bottom: 92, left: '50%', transform: 'translateX(-50%)', color: '#B3261E', fontSize: 13, fontWeight: 700 }}>{micErr}</div>
+
+      <p className="flow-card__message">{node.message}</p>
+      {node.summary ? <p className="flow-card__summary">{node.summary}</p> : null}
+
+      {node.badges?.length ? (
+        <section className="flow-feature-strip" aria-label="Tecnologias y temas">
+          <h4>{isProject ? 'Stack y enfoque' : 'Temas clave'}</h4>
+          <div className="flow-badges">
+            {node.badges.map((badge) => <span key={badge}>{badge}</span>)}
+          </div>
+        </section>
       ) : null}
-      <audio ref={audioElRef} controls style={{
-        position: 'absolute', bottom: 20, right: 20, width: 260,
-        display: fileName ? 'block' : 'none', cursor: 'default'
-      }}></audio>
 
-      <a href={SIMPLE_PAGE}
-        onPointerDown={goToSimplePage}
-        onMouseDown={goToSimplePage}
-        onClick={goToSimplePage}
-        style={{
-        position: 'fixed', top: 16, left: 16, zIndex: 1000,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minHeight: 42, padding: '0 14px',
-        fontSize: 13, fontWeight: 800,
-        color: inkColor, background: 'rgba(255,255,255,0.72)',
-        border: `1.5px solid ${lineColor}`, borderRadius: 999,
-        boxShadow: '0 6px 18px rgba(60,48,38,0.10)',
-        textDecoration: 'none', letterSpacing: '0.06em',
-        cursor: 'pointer', pointerEvents: 'auto'
-      }}>&lt;- Version simple</a>
+      {node.sections?.length ? (
+        <div className="flow-sections">
+          {node.sections.map((section) => (
+            <section key={section.title} className="flow-section">
+              <h4>{section.title}</h4>
+              {section.items?.length ? (
+                <ul>
+                  {section.items.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              ) : null}
+            </section>
+          ))}
+        </div>
+      ) : null}
 
-      <PanelAjustes>
-        <TweakSection label="Boca"></TweakSection>
-        <TweakSlider label="Sensibilidad del microfono" value={t.micGain} min={0.3} max={5} step={0.1}
-          onChange={(v) => setTweak('micGain', v)}></TweakSlider>
-        <TweakSlider label="Umbral semiabierta" value={t.thHalf} min={0.01} max={0.3} step={0.005}
-          onChange={(v) => setTweak('thHalf', v)}></TweakSlider>
-        <TweakSlider label="Umbral abierta" value={t.thFull} min={0.05} max={0.4} step={0.005}
-          onChange={(v) => setTweak('thFull', v)}></TweakSlider>
-        <TweakSlider label="Velocidad de cierre" value={t.release} min={0.03} max={0.4} step={0.01}
-          onChange={(v) => setTweak('release', v)}></TweakSlider>
-        <TweakToggle label="Parpadeo automatico" value={t.autoBlink}
-          onChange={(v) => setTweak('autoBlink', v)}></TweakToggle>
-        <TweakSection label="Movimiento"></TweakSection>
-        <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
-          onChange={(v) => setTweak('followRange', v)}></TweakSlider>
-        <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
-          onChange={(v) => setTweak('smoothing', v)}></TweakSlider>
-        <TweakSection label="Apariencia"></TweakSection>
-        <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
-          onChange={(v) => setTweak('charSize', v)}></TweakSlider>
-      </PanelAjustes>
+      {node.links?.length ? (
+        <section className="flow-link-panel" aria-label="Enlaces">
+          <h4>{isProject ? 'Enlaces destacados' : 'Enlaces'}</h4>
+          <div className="flow-links">
+            {node.links.map((link) => (
+              <a
+                key={`${link.label}-${link.url}`}
+                className="flow-link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {options.length ? (
+        <div className="flow-options" aria-label="Opciones de Aru">
+          {options.map((option) => (
+            option.url ? (
+              <a
+                key={`${option.label}-${option.url}`}
+                className={optionClassName(option.kind || 'link')}
+                href={option.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {option.label}
+              </a>
+            ) : (
+              <button
+                type="button"
+                key={`${option.label}-${option.next}`}
+                className={optionClassName(option.kind)}
+                onClick={() => onSelect(option)}
+              >
+                {option.label}
+              </button>
+            )
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App></App>);
+function App() {
+  const [messages, setMessages] = React.useState(loadMessages);
+  const [input, setInput] = React.useState('');
+  const [visitorMemory, setVisitorMemory] = React.useState(getVisitorMemory);
+  const expressionController = useAruExpressionController();
+  const messagesListRef = React.useRef(null);
+  const currentNode = getGuidedNode(lastAssistantNodeId(messages));
+  const backNodeId = previousAssistantNodeId(messages);
+  const lastAssistantIndex = latestAssistantIndex(messages);
+  const currentStatus = compactStatusForNode(currentNode);
+
+  React.useEffect(() => {
+    saveConversation(messages);
+  }, [messages]);
+
+  React.useEffect(() => {
+    saveVisitorMemory({ lastVisitAt: new Date().toISOString() });
+  }, []);
+
+  React.useEffect(() => {
+    const list = messagesListRef.current;
+    if (!list) return;
+    const latestAssistant = list.querySelector('[data-latest-assistant="true"]');
+    if (latestAssistant) {
+      latestAssistant.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      return;
+    }
+
+    list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+  }, [messages]);
+
+  function showNode(nodeId, userLabel = null) {
+    const node = getGuidedNode(nodeId);
+
+    setMessages((currentMessages) => {
+      const currentNodeId = lastAssistantNodeId(currentMessages);
+      if (currentNodeId === node.id) return currentMessages;
+
+      return [
+        ...currentMessages.filter((message) => message.role !== 'error'),
+        ...(userLabel ? [createMessage('user', userLabel)] : []),
+        createNodeMessage(node.id),
+      ];
+    });
+
+    expressionController.setTemporaryExpression(expressionForNode(node), {
+      durationMs: 6200,
+      resetToIdle: true,
+      source: 'system',
+      priority: ARU_EXPRESSION_PRIORITY.system,
+      force: true,
+    });
+  }
+
+  function selectOption(option) {
+    if (!option?.next) return;
+    showNode(option.next, option.label);
+  }
+
+  function submitContent(rawContent) {
+    const content = String(rawContent || '').trim();
+    if (!content) return;
+
+    rememberVisitorFromText(content);
+    setVisitorMemory(getVisitorMemory());
+
+    const result = searchGuidedFlow(content);
+    const node = result || getGuidedNode(NOT_FOUND_NODE_ID);
+
+    setInput('');
+    setMessages((currentMessages) => {
+      if (lastAssistantNodeId(currentMessages) === node.id) return currentMessages;
+
+      return [
+        ...currentMessages.filter((message) => message.role !== 'error'),
+        createMessage('user', content),
+        createNodeMessage(node.id),
+      ];
+    });
+    expressionController.setTemporaryExpression(expressionForNode(node), {
+      durationMs: result ? 6200 : 6800,
+      resetToIdle: true,
+      source: result ? 'system' : 'error',
+      priority: result ? ARU_EXPRESSION_PRIORITY.system : ARU_EXPRESSION_PRIORITY.error,
+      force: true,
+    });
+  }
+
+  function submitMessage(event) {
+    event?.preventDefault();
+    submitContent(input);
+  }
+
+  function startNewConversation() {
+    clearStoredConversation();
+    setMessages(initialMessages());
+    setInput('');
+    expressionController.resetToIdle();
+  }
+
+  function clearLocalMemory() {
+    clearVisitorMemory();
+    setVisitorMemory({});
+    startNewConversation();
+  }
+
+  return (
+    <main className="page chat-page voz-page" data-mode="guided">
+      <div className="voz-bg" aria-hidden="true">
+        <div className="voz-bg__blob voz-bg__blob--rose" />
+        <div className="voz-bg__blob voz-bg__blob--mint" />
+        <div className="voz-bg__cloud voz-bg__cloud--one" />
+        <div className="voz-bg__cloud voz-bg__cloud--two" />
+        <div className="voz-bg__spark voz-bg__spark--one" />
+        <div className="voz-bg__spark voz-bg__spark--two" />
+      </div>
+
+      <aside className="chat-avatar-panel companion-card" data-section={currentNode.id} aria-label="Aru">
+        <div className="companion-card__header">
+          <div className="brand-lockup">
+            <div className="brand-mark" aria-hidden="true">A</div>
+            <div>
+              <h1 className="brand-title">Aru</h1>
+              <p className="brand-subtitle">Guia virtual de Kendall</p>
+            </div>
+          </div>
+          <span className="companion-card__chip">{currentStatus}</span>
+        </div>
+
+        <div className="chat-avatar-wrap">
+          <div className="chat-avatar-stage" aria-hidden="true" />
+          <AruAvatar
+            mode="chat"
+            className="chat-avatar"
+            charSize={62}
+            followRange={380}
+            smoothing={0.24}
+            moodEnabled={false}
+            lookEnabled
+            autoBlink
+            expression={expressionController.overrideExpression}
+          />
+        </div>
+
+        <p className="companion-card__line">
+          Aru te guia por el perfil profesional de Kendall.
+        </p>
+
+        <div className="mini-status">
+          <div className="mini-status__item">
+            <span>Estado</span>
+            <strong>{currentStatus}</strong>
+          </div>
+          <div className="mini-status__item">
+            <span>Seccion</span>
+            <strong>{currentNode.title}</strong>
+          </div>
+          {visitorMemory.name ? (
+            <div className="mini-status__item">
+              <span>Visitante</span>
+              <strong>{visitorMemory.name}</strong>
+            </div>
+          ) : null}
+          <a className="nav-link companion-back" href={SIMPLE_PAGE}>Volver al avatar</a>
+        </div>
+      </aside>
+
+      <section className="chat-panel" aria-label="Guia con Aru">
+        <header className="chat-header">
+          <div>
+            <h2 className="chat-title">Guia con Aru</h2>
+            <p className="chat-subtitle">
+              FAQ interactivo local basado en la informacion publica de Kendall.
+            </p>
+          </div>
+          <div className="chat-header__actions">
+            <button type="button" className="soft-button chat-reset-button" onClick={startNewConversation}>
+              Nueva conversacion
+            </button>
+            <button type="button" className="soft-button chat-memory-button" onClick={clearLocalMemory}>
+              Borrar memoria local
+            </button>
+          </div>
+        </header>
+
+        <div className="chat-messages" aria-live="polite" ref={messagesListRef}>
+          {messages.map((message, index) => {
+            const node = message.nodeId ? getGuidedNode(message.nodeId) : null;
+            const isLatestAssistant = message.role === 'assistant' && index === lastAssistantIndex;
+            return (
+              <div
+                key={message.id}
+                className={`message-row message-row--${message.role}`}
+                data-latest-assistant={isLatestAssistant ? 'true' : undefined}
+              >
+                {message.role !== 'user' ? <span className="message-avatar" aria-hidden="true">A</span> : null}
+                <div className="message-bubble">
+                  {node ? (
+                    <GuidedNodeContent
+                      node={node}
+                      backNodeId={backNodeId}
+                      isLatest={isLatestAssistant}
+                      onSelect={selectOption}
+                    />
+                  ) : (
+                    <p>{message.content}</p>
+                  )}
+                </div>
+                {message.role === 'user' ? <span className="message-avatar message-avatar--user" aria-hidden="true">Tu</span> : null}
+              </div>
+            );
+          })}
+        </div>
+
+        <form className="chat-composer" onSubmit={submitMessage}>
+          <div className="composer-row">
+            <textarea
+              className="chat-input"
+              value={input}
+              rows={1}
+              placeholder="Tambien puedes buscar algo especifico sobre Kendall..."
+              aria-label="Busqueda local sobre Kendall"
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  submitMessage(event);
+                }
+              }}
+            />
+            <button type="submit" className="primary-button" disabled={!input.trim()}>
+              Buscar
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
