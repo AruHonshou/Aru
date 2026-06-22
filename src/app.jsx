@@ -36,6 +36,7 @@ const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#FDE7EF', '#EAF4FF'];
 const CHAT_PAGE = `${import.meta.env.BASE_URL}guia.html`;
+const PORTFOLIO_PAGE = 'https://aruhonshou.github.io/AruDev/';
 
 function micErrorMessage(error) {
   if (error?.message === 'MIC_UNSUPPORTED') return 'Este navegador no permite usar el micrófono aquí.';
@@ -171,9 +172,14 @@ function App() {
             <p className="brand-subtitle">Modo avatar</p>
           </div>
         </div>
-        <a className="nav-link nav-link--primary" href={locked ? undefined : CHAT_PAGE} aria-disabled={locked}>
-          💬 Conversar con Aru ✨
-        </a>
+        <nav className="topbar-actions" aria-label="Acciones principales">
+          <a className="nav-link nav-link--primary" href={locked ? undefined : CHAT_PAGE} aria-disabled={locked}>
+            💬 Hablar con Aru
+          </a>
+          <a className="nav-link nav-link--portfolio" href={PORTFOLIO_PAGE} target="_blank" rel="noopener noreferrer">
+            🌐 Ver portfolio completo
+          </a>
+        </nav>
       </header>
 
       <section className="simple-main" aria-label="Avatar y controles de Aru">

@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AruAvatar from './components/AruAvatar';
 import { useAruExpressionController } from './hooks/useAruExpressionController';
+import { useAruMotionController } from './hooks/useAruMotionController';
 import { ARU_EXPRESSION_PRIORITY } from './lib/aru-expression-map';
+import { getAruAction } from './lib/aru-actions';
 import {
   clearConversation as clearStoredConversation,
   clearVisitorMemory,
@@ -18,6 +20,7 @@ import {
   NOT_FOUND_NODE_ID,
   searchGuidedFlow,
 } from './data/aru-guided-flow';
+import { deepGuideMeta } from './data/aru-deep-knowledge';
 import './styles/aru-pages.css';
 import './styles/voz-page.css';
 
@@ -45,6 +48,7 @@ function createNodeMessage(nodeId) {
     nodeId: node.id,
     emotion: node.emotion,
     expression: expressionForNode(node),
+    action: node.action,
   });
 }
 
@@ -86,26 +90,12 @@ function compactStatusForNode(node) {
   if (!node) return 'Lista';
   if (node.id === HOME_NODE_ID) return 'Lista';
   if (node.id === NOT_FOUND_NODE_ID) return 'Sin datos';
-  if (node.id === 'free_question') return 'Búsqueda';
-  if (node.id === 'about') return 'Perfil';
-  if (node.id === 'projects') return 'Proyectos';
-  if (node.id.startsWith('project_')) return 'Proyecto';
-  if (node.id === 'certifications') return 'Certificados';
   return node.statusLabel || node.title;
 }
 
 function companionLineForNode(node) {
-  if (!node || node.id === HOME_NODE_ID) return 'Lista para ayudarte ✨';
-  if (node.id === NOT_FOUND_NODE_ID) return 'Buscando solo en la base local';
-  if (node.id === 'free_question') return 'Lista para buscar por palabras clave';
-  if (node.id === 'about') return 'Guiando el perfil de Kendall ✨';
-  if (node.id === 'projects') return 'Viendo proyectos de Kendall';
-  if (node.id.startsWith('project_')) return `Revisando ${node.title}`;
-  if (node.id === 'skills') return 'Explorando skills';
-  if (node.id === 'experience') return 'Mostrando experiencia';
-  if (node.id === 'certifications') return 'Mostrando certificaciones';
-  if (node.id === 'contact') return 'Mostrando contacto';
-  return 'Guiando el perfil de Kendall ✨';
+  if (!node || node.id === HOME_NODE_ID) return 'Aru explica lo que AruDev resume.';
+  return node.companionLine || 'Guiando el perfil de Kendall ✨';
 }
 
 function optionClassName(kind = 'secondary') {
@@ -140,17 +130,18 @@ function optionsForNode(node, backNodeId) {
   ];
 }
 
-function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
+function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAction }) {
   const options = isLatest ? optionsForNode(node, backNodeId) : [];
   const isProject = node.id.startsWith('project_');
+  const kicker = node.id === HOME_NODE_ID ? 'Aru Deep Guide' : isProject ? 'Ficha técnica guiada' : 'Aru explica';
 
   return (
     <div className={isProject ? 'flow-card flow-card--project' : 'flow-card'}>
       <div className="flow-card__header">
-        <span className="flow-card__kicker">{isProject ? 'Ficha de proyecto' : 'Aru responde'}</span>
+        <span className="flow-card__kicker">{kicker}</span>
         <div className="flow-card__title-row">
           <h3>{node.title}</h3>
-          {isProject ? <span className="flow-card__tag">Proyecto</span> : null}
+          <span className="flow-card__tag">{isProject ? 'Proyecto' : 'Guía local'}</span>
         </div>
       </div>
 
@@ -186,7 +177,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
 
       {node.links?.length ? (
         <section className="flow-link-panel" aria-label="Enlaces">
-          <h4>{isProject ? 'Enlaces destacados' : 'Enlaces'}</h4>
+          <h4>{isProject ? 'Enlaces destacados' : 'Enlaces oficiales'}</h4>
           <div className="flow-links">
             {node.links.map((link) => (
               <a
@@ -195,6 +186,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => onExternalAction?.(link.action || 'portfolio')}
               >
                 {externalLinkLabel(link)}
               </a>
@@ -216,6 +208,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
                 href={option.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => onExternalAction?.(option.action || 'portfolio')}
               >
                 {option.label}
               </a>
@@ -232,6 +225,8 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
           ))}
         </div>
       ) : null}
+
+      <p className="flow-card__source">{deepGuideMeta.sourceNote}</p>
     </div>
   );
 }
@@ -242,6 +237,7 @@ function App() {
   const [visitorMemory, setVisitorMemory] = React.useState(getVisitorMemory);
   const [avatarMood, setAvatarMood] = React.useState('normal');
   const expressionController = useAruExpressionController();
+  const motionController = useAruMotionController('idle');
   const messagesListRef = React.useRef(null);
   const currentNode = getGuidedNode(lastAssistantNodeId(messages));
   const backNodeId = previousAssistantNodeId(messages);
@@ -269,6 +265,18 @@ function App() {
     list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
+  React.useEffect(() => {
+    const action = getAruAction(currentNode.action || (currentNode.id === NOT_FOUND_NODE_ID ? 'notFound' : 'explainFocus'));
+    motionController.runAction(action.id, { force: true });
+    expressionController.setTemporaryExpression(action.expression || expressionForNode(currentNode), {
+      durationMs: action.durationMs || 2400,
+      resetToIdle: action.resetToIdle ?? true,
+      source: currentNode.id === NOT_FOUND_NODE_ID ? 'error' : 'system',
+      priority: currentNode.id === NOT_FOUND_NODE_ID ? ARU_EXPRESSION_PRIORITY.error : ARU_EXPRESSION_PRIORITY.system,
+      force: true,
+    });
+  }, [currentNode.id]);
+
   function showNode(nodeId, userLabel = null) {
     const node = getGuidedNode(nodeId);
 
@@ -281,14 +289,6 @@ function App() {
         ...(userLabel ? [createMessage('user', userLabel)] : []),
         createNodeMessage(node.id),
       ];
-    });
-
-    expressionController.setTemporaryExpression(expressionForNode(node), {
-      durationMs: 6200,
-      resetToIdle: true,
-      source: 'system',
-      priority: ARU_EXPRESSION_PRIORITY.system,
-      force: true,
     });
   }
 
@@ -317,13 +317,6 @@ function App() {
         createNodeMessage(node.id),
       ];
     });
-    expressionController.setTemporaryExpression(expressionForNode(node), {
-      durationMs: result ? 6200 : 6800,
-      resetToIdle: true,
-      source: result ? 'system' : 'error',
-      priority: result ? ARU_EXPRESSION_PRIORITY.system : ARU_EXPRESSION_PRIORITY.error,
-      force: true,
-    });
   }
 
   function submitMessage(event) {
@@ -336,6 +329,7 @@ function App() {
     setMessages(initialMessages());
     setInput('');
     expressionController.resetToIdle();
+    motionController.runAction('home', { force: true });
   }
 
   function clearLocalMemory() {
@@ -345,7 +339,12 @@ function App() {
   }
 
   return (
-    <main className="page chat-page voz-page" data-mode="guided" data-avatar-mood={avatarMood}>
+    <main
+      className="page chat-page voz-page"
+      data-mode="guided"
+      data-avatar-mood={avatarMood}
+      data-aru-action={motionController.action.id}
+    >
       <div className="voz-bg" aria-hidden="true">
         <div className="voz-bg__blob voz-bg__blob--rose" />
         <div className="voz-bg__blob voz-bg__blob--mint" />
@@ -361,7 +360,7 @@ function App() {
             <div className="brand-mark" aria-hidden="true">A</div>
             <div>
               <h1 className="brand-title">Aru</h1>
-              <p className="brand-subtitle">Guía virtual de Kendall</p>
+              <p className="brand-subtitle">PNGTuber deep guide</p>
             </div>
           </div>
           <span className="companion-card__chip">{currentStatus}</span>
@@ -380,6 +379,8 @@ function App() {
             lookEnabled
             autoBlink
             expression={expressionController.overrideExpression}
+            motion={motionController.motion}
+            actionBubble={motionController.bubble}
           />
         </div>
 
@@ -411,7 +412,7 @@ function App() {
           <div>
             <h2 className="chat-title">Guía con Aru</h2>
             <p className="chat-subtitle">
-              FAQ interactivo local basado en la información pública de Kendall.
+              Aru explica lo que AruDev resume, usando conocimiento local.
             </p>
           </div>
           <div className="chat-header__actions">
@@ -443,6 +444,7 @@ function App() {
                         backNodeId={backNodeId}
                         isLatest={isLatestAssistant}
                         onSelect={selectOption}
+                        onExternalAction={(actionId) => motionController.runAction(actionId, { force: true })}
                       />
                     ) : (
                       <p>{message.content}</p>
@@ -461,7 +463,7 @@ function App() {
               className="chat-input"
               value={input}
               rows={1}
-              placeholder="También puedes buscar algo específico sobre Kendall..."
+              placeholder="Busca en la base local de Kendall..."
               aria-label="Búsqueda local sobre Kendall"
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {

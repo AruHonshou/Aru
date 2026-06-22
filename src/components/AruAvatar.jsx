@@ -12,6 +12,7 @@ import {
   SHEETS,
 } from '../lib/aru-frames';
 import '../styles/aru-avatar.css';
+import '../styles/aru-motion.css';
 
 const RAGE_CLICK_LIMIT = 10;
 const AFK_MS = 240_000;
@@ -40,6 +41,8 @@ export default function AruAvatar({
   ariaLabel = 'Aru',
   onMoodChange,
   expression = null,
+  motion = 'idle-breathe',
+  actionBubble = null,
 }) {
   const avatarRef = React.useRef(null);
   const [pressed, setPressed] = React.useState(false);
@@ -101,6 +104,12 @@ export default function AruAvatar({
     ? SHEETS.special[mood]
     : forcedExpression || sheetForMouth({ eyesClosed: blink, mouth: enableAudioMouthSync ? mouth : 0 });
 
+  const moodMotion = mood === 'bored'
+    ? 'tired-sway'
+    : mood === 'annoyed' || mood === 'locked'
+      ? 'angry-shake'
+      : null;
+  const effectiveMotion = moodMotion || motion;
   const size = `${charSize * 4 / 3}vmin`;
   const classes = [
     'aru-avatar',
@@ -109,6 +118,7 @@ export default function AruAvatar({
     locked ? 'aru-avatar--locked' : '',
     moodEnabled && mood !== 'normal' ? `aru-avatar--mood-${mood}` : '',
     mode ? `aru-avatar--${mode}` : '',
+    effectiveMotion ? `aru-avatar--motion-${effectiveMotion}` : '',
     className,
   ].filter(Boolean).join(' ');
 
@@ -117,6 +127,7 @@ export default function AruAvatar({
       ref={avatarRef}
       className={classes}
       data-mood={mood}
+      data-motion={effectiveMotion || 'none'}
       aria-label={ariaLabel}
       role="img"
       style={{
@@ -175,6 +186,10 @@ export default function AruAvatar({
               Lo siento
             </button>
           ) : null}
+        </div>
+      ) : actionBubble ? (
+        <div className="aru-avatar__bubble aru-avatar__bubble--action">
+          <div className="aru-avatar__action-text">{actionBubble}</div>
         </div>
       ) : null}
 

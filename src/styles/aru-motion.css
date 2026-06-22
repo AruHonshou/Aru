@@ -1,0 +1,135 @@
+.aru-avatar {
+  --aru-motion-duration: 2600ms;
+}
+
+.aru-avatar__action-text {
+  position: relative;
+  max-width: 100%;
+  padding: 13px 17px 12px;
+  border: 2px solid rgba(75, 58, 48, 0.78);
+  border-radius: 26px 22px 28px 20px;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.9) 0 13%, transparent 14%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 232, 241, 0.94));
+  color: var(--aru-ink);
+  box-shadow: 7px 8px 0 rgba(255, 159, 200, 0.18), 0 16px 30px rgba(120, 80, 110, 0.16);
+  font-size: clamp(13px, 1.5vw, 16px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.aru-avatar__action-text::after {
+  position: absolute;
+  left: 28%;
+  bottom: -9px;
+  width: 16px;
+  height: 16px;
+  border-right: 2px solid rgba(75, 58, 48, 0.72);
+  border-bottom: 2px solid rgba(75, 58, 48, 0.72);
+  background: rgba(255, 242, 248, 0.96);
+  transform: translateX(-50%) rotate(45deg);
+  content: "";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .aru-avatar--motion-idle-breathe .aru-avatar__body {
+    animation: aru-motion-idle 4.8s ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-happy-bounce .aru-avatar__body {
+    animation: aru-motion-happy 900ms cubic-bezier(0.2, 1.35, 0.38, 1) both, aru-motion-idle 4.8s 900ms ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-thinking-tilt .aru-avatar__body {
+    animation: aru-motion-thinking 1200ms ease-in-out both, aru-motion-idle 5s 1200ms ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-angry-shake .aru-avatar__body {
+    animation: aru-motion-angry 520ms ease-in-out both;
+  }
+
+  .aru-avatar--motion-tired-sway .aru-avatar__body {
+    animation: aru-motion-tired 4.6s ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-selected-pop .aru-avatar__body {
+    animation: aru-motion-pop 720ms cubic-bezier(0.2, 1.4, 0.38, 1) both, aru-motion-idle 4.8s 720ms ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-talking-bounce .aru-avatar__body {
+    animation: aru-motion-talking 1100ms ease-in-out both, aru-motion-idle 4.8s 1100ms ease-in-out infinite;
+  }
+
+  .aru-avatar--motion-explain-focus .aru-avatar__body {
+    animation: aru-motion-explain 1600ms ease-in-out both, aru-motion-idle 5s 1600ms ease-in-out infinite;
+  }
+
+  .aru-avatar__action-text {
+    animation: aru-action-bubble 420ms cubic-bezier(0.2, 1.45, 0.38, 1) both;
+  }
+
+  @keyframes aru-motion-idle {
+    0%, 100% { translate: 0 0; scale: 1; }
+    50% { translate: 0 -0.9vmin; scale: 1.006; }
+  }
+
+  @keyframes aru-motion-happy {
+    0% { translate: 0 0; scale: 1; }
+    35% { translate: 0 -1.8vmin; scale: 1.025; }
+    70% { translate: 0 0.4vmin; scale: 0.994; }
+    100% { translate: 0 0; scale: 1; }
+  }
+
+  @keyframes aru-motion-thinking {
+    0%, 100% { rotate: 0deg; translate: 0 0; }
+    35% { rotate: -2.5deg; translate: -0.35vmin -0.3vmin; }
+    70% { rotate: 2deg; translate: 0.25vmin -0.1vmin; }
+  }
+
+  @keyframes aru-motion-angry {
+    0%, 100% { translate: 0 0; rotate: 0; }
+    20% { translate: -0.9vmin 0; rotate: -1.5deg; }
+    40% { translate: 0.9vmin 0; rotate: 1.5deg; }
+    60% { translate: -0.7vmin 0; rotate: -1deg; }
+    80% { translate: 0.6vmin 0; rotate: 1deg; }
+  }
+
+  @keyframes aru-motion-tired {
+    0%, 100% { translate: 0 0; rotate: -0.4deg; }
+    50% { translate: 0.3vmin 0.5vmin; rotate: 1.1deg; }
+  }
+
+  @keyframes aru-motion-pop {
+    0% { scale: 0.97; translate: 0 0.6vmin; }
+    55% { scale: 1.035; translate: 0 -0.9vmin; }
+    100% { scale: 1; translate: 0 0; }
+  }
+
+  @keyframes aru-motion-talking {
+    0%, 100% { translate: 0 0; scale: 1; }
+    25% { translate: 0 -0.8vmin; scale: 1.01; }
+    50% { translate: 0 0; scale: 1; }
+    75% { translate: 0 -0.45vmin; scale: 1.006; }
+  }
+
+  @keyframes aru-motion-explain {
+    0%, 100% { translate: 0 0; rotate: 0; }
+    35% { translate: 0 -0.65vmin; rotate: -1deg; }
+    70% { translate: 0 -0.35vmin; rotate: 0.8deg; }
+  }
+
+  @keyframes aru-action-bubble {
+    0% { opacity: 0; transform: translate(-50%, -56%) scale(0.78) rotate(-3deg); }
+    70% { opacity: 1; transform: translate(-50%, -73%) scale(1.04) rotate(1deg); }
+    100% { opacity: 1; transform: translate(-50%, -70%) scale(1) rotate(0); }
+  }
+}
+
+@media (max-width: 620px) {
+  .aru-avatar__action-text {
+    max-width: min(280px, 92vw);
+    padding: 10px 13px;
+    font-size: 12px;
+  }
+}
