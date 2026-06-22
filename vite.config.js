@@ -7,12 +7,13 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
   server: {
     host: '127.0.0.1',
-    open: '/voz.html',
+    open: '/index.html',
   },
   build: {
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
+        guia: resolve(import.meta.dirname, 'guia.html'),
         simple: resolve(import.meta.dirname, 'simple.html'),
         voz: resolve(import.meta.dirname, 'voz.html'),
       },

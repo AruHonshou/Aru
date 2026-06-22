@@ -3,7 +3,11 @@ import { join, posix } from 'node:path';
 
 const DIST = 'dist';
 const BASE = '/Aru/';
-const HTML_FILES = ['index.html', 'voz.html', 'simple.html'];
+const APP_HTML_FILES = ['index.html', 'guia.html'];
+const REDIRECT_HTML_FILES = {
+  'simple.html': 'index.html',
+  'voz.html': 'guia.html',
+};
 const SHEETS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 
 function fail(message) {
@@ -36,8 +40,17 @@ function assertBaseAssetReference(file, html) {
   }
 }
 
+function assertRedirect(file, html, target) {
+  if (!html.includes(`url=${target}`) || !html.includes(`window.location.replace('${target}')`)) {
+    fail(`${file} debe redirigir a ${target}`);
+  }
+  if (html.includes('/assets/') || html.includes('src/assets') || html.includes('src/app.jsx') || html.includes('src/talk-app.jsx')) {
+    fail(`${file} debe ser un redirect minimo sin assets ni apps React`);
+  }
+}
+
 function assertReferencedBaseAssetsExist(file, html) {
-  const attrPattern = /\b(?:src|href)="(\/aru\/[^"]+)"/g;
+  const attrPattern = /\b(?:src|href)="(\/Aru\/[^"]+)"/g;
   for (const match of html.matchAll(attrPattern)) {
     const urlPath = match[1];
     if (!urlPath.startsWith(BASE)) continue;
@@ -62,11 +75,16 @@ function assertSliceImages() {
   }
 }
 
-for (const file of HTML_FILES) {
+for (const file of APP_HTML_FILES) {
   const html = readDistHtml(file);
   assertNoRootAssetReference(file, html);
   assertReferencedBaseAssetsExist(file, html);
-  if (file !== 'index.html') assertBaseAssetReference(file, html);
+  assertBaseAssetReference(file, html);
+}
+
+for (const [file, target] of Object.entries(REDIRECT_HTML_FILES)) {
+  const html = readDistHtml(file);
+  assertRedirect(file, html, target);
 }
 
 assertSliceImages();

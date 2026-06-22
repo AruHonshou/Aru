@@ -91,8 +91,8 @@ npm run dev
 Abre:
 
 ```text
-http://localhost:5173/voz.html
-http://localhost:5173/simple.html
+http://localhost:5173/index.html
+http://localhost:5173/guia.html
 ```
 
 Verifica:

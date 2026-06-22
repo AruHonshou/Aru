@@ -21,7 +21,7 @@ import {
 import './styles/aru-pages.css';
 import './styles/voz-page.css';
 
-const SIMPLE_PAGE = `${import.meta.env.BASE_URL}simple.html`;
+const SIMPLE_PAGE = `${import.meta.env.BASE_URL}index.html`;
 
 function createMessage(role, content, meta = {}) {
   return {
@@ -35,13 +35,7 @@ function createMessage(role, content, meta = {}) {
 
 function expressionForNode(node) {
   if (!node) return 'A';
-  if (node.id === HOME_NODE_ID) return 'G';
   if (node.id === NOT_FOUND_NODE_ID || node.id === 'free_question') return 'H';
-  if (node.id === 'projects' || node.id.startsWith('project_')) return 'C';
-  if (node.id === 'skills') return 'B';
-  if (node.id === 'experience') return 'A';
-  if (node.id === 'certifications') return 'G';
-  if (node.id === 'contact') return 'B';
   return node.expression || 'G';
 }
 
@@ -92,7 +86,7 @@ function compactStatusForNode(node) {
   if (!node) return 'Lista';
   if (node.id === HOME_NODE_ID) return 'Lista';
   if (node.id === NOT_FOUND_NODE_ID) return 'Sin datos';
-  if (node.id === 'free_question') return 'Busqueda';
+  if (node.id === 'free_question') return 'Búsqueda';
   if (node.id === 'about') return 'Perfil';
   if (node.id === 'projects') return 'Proyectos';
   if (node.id.startsWith('project_')) return 'Proyecto';
@@ -100,11 +94,34 @@ function compactStatusForNode(node) {
   return node.statusLabel || node.title;
 }
 
+function companionLineForNode(node) {
+  if (!node || node.id === HOME_NODE_ID) return 'Lista para ayudarte ✨';
+  if (node.id === NOT_FOUND_NODE_ID) return 'Buscando solo en la base local';
+  if (node.id === 'free_question') return 'Lista para buscar por palabras clave';
+  if (node.id === 'about') return 'Guiando el perfil de Kendall ✨';
+  if (node.id === 'projects') return 'Viendo proyectos de Kendall';
+  if (node.id.startsWith('project_')) return `Revisando ${node.title}`;
+  if (node.id === 'skills') return 'Explorando skills';
+  if (node.id === 'experience') return 'Mostrando experiencia';
+  if (node.id === 'certifications') return 'Mostrando certificaciones';
+  if (node.id === 'contact') return 'Mostrando contacto';
+  return 'Guiando el perfil de Kendall ✨';
+}
+
 function optionClassName(kind = 'secondary') {
   return [
     'flow-option',
     kind ? `flow-option--${kind}` : '',
   ].filter(Boolean).join(' ');
+}
+
+function externalLinkLabel(link) {
+  const text = `${link.label} ${link.url}`.toLowerCase();
+  if (text.includes('demo') || text.includes('abrir') || text.includes('portfolio')) return `🌐 ${link.label}`;
+  if (text.includes('github') || text.includes('repositorio')) return `🔗 ${link.label}`;
+  if (text.includes('mailto')) return `✉ ${link.label}`;
+  if (text.includes('wa.me')) return `💬 ${link.label}`;
+  return `↗ ${link.label}`;
 }
 
 function optionsForNode(node, backNodeId) {
@@ -141,7 +158,10 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
       {node.summary ? <p className="flow-card__summary">{node.summary}</p> : null}
 
       {node.badges?.length ? (
-        <section className="flow-feature-strip" aria-label="Tecnologias y temas">
+        <section
+          className={isProject ? 'flow-feature-strip flow-feature-strip--project' : 'flow-feature-strip'}
+          aria-label="Tecnologías y temas"
+        >
           <h4>{isProject ? 'Stack y enfoque' : 'Temas clave'}</h4>
           <div className="flow-badges">
             {node.badges.map((badge) => <span key={badge}>{badge}</span>)}
@@ -176,7 +196,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {link.label}
+                {externalLinkLabel(link)}
               </a>
             ))}
           </div>
@@ -184,7 +204,10 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect }) {
       ) : null}
 
       {options.length ? (
-        <div className="flow-options" aria-label="Opciones de Aru">
+        <div
+          className={isProject ? 'flow-options flow-options--project-nav' : 'flow-options'}
+          aria-label="Opciones de Aru"
+        >
           {options.map((option) => (
             option.url ? (
               <a
@@ -217,12 +240,14 @@ function App() {
   const [messages, setMessages] = React.useState(loadMessages);
   const [input, setInput] = React.useState('');
   const [visitorMemory, setVisitorMemory] = React.useState(getVisitorMemory);
+  const [avatarMood, setAvatarMood] = React.useState('normal');
   const expressionController = useAruExpressionController();
   const messagesListRef = React.useRef(null);
   const currentNode = getGuidedNode(lastAssistantNodeId(messages));
   const backNodeId = previousAssistantNodeId(messages);
   const lastAssistantIndex = latestAssistantIndex(messages);
   const currentStatus = compactStatusForNode(currentNode);
+  const companionLine = companionLineForNode(currentNode);
 
   React.useEffect(() => {
     saveConversation(messages);
@@ -320,7 +345,7 @@ function App() {
   }
 
   return (
-    <main className="page chat-page voz-page" data-mode="guided">
+    <main className="page chat-page voz-page" data-mode="guided" data-avatar-mood={avatarMood}>
       <div className="voz-bg" aria-hidden="true">
         <div className="voz-bg__blob voz-bg__blob--rose" />
         <div className="voz-bg__blob voz-bg__blob--mint" />
@@ -330,13 +355,13 @@ function App() {
         <div className="voz-bg__spark voz-bg__spark--two" />
       </div>
 
-      <aside className="chat-avatar-panel companion-card" data-section={currentNode.id} aria-label="Aru">
+      <aside className="chat-avatar-panel companion-card" data-section={currentNode.id} data-avatar-mood={avatarMood} aria-label="Aru">
         <div className="companion-card__header">
           <div className="brand-lockup">
             <div className="brand-mark" aria-hidden="true">A</div>
             <div>
               <h1 className="brand-title">Aru</h1>
-              <p className="brand-subtitle">Guia virtual de Kendall</p>
+              <p className="brand-subtitle">Guía virtual de Kendall</p>
             </div>
           </div>
           <span className="companion-card__chip">{currentStatus}</span>
@@ -350,7 +375,8 @@ function App() {
             charSize={62}
             followRange={380}
             smoothing={0.24}
-            moodEnabled={false}
+            moodEnabled
+            onMoodChange={setAvatarMood}
             lookEnabled
             autoBlink
             expression={expressionController.overrideExpression}
@@ -358,7 +384,7 @@ function App() {
         </div>
 
         <p className="companion-card__line">
-          Aru te guia por el perfil profesional de Kendall.
+          {companionLine}
         </p>
 
         <div className="mini-status">
@@ -367,7 +393,7 @@ function App() {
             <strong>{currentStatus}</strong>
           </div>
           <div className="mini-status__item">
-            <span>Seccion</span>
+            <span>Sección</span>
             <strong>{currentNode.title}</strong>
           </div>
           {visitorMemory.name ? (
@@ -380,17 +406,17 @@ function App() {
         </div>
       </aside>
 
-      <section className="chat-panel" aria-label="Guia con Aru">
+      <section className="chat-panel" aria-label="Guía con Aru">
         <header className="chat-header">
           <div>
-            <h2 className="chat-title">Guia con Aru</h2>
+            <h2 className="chat-title">Guía con Aru</h2>
             <p className="chat-subtitle">
-              FAQ interactivo local basado en la informacion publica de Kendall.
+              FAQ interactivo local basado en la información pública de Kendall.
             </p>
           </div>
           <div className="chat-header__actions">
             <button type="button" className="soft-button chat-reset-button" onClick={startNewConversation}>
-              Nueva conversacion
+              Nueva conversación
             </button>
             <button type="button" className="soft-button chat-memory-button" onClick={clearLocalMemory}>
               Borrar memoria local
@@ -399,32 +425,34 @@ function App() {
         </header>
 
         <div className="chat-messages" aria-live="polite" ref={messagesListRef}>
-          {messages.map((message, index) => {
-            const node = message.nodeId ? getGuidedNode(message.nodeId) : null;
-            const isLatestAssistant = message.role === 'assistant' && index === lastAssistantIndex;
-            return (
-              <div
-                key={message.id}
-                className={`message-row message-row--${message.role}`}
-                data-latest-assistant={isLatestAssistant ? 'true' : undefined}
-              >
-                {message.role !== 'user' ? <span className="message-avatar" aria-hidden="true">A</span> : null}
-                <div className="message-bubble">
-                  {node ? (
-                    <GuidedNodeContent
-                      node={node}
-                      backNodeId={backNodeId}
-                      isLatest={isLatestAssistant}
-                      onSelect={selectOption}
-                    />
-                  ) : (
-                    <p>{message.content}</p>
-                  )}
+          <div className="chat-thread">
+            {messages.map((message, index) => {
+              const node = message.nodeId ? getGuidedNode(message.nodeId) : null;
+              const isLatestAssistant = message.role === 'assistant' && index === lastAssistantIndex;
+              return (
+                <div
+                  key={message.id}
+                  className={`message-row message-row--${message.role}`}
+                  data-latest-assistant={isLatestAssistant ? 'true' : undefined}
+                >
+                  {message.role !== 'user' ? <span className="message-avatar" aria-hidden="true">A</span> : null}
+                  <div className="message-bubble">
+                    {node ? (
+                      <GuidedNodeContent
+                        node={node}
+                        backNodeId={backNodeId}
+                        isLatest={isLatestAssistant}
+                        onSelect={selectOption}
+                      />
+                    ) : (
+                      <p>{message.content}</p>
+                    )}
+                  </div>
+                  {message.role === 'user' ? <span className="message-avatar message-avatar--user" aria-hidden="true">Tu</span> : null}
                 </div>
-                {message.role === 'user' ? <span className="message-avatar message-avatar--user" aria-hidden="true">Tu</span> : null}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         <form className="chat-composer" onSubmit={submitMessage}>
@@ -433,8 +461,8 @@ function App() {
               className="chat-input"
               value={input}
               rows={1}
-              placeholder="Tambien puedes buscar algo especifico sobre Kendall..."
-              aria-label="Busqueda local sobre Kendall"
+              placeholder="También puedes buscar algo específico sobre Kendall..."
+              aria-label="Búsqueda local sobre Kendall"
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {

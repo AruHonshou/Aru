@@ -6,7 +6,7 @@ export const guidedFlowNodes = {
     id: 'home',
     title: 'Inicio',
     statusLabel: 'Lista',
-    message: '¡Hola! Soy Aru, la asistente virtual de Kendall. Puedo contarte sobre su perfil, proyectos, experiencia, skills, certificaciones o contacto. ¿Que gustas saber?',
+    message: '¡Hola! Soy Aru, la asistente virtual de Kendall. Puedo contarte sobre su perfil, proyectos, experiencia, skills, certificaciones o contacto. ¿Qué gustas saber?',
     emotion: 'happy',
     expression: 'G',
     searchKeywords: ['inicio', 'home', 'menu', 'ayuda', 'aru', 'asistente'],
@@ -17,7 +17,7 @@ export const guidedFlowNodes = {
       { label: 'Experiencia', next: 'experience', kind: 'primary' },
       { label: 'Certificaciones', next: 'certifications', kind: 'primary' },
       { label: 'Contacto', next: 'contact', kind: 'primary' },
-      { label: 'Preguntar algo especifico', next: 'free_question', kind: 'secondary' },
+      { label: 'Preguntar algo específico', next: 'free_question', kind: 'secondary' },
     ],
   },
 
@@ -25,8 +25,8 @@ export const guidedFlowNodes = {
     id: 'about',
     title: 'Sobre Kendall',
     statusLabel: 'Explorando perfil',
-    message: 'Kendall Valverde Diaz es un Software Engineer de Costa Rica especializado en AI-Augmented Development, desarrollo fullstack, frontend moderno, QA Automation y agentes de IA aplicada.',
-    summary: 'Su perfil combina producto, calidad, automatizacion e inteligencia artificial aplicada al desarrollo de software.',
+    message: 'Kendall Valverde Díaz es un Software Engineer de Costa Rica especializado en AI-Augmented Development, desarrollo fullstack, frontend moderno, QA Automation y agentes de IA aplicada.',
+    summary: 'Su perfil combina producto, calidad, automatización e inteligencia artificial aplicada al desarrollo de software.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'TypeScript', 'Node.js', 'QA Automation', 'RAG', 'Agentes IA'],
@@ -36,14 +36,14 @@ export const guidedFlowNodes = {
         items: [
           'Construye productos fullstack con React, TypeScript y Node.js.',
           'Integra APIs de IA aplicada, agentes inteligentes y sistemas RAG.',
-          'Disena soluciones con testing, CI/CD, seguridad y buenas practicas.',
+          'Diseña soluciones con testing, CI/CD, seguridad y buenas prácticas.',
         ],
       },
       {
-        title: 'Perfil publico',
+        title: 'Perfil público',
         items: [
-          'Ubicacion publica: Costa Rica.',
-          'Idiomas: espanol nativo e ingles avanzado B2+.',
+          'Ubicación pública: Costa Rica.',
+          'Idiomas: español nativo e inglés avanzado B2+.',
           'Colegiado activo del CPIC.',
         ],
       },
@@ -61,12 +61,12 @@ export const guidedFlowNodes = {
     id: 'projects',
     title: 'Proyectos',
     statusLabel: 'Mostrando proyectos',
-    message: 'Kendall tiene varios proyectos destacados. Algunos se enfocan en IA aplicada, otros en QA Automation, fullstack, sistemas administrativos y DevOps. ¿Cual quieres conocer?',
+    message: 'Kendall tiene varios proyectos destacados. Algunos se enfocan en IA aplicada, otros en QA Automation, fullstack, sistemas administrativos y DevOps. ¿Cuál quieres conocer?',
     emotion: 'happy',
     expression: 'G',
     sections: [
       {
-        title: 'Mapa rapido',
+        title: 'Mapa rápido',
         items: [
           'DocuMente y QAPilot muestran IA aplicada a problemas concretos.',
           'Aru.Dev y Aru Assistant muestran marca personal, UI anime/chibi y experiencia guiada.',
@@ -92,17 +92,17 @@ export const guidedFlowNodes = {
     title: 'Aru.Dev',
     statusLabel: 'Mostrando proyectos',
     message: 'Aru.Dev es el portfolio personal de Kendall. Presenta su perfil profesional, skills, experiencia, proyectos, certificaciones y contacto mediante una experiencia visual anime/chibi con Aru como personaje protagonista.',
-    summary: 'Es una pagina tecnica con identidad visual propia, orientada a reclutadores y visitantes que quieren evaluar su perfil completo.',
+    summary: 'Es una página técnica con identidad visual propia, orientada a reclutadores y visitantes que quieren evaluar su perfil completo.',
     emotion: 'happy',
     expression: 'G',
     badges: ['HTML', 'CSS3', 'JavaScript', 'Vite', 'GitHub Pages', 'Portfolio'],
     sections: [
       {
-        title: 'Que demuestra',
+        title: 'Qué demuestra',
         items: [
-          'Marca personal tecnica con estetica anime/chibi.',
-          'Presentacion profesional de skills, proyectos, experiencia y contacto.',
-          'Publicacion en GitHub Pages bajo /AruDev/.',
+          'Marca personal técnica con estética anime/chibi.',
+          'Presentación profesional de skills, proyectos, experiencia y contacto.',
+          'Publicación en GitHub Pages bajo /AruDev/.',
         ],
       },
     ],
@@ -118,23 +118,23 @@ export const guidedFlowNodes = {
     id: 'project_aru',
     title: 'Aru Assistant',
     statusLabel: 'Mostrando proyectos',
-    message: 'Aru es la asistente virtual personal de Kendall. Esta pensada para guiar a visitantes del portfolio, explicar su perfil y responder con informacion controlada desde una base local.',
-    summary: 'El proyecto combina personaje anime/chibi, expresiones visuales, navegacion guiada y conocimiento local sin depender de servicios externos.',
+    message: 'Aru es la asistente virtual personal de Kendall. Está pensada para guiar a visitantes del portfolio, explicar su perfil y responder con información controlada desde una base local.',
+    summary: 'El proyecto combina personaje anime/chibi, expresiones visuales, navegación guiada y conocimiento local sin depender de servicios externos.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'Vite', 'UI anime/chibi', 'FAQ guiado', 'Conocimiento local', 'GitHub Pages'],
     sections: [
       {
-        title: 'Que demuestra',
+        title: 'Qué demuestra',
         items: [
           'Experiencia interactiva de portfolio con personaje 2D.',
           'Seguimiento de mouse, parpadeo y control de expresiones A-K.',
-          'Arquitectura frontend sin exponer secretos ni depender de backend para la guia.',
+          'Arquitectura frontend sin exponer secretos ni depender de backend para la guía.',
         ],
       },
     ],
     links: [
-      { label: 'Abrir asistente', url: 'https://aruhonshou.github.io/Aru/voz.html' },
+      { label: 'Abrir guia', url: 'https://aruhonshou.github.io/Aru/guia.html' },
       { label: 'Ver repositorio', url: 'https://github.com/AruHonshou/Aru' },
     ],
     searchKeywords: ['aru', 'asistente', 'assistant', 'asistente virtual', 'aru assistant', 'chat con aru', 'aru honshou', 'personaje'],
@@ -146,13 +146,13 @@ export const guidedFlowNodes = {
     title: 'DocuMente',
     statusLabel: 'Mostrando proyectos',
     message: 'DocuMente es un sistema RAG fullstack creado por Kendall para subir documentos PDF/TXT, generar embeddings, recuperar fragmentos relevantes y responder preguntas con fuentes citables.',
-    summary: 'Es uno de sus proyectos mas fuertes de IA aplicada porque une frontend, backend, autenticacion, SQLite, Docker, CI/CD y un RAGAgent con skills.',
+    summary: 'Es uno de sus proyectos más fuertes de IA aplicada porque une frontend, backend, autenticación, SQLite, Docker, CI/CD y un RAGAgent con skills.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'TypeScript', 'Node.js', 'Express', 'SQLite', 'OpenAI API', 'RAG', 'Docker', 'GitHub Actions'],
     sections: [
       {
-        title: 'Como funciona',
+        title: 'Cómo funciona',
         items: [
           'Procesa documentos, divide texto en chunks con overlap y genera embeddings.',
           'Recupera chunks por similitud coseno para responder con contexto.',
@@ -177,7 +177,7 @@ export const guidedFlowNodes = {
     title: 'QAPilot',
     statusLabel: 'Mostrando proyectos',
     message: 'QAPilot es una plataforma open source local-first que convierte requerimientos funcionales en casos de prueba, ejecuta pruebas UI y API, analiza fallos con IA y genera reportes HTML, PDF y JSON.',
-    summary: 'Demuestra QA Automation con IA, Playwright, seguridad local-first, agentes con skills y generacion de reportes.',
+    summary: 'Demuestra QA Automation con IA, Playwright, seguridad local-first, agentes con skills y generación de reportes.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'TypeScript', 'Node.js', 'OpenAI API', 'Playwright', 'SQLite', 'Docker', 'QA Automation'],
@@ -206,17 +206,17 @@ export const guidedFlowNodes = {
     id: 'project_openai_bot',
     title: 'OpenAI Chatbot Fullstack',
     statusLabel: 'Mostrando proyectos',
-    message: 'OpenAI Chatbot Fullstack es una aplicacion de Kendall con frontend React y backend NestJS para chat conversacional, comparativa de modelos y vision de imagen a texto.',
-    summary: 'Demuestra integracion de OpenAI API, separacion frontend/backend, endpoints REST y una UI moderna para flujos conversacionales.',
+    message: 'OpenAI Chatbot Fullstack es una aplicación de Kendall con frontend React y backend NestJS para chat conversacional, comparativa de modelos y visión de imagen a texto.',
+    summary: 'Demuestra integración de OpenAI API, separación frontend/backend, endpoints REST y una UI moderna para flujos conversacionales.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'TypeScript', 'Vite', 'TailwindCSS', 'NestJS', 'REST', 'OpenAI API', 'Vision'],
     sections: [
       {
-        title: 'Que demuestra',
+        title: 'Qué demuestra',
         items: [
           'Frontend moderno conectado a backend NestJS.',
-          'Uso de chat, vision y comparativa de modelos.',
+          'Uso de chat, visión y comparativa de modelos.',
           'Arquitectura fullstack separada por repositorios.',
         ],
       },
@@ -233,8 +233,8 @@ export const guidedFlowNodes = {
     id: 'project_hr_system',
     title: 'Sistema de Recursos Humanos',
     statusLabel: 'Mostrando proyectos',
-    message: 'El Sistema de Recursos Humanos es un sistema fullstack para Fundacion Centro VRAI enfocado en nomina, expedientes, vacaciones, reportes y panel administrativo.',
-    summary: 'Reemplazo una operacion 100% en papel y redujo el tiempo administrativo un 80%.',
+    message: 'El Sistema de Recursos Humanos es un sistema fullstack para Fundación Centro VRAI enfocado en nómina, expedientes, vacaciones, reportes y panel administrativo.',
+    summary: 'Reemplazó una operación 100% en papel y redujo el tiempo administrativo un 80%.',
     emotion: 'happy',
     expression: 'G',
     badges: ['React', 'TypeScript', 'Node.js', 'MySQL', 'Jest', 'Postman', 'Producto interno'],
@@ -242,8 +242,8 @@ export const guidedFlowNodes = {
       {
         title: 'Impacto',
         items: [
-          'Digitalizacion de procesos administrativos.',
-          'Gestion de expedientes, vacaciones, permisos, incapacidades y reportes.',
+          'Digitalización de procesos administrativos.',
+          'Gestión de expedientes, vacaciones, permisos, incapacidades y reportes.',
           'Demuestra fullstack aplicado a procesos reales.',
         ],
       },
@@ -259,14 +259,14 @@ export const guidedFlowNodes = {
     id: 'project_infra',
     title: 'Infraestructura AWS/Terraform',
     statusLabel: 'Mostrando proyectos',
-    message: 'Este proyecto muestra infraestructura como codigo con Terraform, AWS, Docker y CI/CD para provisionar recursos reproducibles y desplegar una API containerizada.',
-    summary: 'Incluye VPC personalizada, EC2 t3.micro, subnets publica y privada, Security Groups, Elastic IP e IAM con minimos privilegios.',
+    message: 'Este proyecto muestra infraestructura como código con Terraform, AWS, Docker y CI/CD para provisionar recursos reproducibles y desplegar una API containerizada.',
+    summary: 'Incluye VPC personalizada, EC2 t3.micro, subnets pública y privada, Security Groups, Elastic IP e IAM con mínimos privilegios.',
     emotion: 'happy',
     expression: 'G',
     badges: ['Terraform', 'AWS', 'Docker', 'GitHub Actions', 'Flask', 'Python', 'Gunicorn', 'pytest'],
     sections: [
       {
-        title: 'Que demuestra',
+        title: 'Qué demuestra',
         items: [
           'DevOps e infraestructura reproducible.',
           'Pipelines de App y Terraform.',
@@ -291,8 +291,8 @@ export const guidedFlowNodes = {
     sections: [
       { title: 'Frontend', items: ['React', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'TailwindCSS', 'Vite', 'Zustand', 'React Router', 'UI responsive'] },
       { title: 'Backend y APIs', items: ['Node.js', 'Express', 'NestJS', 'REST APIs', 'GraphQL', 'JWT', 'CORS', 'Postman'] },
-      { title: 'IA y agentes', items: ['OpenAI API', 'Anthropic Claude SDK', 'RAG', 'Embeddings', 'Function Calling', 'Agentes con skills atomicas', 'Prompt Engineering'] },
-      { title: 'QA y Testing', items: ['Playwright', 'Selenium', 'Jest', 'Vitest', 'pytest', 'Postman', 'Datos sinteticos', 'Jira', 'Scrum'] },
+      { title: 'IA y agentes', items: ['OpenAI API', 'Anthropic Claude SDK', 'RAG', 'Embeddings', 'Function Calling', 'Agentes con skills atómicas', 'Prompt Engineering'] },
+      { title: 'QA y Testing', items: ['Playwright', 'Selenium', 'Jest', 'Vitest', 'pytest', 'Postman', 'Datos sintéticos', 'Jira', 'Scrum'] },
       { title: 'DevOps y Cloud', items: ['Docker', 'Docker Compose', 'GitHub Actions', 'Terraform', 'AWS EC2', 'AWS VPC', 'AWS S3', 'AWS IAM', 'Gunicorn'] },
       { title: 'Bases de datos', items: ['MySQL', 'SQL Server', 'SQLite', 'Consultas parametrizadas', 'Modelado relacional'] },
       { title: 'Lenguajes y versionado', items: ['TypeScript', 'JavaScript', 'Python', 'Git', 'GitHub', 'Pull requests'] },
@@ -317,16 +317,16 @@ export const guidedFlowNodes = {
       {
         title: 'Novacomp / Davivienda Bank Costa Rica',
         items: [
-          'QA Engineer / Lider de QA entre 2025 y 2026.',
-          'Implemento automatizacion con Playwright + TypeScript en staging aislado.',
-          'Integro CI/CD con GitHub Actions y redujo el ciclo de pruebas cerca de 40%.',
-          'Valido APIs REST en AWS usando Postman y coordino documentacion funcional.',
+          'QA Engineer / Líder de QA entre 2025 y 2026.',
+          'Implementó automatización con Playwright + TypeScript en staging aislado.',
+          'Integró CI/CD con GitHub Actions y redujo el ciclo de pruebas cerca de 40%.',
+          'Validó APIs REST en AWS usando Postman y coordinó documentación funcional.',
         ],
       },
       {
         title: 'Fullstack freelance',
         items: [
-          'Desarrollador fullstack desde 2023 para mas de 10 clientes en Costa Rica y Estados Unidos.',
+          'Desarrollador fullstack desde 2023 para más de 10 clientes en Costa Rica y Estados Unidos.',
           'Construye aplicaciones React + TypeScript, APIs REST/GraphQL y backends con Node.js, Express y NestJS.',
           'Integra OpenAI API, Anthropic Claude SDK, RAG, Function Calling y embeddings.',
         ],
@@ -345,27 +345,27 @@ export const guidedFlowNodes = {
     id: 'certifications',
     title: 'Certificaciones',
     statusLabel: 'Mostrando certificaciones',
-    message: 'Kendall registra formacion academica y complementaria en ingenieria de sistemas, IA aplicada al SDLC y tecnologias clave para fullstack, QA y DevOps.',
+    message: 'Kendall registra formación académica y complementaria en ingeniería de sistemas, IA aplicada al SDLC y tecnologías clave para fullstack, QA y DevOps.',
     emotion: 'happy',
     expression: 'G',
     sections: [
       {
-        title: 'Formacion academica',
+        title: 'Formación académica',
         items: [
-          'Bachillerato en Ingenieria en Sistemas de Informacion por la Universidad Internacional de las Americas.',
-          'IA 360: Ingenieria del Software Aumentada con IA en Universidad CENFOTEC.',
-          'Ingles avanzado B2+ completado en CCCN.',
+          'Bachillerato en Ingeniería en Sistemas de Información por la Universidad Internacional de las Américas.',
+          'IA 360: Ingeniería del Software Aumentada con IA en Universidad CENFOTEC.',
+          'Inglés avanzado B2+ completado en CCCN.',
         ],
       },
       {
-        title: 'Formacion complementaria',
+        title: 'Formación complementaria',
         items: [
-          'TypeScript: Guia completa.',
+          'TypeScript: Guía completa.',
           'React: De cero a experto: Hooks y MERN.',
           'Node.js: De cero a experto.',
           'NestJS: Microservicios y aplicaciones escalables.',
-          'Playwright: Automatizacion de pruebas.',
-          'Docker: Guia practica para desarrolladores.',
+          'Playwright: Automatización de pruebas.',
+          'Docker: Guía práctica para desarrolladores.',
           'MySQL: Bases de datos relacionales.',
         ],
       },
@@ -385,17 +385,17 @@ export const guidedFlowNodes = {
     id: 'contact',
     title: 'Contacto',
     statusLabel: 'Mostrando contacto',
-    message: 'Puedes contactar a Kendall por sus canales publicos profesionales.',
+    message: 'Puedes contactar a Kendall por sus canales públicos profesionales.',
     emotion: 'happy',
     expression: 'G',
     sections: [
       {
-        title: 'Canales publicos',
+        title: 'Canales públicos',
         items: [
           'GitHub: AruHonshou.',
-          'LinkedIn: Kendall Valverde Diaz.',
+          'LinkedIn: Kendall Valverde Díaz.',
           'Email profesional: kendallavd@gmail.com.',
-          'Telefono publico mostrado en portfolio y CV: +506 8509-7920.',
+          'Teléfono público mostrado en portfolio y CV: +506 8509-7920.',
         ],
       },
     ],
@@ -415,12 +415,12 @@ export const guidedFlowNodes = {
 
   free_question: {
     id: 'free_question',
-    title: 'Busqueda local',
-    statusLabel: 'Busqueda local',
-    message: 'Tambien puedes buscar algo especifico sobre Kendall. Escribeme palabras como DocuMente, QAPilot, React, contacto, certificaciones, experiencia o Recursos Humanos.',
+    title: 'Búsqueda local',
+    statusLabel: 'Búsqueda local',
+    message: 'También puedes buscar algo específico sobre Kendall. Escríbeme palabras como DocuMente, QAPilot, React, contacto, certificaciones, experiencia o Recursos Humanos.',
     emotion: 'thinking',
     expression: 'H',
-    searchKeywords: ['preguntar', 'pregunta', 'buscar', 'busqueda', 'algo especifico', 'especifico'],
+    searchKeywords: ['preguntar', 'pregunta', 'buscar', 'busqueda', 'búsqueda', 'algo especifico', 'algo específico', 'especifico', 'específico'],
     options: [
       { label: 'Ver proyectos', next: 'projects', kind: 'primary' },
       { label: 'Ver skills', next: 'skills', kind: 'secondary' },
@@ -430,9 +430,9 @@ export const guidedFlowNodes = {
 
   not_found: {
     id: 'not_found',
-    title: 'Sin informacion local',
-    statusLabel: 'Sin informacion local',
-    message: 'No tengo esa informacion en mi base de conocimiento sobre Kendall. Puedes preguntarme sobre su perfil, proyectos, skills, experiencia, certificaciones o contacto.',
+    title: 'Sin información local',
+    statusLabel: 'Sin información local',
+    message: 'No tengo esa información en mi base de conocimiento sobre Kendall. Puedes preguntarme sobre su perfil, proyectos, skills, experiencia, certificaciones o contacto.',
     emotion: 'thinking',
     expression: 'H',
     searchKeywords: [],
@@ -450,7 +450,7 @@ function projectOptions() {
   return [
     { label: 'Volver a proyectos', next: 'projects', kind: 'back' },
     { label: 'Volver al inicio', next: 'home', kind: 'back' },
-    { label: 'Contactar a Kendall', next: 'contact', kind: 'secondary' },
+    { label: 'Contacto', next: 'contact', kind: 'secondary' },
   ];
 }
 

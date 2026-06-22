@@ -54,7 +54,13 @@ export function frameGrid(sheets) {
 }
 
 export function avatarSheets({ includeMouthFrames = false, includeSpecial = false, includeAllExpressions = false } = {}) {
-  if (includeAllExpressions) return EXPRESSION_SHEETS;
+  if (includeAllExpressions) {
+    const sheets = [...EXPRESSION_SHEETS];
+    if (includeSpecial) {
+      sheets.push(SHEETS.special.bored, SHEETS.special.annoyed, SHEETS.special.locked);
+    }
+    return Array.from(new Set(sheets));
+  }
 
   const sheets = includeMouthFrames
     ? [...SHEETS.eyesOpen, ...SHEETS.eyesClosed]
@@ -68,8 +74,8 @@ export function avatarSheets({ includeMouthFrames = false, includeSpecial = fals
 }
 
 export function moodMessage(mood) {
-  if (mood === 'bored') return 'Sigues aqui, me aburro';
-  if (mood === 'locked') return 'YA DEJAME EN PAZ, AHORA REFRESCA LA PAGINA';
+  if (mood === 'bored') return '¿Sigues aquí? Me estoy aburriendo...';
+  if (mood === 'locked') return 'Ya déjame en paz, ahora refresca la página.';
   return '💢 💢 ¡Deja de darme clics!';
 }
 

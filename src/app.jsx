@@ -35,22 +35,27 @@ const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#FDE7EF', '#EAF4FF'];
-const CHAT_PAGE = `${import.meta.env.BASE_URL}voz.html`;
+const CHAT_PAGE = `${import.meta.env.BASE_URL}guia.html`;
 
 function micErrorMessage(error) {
-  if (error?.message === 'MIC_UNSUPPORTED') return 'Este navegador no permite usar el microfono aqui.';
+  if (error?.message === 'MIC_UNSUPPORTED') return 'Este navegador no permite usar el micrófono aquí.';
   if (error?.message === 'AUDIO_CONTEXT_UNSUPPORTED') return 'Este navegador no soporta AudioContext.';
   if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
-    return 'Permiso de microfono denegado. Revisa los permisos del navegador.';
+    return 'Permiso de micrófono denegado. Revisa los permisos del navegador.';
   }
-  return 'No se puede usar el microfono ahora.';
+  return 'No se puede usar el micrófono ahora.';
+}
+
+function displayMouthLabel(mouth) {
+  const label = mouthLabel(mouth);
+  if (label === 'semiabierta') return 'Media';
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 function App() {
   const [t, setTweak] = useAjustes(SIMPLE_DEFAULTS);
   const [micOn, setMicOn] = React.useState(false);
   const [fileName, setFileName] = React.useState('');
-  const [audioMessage, setAudioMessage] = React.useState('');
   const [audioError, setAudioError] = React.useState('');
   const [mood, setMood] = React.useState('normal');
   const audioElRef = React.useRef(null);
@@ -76,7 +81,6 @@ function App() {
     try {
       await engine.startMic();
       setMicOn(true);
-      setAudioMessage('Microfono activo');
     } catch (error) {
       setMicOn(false);
       setAudioError(micErrorMessage(error));
@@ -86,7 +90,6 @@ function App() {
   function stopMic() {
     engine.stopMic();
     setMicOn(false);
-    setAudioMessage('Microfono detenido');
   }
 
   async function onFilePick(event) {
@@ -96,7 +99,7 @@ function App() {
     setAudioError('');
     if (!file.type.startsWith('audio/')) {
       setFileName('');
-      setAudioError('Archivo invalido. Elige un archivo de audio.');
+      setAudioError('Archivo inválido. Elige un archivo de audio.');
       return;
     }
 
@@ -111,20 +114,27 @@ function App() {
       fileUrlRef.current = url;
       element.src = url;
       setFileName(file.name);
-      setAudioMessage('Archivo de audio cargado');
       await element.play();
     } catch (error) {
-      setAudioMessage('Archivo listo para reproducir');
+      // Autoplay may be blocked; the native audio controls remain available.
     }
   }
 
   const listening = micOn || level > 0.04;
   const locked = mood === 'locked';
+  const fileLoaded = Boolean(fileName);
+  const audioIsActive = fileLoaded && !micOn && level > 0.04;
+  const panelState = micOn ? 'listening' : audioIsActive ? 'playing' : fileLoaded ? 'loaded' : 'idle';
+  const micStatus = micOn ? 'Activo' : 'En espera';
+  const audioStatus = audioIsActive ? 'Reproduciendo' : fileLoaded ? 'Cargado' : 'Sin archivo';
+  const overallStatus = micOn ? 'Escuchando' : audioIsActive ? 'Reproduciendo' : fileLoaded ? 'Audio cargado' : 'Lista';
+  const mouthStatus = displayMouthLabel(mouth);
 
   return (
     <main
       className="page simple-page"
       data-decor={t.bgDecorEnabled ? 'on' : 'off'}
+      data-audio-state={panelState}
       style={{
         '--page-bg': t.bgColor,
         '--page-bg-soft': t.bgSoftColor,
@@ -143,6 +153,12 @@ function App() {
         <div className="anime-bg__cloud anime-bg__cloud--two" />
         <div className="anime-bg__sticker anime-bg__sticker--star" />
         <div className="anime-bg__sticker anime-bg__sticker--flower" />
+        <div className="anime-bg__sparkle anime-bg__sparkle--one" />
+        <div className="anime-bg__sparkle anime-bg__sparkle--two" />
+        <div className="anime-bg__sparkle anime-bg__sparkle--three" />
+        <div className="anime-bg__bokeh anime-bg__bokeh--one" />
+        <div className="anime-bg__bokeh anime-bg__bokeh--two" />
+        <div className="anime-bg__bokeh anime-bg__bokeh--three" />
         <div className="anime-bg__petal anime-bg__petal--one" />
         <div className="anime-bg__petal anime-bg__petal--two" />
         <div className="anime-bg__petal anime-bg__petal--three" />
@@ -156,7 +172,7 @@ function App() {
           </div>
         </div>
         <a className="nav-link nav-link--primary" href={locked ? undefined : CHAT_PAGE} aria-disabled={locked}>
-          Conversar con Aru
+          💬 Conversar con Aru ✨
         </a>
       </header>
 
@@ -178,42 +194,43 @@ function App() {
           />
         </div>
 
-        <aside className="simple-panel" aria-label="Controles de voz de Aru">
-          <div>
-            <h2 className="panel-title">Aru esta {listening ? 'escuchando' : 'lista'}</h2>
-            <p className="panel-copy">Tu companera chibi reacciona a voz, audio y movimiento.</p>
+        <aside className="simple-panel" data-audio-state={panelState} aria-label="Controles de voz de Aru">
+          <div className="panel-heading">
+            <span className="panel-badge">Modo audio</span>
+            <h2 className="panel-title">Aru está {micOn ? 'escuchando' : audioIsActive ? 'reproduciendo' : 'lista'}</h2>
+            <p className="panel-copy">Tu compañera chibi reacciona a voz, audio y movimiento.</p>
           </div>
 
           <div className="status-grid" aria-live="polite">
-            <div className="status-card status-card--mic">
-              <span className="status-label">Microfono</span>
-              <span className="status-value">{micOn ? 'Activo' : 'Inactivo'}</span>
+            <div className="status-card status-card--mic" data-active={micOn ? 'true' : 'false'}>
+              <span className="status-label">Micrófono</span>
+              <span className="status-value">{micStatus}</span>
             </div>
-            <div className="status-card status-card--audio">
+            <div className="status-card status-card--audio" data-active={fileLoaded ? 'true' : 'false'} title={fileName || 'Sin archivo'}>
               <span className="status-label">Audio</span>
-              <span className="status-value">{fileName || 'Sin archivo'}</span>
+              <span className="status-value">{audioStatus}</span>
             </div>
-            <div className="status-card status-card--mouth">
+            <div className="status-card status-card--mouth" data-active={listening ? 'true' : 'false'}>
               <span className="status-label">Boca</span>
-              <span className="status-value">{mouthLabel(mouth)}</span>
+              <span className="status-value">{mouthStatus}</span>
             </div>
-            <div className="status-card status-card--mood">
+            <div className="status-card status-card--mood" data-active={listening || fileLoaded ? 'true' : 'false'}>
               <span className="status-label">Estado</span>
-              <span className="status-value">{audioMessage || (listening ? 'Aru esta escuchando' : 'En espera')}</span>
+              <span className="status-value">{overallStatus}</span>
             </div>
           </div>
 
           <div className="voice-controls">
             <div className="control-row">
               <button type="button" className="primary-button" onClick={startMic} disabled={micOn || locked}
-                aria-label="Iniciar microfono de Aru">
+                aria-label="Iniciar micrófono de Aru">
                 <span className="button-icon button-icon--mic" aria-hidden="true" />
-                Iniciar microfono
+                Iniciar micrófono
               </button>
               <button type="button" className="soft-button" onClick={stopMic} disabled={!micOn}
-                aria-label="Detener microfono de Aru">
+                aria-label="Detener micrófono de Aru">
                 <span className="button-icon button-icon--stop" aria-hidden="true" />
-                Detener microfono
+                Detener micrófono
               </button>
             </div>
 
@@ -223,10 +240,10 @@ function App() {
               <input className="file-input" type="file" accept="audio/*" onChange={onFilePick} />
             </label>
 
-            <div className="audio-meter" aria-label={`Boca ${mouthLabel(mouth)}`}>
+            <div className="audio-meter" aria-label={`Boca ${mouthStatus}`}>
               <div className="meter-header">
                 <span>Volumen</span>
-                <span>{mouthLabel(mouth)}</span>
+                <span>{mouthStatus}</span>
               </div>
               <div className="meter-track">
                 <div className="meter-fill" style={{ '--meter-level': level }} />
@@ -249,7 +266,7 @@ function App() {
       {!locked ? (
         <PanelAjustes title="Ajustes de Aru">
           <TweakSection label="Boca" />
-          <TweakSlider label="Sensibilidad del microfono" value={t.micGain} min={0.3} max={5} step={0.1}
+          <TweakSlider label="Sensibilidad del micrófono" value={t.micGain} min={0.3} max={5} step={0.1}
             onChange={(value) => setTweak('micGain', value)} />
           <TweakSlider label="Umbral semiabierta" value={t.thHalf} min={0.01} max={0.3} step={0.005}
             onChange={(value) => setTweak('thHalf', value)} />
@@ -257,7 +274,7 @@ function App() {
             onChange={(value) => setTweak('thFull', value)} />
           <TweakSlider label="Velocidad de cierre" value={t.release} min={0.03} max={0.4} step={0.01}
             onChange={(value) => setTweak('release', value)} />
-          <TweakToggle label="Parpadeo automatico" value={t.autoBlink}
+          <TweakToggle label="Parpadeo automático" value={t.autoBlink}
             onChange={(value) => setTweak('autoBlink', value)} />
           <TweakSection label="Movimiento" />
           <TweakSlider label="Rango de seguimiento" value={t.followRange} min={120} max={1200} step={10} unit="px"
@@ -265,25 +282,25 @@ function App() {
           <TweakSlider label="Velocidad de seguimiento" value={t.smoothing} min={0.04} max={0.5} step={0.01}
             onChange={(value) => setTweak('smoothing', value)} />
           <TweakSection label="Apariencia" />
-          <TweakSlider label="Tamano del personaje" value={t.charSize} min={30} max={92} unit="vmin"
+          <TweakSlider label="Tamaño del personaje" value={t.charSize} min={30} max={92} unit="vmin"
             onChange={(value) => setTweak('charSize', value)} />
-          <TweakSection label="Fondo y ambiente" />
-          <TweakColor label="Color base" value={t.bgColor} options={BG_OPTIONS}
+          <TweakSection label="Fondo anime" />
+          <TweakColor label="Color base del fondo" value={t.bgColor} options={BG_OPTIONS}
             onChange={(value) => setTweak('bgColor', value)} />
-          <TweakColor label="Color secundario" value={t.bgSoftColor}
+          <TweakColor label="Color secundario suave" value={t.bgSoftColor}
             onChange={(value) => setTweak('bgSoftColor', value)} />
-          <TweakColor label="Color acento" value={t.bgAccentColor}
+          <TweakColor label="Color acento/decoraciones" value={t.bgAccentColor}
             onChange={(value) => setTweak('bgAccentColor', value)} />
-          <TweakColor label="Color decoracion" value={t.bgDecorColor}
+          <TweakColor label="Color brillos/menta" value={t.bgDecorColor}
             onChange={(value) => setTweak('bgDecorColor', value)} />
           <TweakToggle label="Decoraciones del fondo" value={t.bgDecorEnabled}
             onChange={(value) => setTweak('bgDecorEnabled', value)} />
-          <TweakSlider label="Intensidad de animacion" value={t.bgMotion} min={0} max={1} step={0.05}
+          <TweakSlider label="Intensidad del ambiente" value={t.bgMotion} min={0} max={1} step={0.05}
             onChange={(value) => setTweak('bgMotion', value)} />
-          <TweakSlider label="Densidad decorativa" value={t.bgDensity} min={0.25} max={1} step={0.05}
+          <TweakSlider label="Cantidad de decoraciones" value={t.bgDensity} min={0.25} max={1} step={0.05}
             onChange={(value) => setTweak('bgDensity', value)} />
-          <TweakSection label="Depuracion" />
-          <TweakToggle label="Mostrar cuadricula" value={t.showDebug}
+          <TweakSection label="Depuración" />
+          <TweakToggle label="Mostrar cuadrícula" value={t.showDebug}
             onChange={(value) => setTweak('showDebug', value)} />
         </PanelAjustes>
       ) : null}

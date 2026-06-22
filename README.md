@@ -2,9 +2,15 @@
 
 Aplicacion web de avatar para **Aru**. El personaje sigue el mouse en 25 direcciones, parpadea automaticamente y puede mover la boca segun el microfono o un archivo de audio.
 
-`simple.html` es el avatar interactivo principal con microfono, audio, ajustes y estados visuales.
+La pagina principal es `/Aru/` y abre el modo avatar interactivo.
 
-`voz.html` funciona como una guia local tipo FAQ sobre Kendall: responde desde datos estaticos del frontend, usa navegacion guiada y busqueda local, y no requiere backend, claves, variables de entorno ni servicios externos.
+`index.html` es el modo avatar interactivo de Aru con microfono, audio, ajustes y estados visuales.
+
+`guia.html` es la guia local FAQ sobre Kendall: responde desde datos estaticos del frontend, usa navegacion guiada y busqueda local, y no requiere backend.
+
+La app no usa Worker, no usa DeepSeek, no requiere API keys y no requiere backend.
+
+`simple.html` y `voz.html` se mantienen temporalmente como aliases antiguos: redirigen a `index.html` y `guia.html`.
 
 ## Instalacion
 
@@ -21,7 +27,7 @@ npm install
 
 Las hojas fuente estan en `imagenes/` y no se suben a Git porque son muy pesadas.
 
-Para regenerar los 150 frames WebP:
+Para regenerar los frames WebP:
 
 ```bash
 npm run generate:character
@@ -46,22 +52,28 @@ npm run dev
 Entradas:
 
 ```text
-http://localhost:5173/voz.html
-http://localhost:5173/simple.html
+http://localhost:5173/
+http://localhost:5173/index.html
+http://localhost:5173/guia.html
 ```
 
-`index.html` redirige automaticamente a la guia local.
+Aliases antiguos:
 
-## Modo Local De Voz
+```text
+http://localhost:5173/simple.html
+http://localhost:5173/voz.html
+```
 
-La pantalla `voz.html` no usa backend ni llamadas externas de chat. La informacion vive en:
+## Guia Local FAQ
+
+La pantalla `guia.html` no usa backend ni llamadas externas de chat. La informacion vive en:
 
 ```text
 src/data/aru-guided-flow.js
 src/data/kendall-profile.md
 ```
 
-La busqueda libre de `voz.html` es una busqueda local sobre esos datos. No se necesita `.env`, no se configura ninguna URL remota y no se suben claves al repositorio.
+La busqueda libre de `guia.html` es una busqueda local sobre esos datos. No se necesita `.env`, no se configura ninguna URL remota y no se suben claves al repositorio.
 
 ## Build
 
@@ -77,9 +89,10 @@ El build usa base path `/Aru/`, listo para GitHub Pages con este repositorio.
 
 ```text
 .
-|-- index.html
-|-- voz.html
-|-- simple.html
+|-- index.html        # modo avatar principal
+|-- guia.html         # guia local FAQ
+|-- simple.html       # alias antiguo hacia index.html
+|-- voz.html          # alias antiguo hacia guia.html
 |-- scripts/
 |   |-- generate-character-slices.mjs
 |   `-- verify-pages-build.mjs
@@ -118,13 +131,17 @@ Las filas y columnas representan las 25 direcciones de mirada:
 
 ## Publicacion En GitHub
 
-Antes de subir:
+GitHub Pages debe abrir el avatar en:
 
-1. Crea un repositorio vacio llamado `aru`.
-2. No agregues README, `.gitignore` ni licencia desde GitHub.
-3. Pasa la URL HTTPS del repositorio para conectar el remoto.
+```text
+https://aruhonshou.github.io/Aru/
+```
 
-No se hara commit ni push hasta tener esa URL.
+La guia local queda en:
+
+```text
+https://aruhonshou.github.io/Aru/guia.html
+```
 
 ## Licencia
 

@@ -97,9 +97,9 @@ export default function AruAvatar({
     includeAllExpressions: Boolean(forcedExpression),
   })), [enableAudioMouthSync, forcedExpression, moodEnabled]);
 
-  const activeSheet = forcedExpression || (mood !== 'normal'
+  const activeSheet = moodEnabled && mood !== 'normal'
     ? SHEETS.special[mood]
-    : sheetForMouth({ eyesClosed: blink, mouth: enableAudioMouthSync ? mouth : 0 }));
+    : forcedExpression || sheetForMouth({ eyesClosed: blink, mouth: enableAudioMouthSync ? mouth : 0 });
 
   const size = `${charSize * 4 / 3}vmin`;
   const classes = [
@@ -107,6 +107,7 @@ export default function AruAvatar({
     'aru-avatar--bob',
     moodEnabled ? 'aru-avatar--clickable' : '',
     locked ? 'aru-avatar--locked' : '',
+    moodEnabled && mood !== 'normal' ? `aru-avatar--mood-${mood}` : '',
     mode ? `aru-avatar--${mode}` : '',
     className,
   ].filter(Boolean).join(' ');
@@ -115,6 +116,7 @@ export default function AruAvatar({
     <div
       ref={avatarRef}
       className={classes}
+      data-mood={mood}
       aria-label={ariaLabel}
       role="img"
       style={{
