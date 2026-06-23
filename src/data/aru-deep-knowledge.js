@@ -18,7 +18,10 @@ export const OFFICIAL_LINKS = {
   email: 'mailto:kendallavd@gmail.com',
 };
 
-const sourceNote = 'Fuente local: kendall-profile.md';
+const sourceNote = {
+  es: 'Fuente local: kendall-profile.md',
+  en: 'Local source: kendall-profile.md',
+};
 
 function baseOptions() {
   return [
@@ -39,7 +42,7 @@ function projectOptions() {
   ];
 }
 
-export const deepGuideNodes = {
+const deepGuideNodesEs = {
   home: {
     id: 'home',
     title: 'Inicio',
@@ -765,6 +768,579 @@ export const deepGuideNodes = {
     ],
   },
 };
+
+const deepGuideTranslationsEn = {
+  home: {
+    title: 'Home',
+    statusLabel: 'Ready',
+    companionLine: 'Aru explains what AruDev summarizes.',
+    message: 'I’m Aru ✨ The portfolio shows Kendall’s professional summary. I can tell you the full story behind it: projects, technical decisions, experience, skills, and professional context.',
+    summary: 'Everything I explain comes from the local kendall-profile.md knowledge base and current project files. If a detail is not registered, I do not invent it.',
+    badges: ['PNGTuber web', 'Local guide', 'No backend', 'No external AI', 'AruDev companion'],
+    sections: [
+      {
+        title: 'How to use me',
+        items: [
+          'Use the options to explore the details behind the portfolio.',
+          'Type a local search if you want to jump straight to a project, technology, or experience.',
+          'For the quick visual summary, open AruDev; for deeper context, stay with Aru.',
+        ],
+      },
+    ],
+    links: ['View full portfolio', 'Kendall’s GitHub', 'Aru repository'],
+    options: [
+      'Deep summary of Kendall',
+      'Explain his projects in detail',
+      'What technologies does he master?',
+      'How does he work in QA?',
+      'How does he work with AI?',
+      'Go to full portfolio',
+      'View GitHub',
+    ],
+    searchKeywords: ['home', 'menu', 'help', 'aru', 'assistant', 'guide', 'deep', 'full story'],
+  },
+
+  deep_summary: {
+    title: 'Deep summary of Kendall',
+    statusLabel: 'Deep profile',
+    companionLine: 'Profile with context, not just a list of skills.',
+    message: 'Kendall Valverde Díaz is a Software Engineer from Costa Rica specialized in AI-Augmented Development, fullstack development, modern frontend, QA Automation, and generative AI agents.',
+    summary: 'His profile combines product thinking, quality, automation, backend, frontend, and applied AI. AruDev summarizes that identity; here I explain how each part connects.',
+    sections: [
+      {
+        title: 'What his focus means',
+        items: [
+          'He builds fullstack web applications with React, TypeScript, Node.js, Express, and NestJS.',
+          'He applies generative AI in concrete projects: RAG, embeddings, Function Calling, agents, and virtual assistants.',
+          'He has a strong QA Automation base with Playwright, Postman, CI/CD, and functional documentation.',
+        ],
+      },
+      {
+        title: 'What this demonstrates professionally',
+        items: [
+          'He can think in terms of product, not only screens.',
+          'He can automate quality and connect tests with real user flows.',
+          'He can design public demos without exposing secrets or relying on unnecessary external services.',
+        ],
+      },
+    ],
+    links: ['View full portfolio', 'Kendall’s GitHub'],
+    options: ['Deep summary', 'Projects in detail', 'QA and automation', 'Applied AI', 'Why hire him', 'Go to AruDev'],
+    searchKeywords: ['kendall', 'who', 'profile', 'about', 'summary', 'deep', 'software engineer', 'story', 'context'],
+  },
+
+  projects: {
+    title: 'Projects in detail',
+    statusLabel: 'Projects',
+    companionLine: 'The projects show how Kendall works.',
+    message: 'AruDev presents the projects as quick cards. Here we read them as technical evidence: what problem they solve, which decisions they make, and what they demonstrate about Kendall.',
+    badges: ['Applied AI', 'QA Automation', 'Fullstack', 'DevOps', 'Product'],
+    sections: [
+      {
+        title: 'Reading map',
+        items: [
+          'DocuMente demonstrates fullstack RAG, documents, embeddings, sources, and architecture.',
+          'QAPilot demonstrates AI-assisted QA Automation with Playwright, failure analysis, and reports.',
+          'The HR system demonstrates real impact on administrative processes.',
+          'The AWS/Terraform infrastructure project demonstrates DevOps, reproducibility, and CI/CD.',
+        ],
+      },
+    ],
+    options: [
+      'What does DocuMente demonstrate?',
+      'What does QAPilot demonstrate?',
+      'AruDev as the official portfolio',
+      'Aru as a PNGTuber assistant',
+      'OpenAI Chatbot Fullstack',
+      'Human Resources System',
+      'AWS/Terraform Infrastructure',
+      'Back with Aru',
+    ],
+    searchKeywords: ['project', 'projects', 'detail', 'work', 'portfolio', 'repository', 'demo', 'documente', 'qapilot', 'openai bot'],
+  },
+
+  project_documente: {
+    companionLine: 'Fullstack RAG explained clearly.',
+    message: 'DocuMente is a fullstack RAG system for uploading PDF/TXT documents, generating embeddings, retrieving relevant chunks, and answering questions with citable sources.',
+    summary: 'The important point is not just “it uses AI”: the project shows how to connect documents, backend, semantic search, security, Docker, and CI/CD into a complete experience.',
+    sections: [
+      {
+        title: 'Problem it solves',
+        items: [
+          'It lets users query information inside documents instead of reading them manually.',
+          'It answers with context retrieved from chunks and sources, not free-form unsupported output.',
+          'It organizes the flow from document upload to final answer.',
+        ],
+      },
+      {
+        title: 'Technical decisions',
+        items: [
+          'It splits text into chunks with overlap to preserve context.',
+          'It generates embeddings and retrieves fragments through cosine similarity.',
+          'It uses skills such as searchDocuments, generateAnswer, summarizeDocument, and extractKeywords.',
+        ],
+      },
+      {
+        title: 'What Kendall demonstrates',
+        items: [
+          'Fullstack architecture applied to real AI workflows.',
+          'Technical judgment to explain RAG, sources, and semantic retrieval.',
+          'Ability to turn a technical demo into an understandable product.',
+        ],
+      },
+    ],
+    links: ['View demo', 'View repository', 'View full portfolio'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['documente', 'docu mente', 'rag', 'pdf', 'txt', 'embeddings', 'chunks', 'sources', 'documents', 'chat with documents'],
+  },
+
+  project_qapilot: {
+    companionLine: 'QA Automation with a local-first agent approach.',
+    message: 'QAPilot is a local-first platform that turns functional requirements into test cases, runs UI/API tests, analyzes failures with AI, and generates HTML, PDF, and JSON reports.',
+    summary: 'The core idea is to bring AI into QA work without losing control: requirements, cases, execution, analysis, and reports stay inside an auditable flow.',
+    sections: [
+      {
+        title: 'Problem it solves in QA',
+        items: [
+          'It reduces friction when converting functional requirements into test cases.',
+          'It connects test generation with UI execution through Playwright.',
+          'It helps analyze failures and deliver exportable reports.',
+        ],
+      },
+      {
+        title: 'Technical decisions',
+        items: [
+          'Local-first model: the provider credential belongs to the user.',
+          'QAAgent with skills for requirement analysis, test case generation, and failure review.',
+          'HTML, PDF, and JSON reports to evidence results.',
+        ],
+      },
+      {
+        title: 'What Kendall demonstrates',
+        items: [
+          'Practical experience in QA Automation.',
+          'Judgment to combine AI, testing, local security, and reporting.',
+          'Ability to design useful internal tools for quality teams.',
+        ],
+      },
+    ],
+    links: ['View repository', 'View full portfolio'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['qapilot', 'qa pilot', 'qaagent', 'testing', 'playwright', 'test cases', 'failures', 'reports', 'qa automation'],
+  },
+
+  project_arudev: {
+    statusLabel: 'AruDev',
+    companionLine: 'AruDev is the official portfolio.',
+    message: 'AruDev is Kendall’s official portfolio. It is designed to show the professional summary quickly: skills, experience, projects, certifications, and contact.',
+    summary: 'Aru does not replace AruDev. Aru explains in more detail what the portfolio summarizes.',
+    badges: ['Official portfolio', 'GitHub Pages', 'Anime/chibi UI', 'Professional summary'],
+    sections: [
+      {
+        title: 'Role of AruDev',
+        items: [
+          'Present a quick read for recruiters or visitors.',
+          'Show visual identity, projects, and official channels.',
+          'Serve as the professional entry point.',
+        ],
+      },
+      {
+        title: 'Role of Aru',
+        items: [
+          'Explain technical decisions and context behind each project.',
+          'Guide the visitor in a conversational, local experience.',
+          'Always connect back to the official portfolio.',
+        ],
+      },
+    ],
+    links: ['View full portfolio', 'AruDev repository'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['arudev', 'aru dev', 'portfolio', 'official', 'professional summary'],
+  },
+
+  project_aru: {
+    title: 'Aru Assistant',
+    statusLabel: 'Aru',
+    companionLine: 'I am the explanatory side of the ecosystem.',
+    message: 'Aru is Kendall’s personal virtual assistant. In this version, it works as a structured local guide based on kendall-profile.md, without a backend or generative model.',
+    summary: 'The project demonstrates a web PNGTuber experience with React, Vite, A-K expressions, moods, mouse tracking, blinking, audio/microphone in avatar mode, and a deep local guide.',
+    badges: ['React', 'Vite', 'Web PNGTuber', 'Local knowledge', 'GitHub Pages'],
+    sections: [
+      {
+        title: 'What it demonstrates',
+        items: [
+          'Design of an interactive companion that complements a portfolio.',
+          'Separation between avatar entry point and deep guide.',
+          'Security awareness: no API keys, no backend, and no external calls for the guide.',
+        ],
+      },
+    ],
+    links: ['Open Aru', 'Aru repository'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['aru', 'assistant', 'pngtuber', 'local guide', 'avatar mode'],
+  },
+
+  project_openai_bot: {
+    title: 'OpenAI Chatbot Fullstack',
+    statusLabel: 'OpenAI Bot',
+    companionLine: 'Frontend/backend separation for conversational AI.',
+    message: 'OpenAI Chatbot Fullstack is an application with a React frontend and NestJS backend for conversational chat, model comparison, and image-to-text vision.',
+    summary: 'It demonstrates OpenAI API integration, REST endpoints, layered separation, and a modern UI for testing conversational flows.',
+    sections: [
+      {
+        title: 'What it adds to the profile',
+        items: [
+          'It shows fullstack integration with generative AI.',
+          'It separates responsibilities between frontend and backend.',
+          'It explores chat, vision, and model comparison.',
+        ],
+      },
+    ],
+    links: ['Frontend', 'Backend'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['openai bot', 'openai chatbot', 'fullstack chatbot', 'vision', 'nest', 'nestjs', 'models'],
+  },
+
+  project_hr_system: {
+    title: 'Human Resources System',
+    statusLabel: 'HR',
+    companionLine: 'Fullstack applied to a real process.',
+    message: 'The Human Resources System is a fullstack system for Fundación Centro VRAI focused on payroll, employee files, vacation, reports, and an admin dashboard.',
+    summary: 'According to the local knowledge base, it replaced a 100% paper-based operation and reduced administrative time by 80%.',
+    sections: [
+      {
+        title: 'Problem it solves',
+        items: [
+          'It digitizes employee files, vacation, permissions, sick leave, and reports.',
+          'It reduces manual administrative work.',
+          'It delivers dashboards and flows for an internal operation.',
+        ],
+      },
+      {
+        title: 'What Kendall demonstrates',
+        items: [
+          'Ability to transform real processes into software.',
+          'Use of frontend, backend, database, tests, and documentation.',
+          'Focus on operational impact, not only a visual demo.',
+        ],
+      },
+    ],
+    links: ['View repository', 'View full portfolio'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['human resources', 'hr', 'payroll', 'employee files', 'foundation', 'centro vrai', 'mysql'],
+  },
+
+  project_infra: {
+    title: 'AWS/Terraform Infrastructure',
+    statusLabel: 'DevOps',
+    companionLine: 'Reproducible infrastructure, not just manual deployment.',
+    message: 'This project shows infrastructure as code with Terraform, AWS, Docker, and CI/CD to provision reproducible resources and deploy a containerized API.',
+    summary: 'It includes a custom VPC, EC2 t3.micro, public and private subnets, Security Groups, Elastic IP, and IAM with least privilege.',
+    sections: [
+      {
+        title: 'What it demonstrates',
+        items: [
+          'Reproducible infrastructure with Terraform.',
+          'Pipelines for application and infrastructure.',
+          'Security judgment with IAM and segmented networking.',
+        ],
+      },
+    ],
+    links: ['View repository', 'View full portfolio'],
+    options: ['Back to projects', 'View AruDev', 'Back with Aru'],
+    searchKeywords: ['terraform', 'aws', 'devops', 'infrastructure', 'docker', 'github actions', 'ec2', 'vpc', 'flask'],
+  },
+
+  skills: {
+    title: 'Technologies he masters',
+    statusLabel: 'Skills',
+    companionLine: 'These skills come from real projects.',
+    message: 'Kendall works with modern frontend, backend and APIs, applied AI, QA Automation, DevOps, cloud, and relational databases.',
+    summary: 'The difference is how he combines those areas: React/TypeScript for product, Node/Nest for APIs, Playwright for QA, and RAG/agents for applied AI.',
+    sections: [
+      { title: 'Frontend', items: ['React', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'TailwindCSS', 'Vite', 'Zustand', 'React Router', 'Responsive UI'] },
+      { title: 'Backend and APIs', items: ['Node.js', 'Express', 'NestJS', 'REST APIs', 'GraphQL', 'JWT', 'CORS', 'Postman'] },
+      { title: 'AI and agents', items: ['OpenAI API', 'Anthropic Claude SDK', 'RAG', 'Embeddings', 'Function Calling', 'Agents with atomic skills', 'Prompt Engineering'] },
+      { title: 'QA and Testing', items: ['Playwright', 'Selenium', 'Jest', 'Vitest', 'pytest', 'Postman', 'Synthetic data', 'Jira', 'Scrum'] },
+      { title: 'DevOps and Cloud', items: ['Docker', 'Docker Compose', 'GitHub Actions', 'Terraform', 'AWS EC2', 'AWS VPC', 'AWS S3', 'AWS IAM', 'Gunicorn'] },
+      { title: 'Databases', items: ['MySQL', 'SQL Server', 'SQLite', 'Parameterized queries', 'Relational modeling'] },
+    ],
+    options: ['View related projects', 'QA and automation', 'Applied AI', 'Back with Aru'],
+    searchKeywords: ['skill', 'skills', 'technology', 'technologies', 'stack', 'react', 'typescript', 'node', 'backend', 'frontend', 'docker', 'aws'],
+  },
+
+  qa_automation: {
+    title: 'QA and automation',
+    statusLabel: 'QA',
+    companionLine: 'Kendall does not just test: he automates and improves processes.',
+    message: 'Kendall has strong QA Automation experience. At Novacomp, for Davivienda Bank Costa Rica, he implemented automation with Playwright + TypeScript, integrated CI/CD with GitHub Actions, and reduced the testing cycle by around 40%.',
+    summary: 'The local knowledge base also connects that experience with QAPilot, a project that applies AI to test case generation, test execution, and failure analysis.',
+    sections: [
+      {
+        title: 'Professional experience',
+        items: [
+          'QA Engineer / QA Lead at Novacomp for Davivienda Bank Costa Rica.',
+          'Automation with Playwright + TypeScript in an isolated staging environment.',
+          'REST API validation on AWS using Postman.',
+          'Functional documentation and QA coordination in a Scrum/Jira context.',
+        ],
+      },
+      {
+        title: 'What it demonstrates',
+        items: [
+          'Judgment to prioritize critical flows.',
+          'Ability to reduce testing cycles through automation.',
+          'Connection between professional QA work and his own tools such as QAPilot.',
+        ],
+      },
+    ],
+    links: ['View QAPilot', 'View full portfolio'],
+    options: ['View QAPilot in detail', 'Technologies he uses', 'Back with Aru'],
+    searchKeywords: ['qa', 'automation', 'playwright', 'novacomp', 'davivienda', 'postman', 'testing', 'jira', 'scrum'],
+  },
+
+  ai_work: {
+    title: 'Applied AI',
+    statusLabel: 'AI',
+    companionLine: 'RAG, agents, and OpenAI API are part of his current focus.',
+    message: 'Kendall applies generative AI in concrete projects: DocuMente uses RAG, embeddings, and citable sources; QAPilot uses AI to transform requirements into tests; OpenAI Chatbot integrates chat and vision.',
+    summary: 'His AI-Augmented Development approach is not only prompting: it includes agents, Function Calling, embeddings, RAG, SDLC workflows, and demonstrable products.',
+    badges: ['OpenAI API', 'Anthropic SDK', 'RAG', 'Embeddings', 'Function Calling', 'Agents'],
+    sections: [
+      {
+        title: 'How he applies it',
+        items: [
+          'DocuMente: documents, chunks, embeddings, semantic retrieval, and sources.',
+          'QAPilot: test case generation, test execution, failure analysis, and reports.',
+          'OpenAI Chatbot: React frontend, NestJS backend, chat, vision, and model comparison.',
+        ],
+      },
+      {
+        title: 'What it demonstrates professionally',
+        items: [
+          'Ability to ground AI in product workflows.',
+          'Judgment to separate frontend/backend and protect secrets.',
+          'Understanding of agents with atomic skills and contextual search.',
+        ],
+      },
+    ],
+    links: ['View DocuMente', 'View QAPilot', 'View full portfolio'],
+    options: ['View DocuMente', 'View QAPilot', 'View OpenAI Bot', 'Back with Aru'],
+    searchKeywords: ['ai', 'openai', 'anthropic', 'rag', 'embeddings', 'function calling', 'agents', 'prompt', 'sdlc'],
+  },
+
+  fullstack: {
+    title: 'Fullstack React/Node/TypeScript',
+    statusLabel: 'Fullstack',
+    companionLine: 'Frontend and backend connected with product intent.',
+    message: 'Kendall builds React + TypeScript applications, REST/GraphQL APIs, and backends with Node.js, Express, and NestJS.',
+    summary: 'Projects like DocuMente, OpenAI Bot, and the HR System show that combination of UI, API, data, tests, and deployment.',
+    sections: [
+      {
+        title: 'Where it appears',
+        items: [
+          'DocuMente combines frontend, backend, SQLite, RAG, and Docker.',
+          'OpenAI Bot separates React frontend and NestJS backend.',
+          'The HR System applies React, Node, and MySQL to administrative processes.',
+        ],
+      },
+    ],
+    options: ['View projects', 'View skills', 'Back with Aru'],
+    searchKeywords: ['fullstack', 'react', 'node', 'typescript', 'express', 'nestjs', 'api', 'graphql', 'rest'],
+  },
+
+  devops: {
+    title: 'DevOps, AWS, and CI/CD',
+    statusLabel: 'DevOps',
+    companionLine: 'Automation beyond the frontend.',
+    message: 'Kendall works with Docker, Docker Compose, GitHub Actions, Terraform, and AWS. His automated infrastructure project shows reproducible resources and containerized deployment.',
+    sections: [
+      {
+        title: 'What it covers',
+        items: [
+          'Containers with Docker and Docker Compose.',
+          'Pipelines with GitHub Actions.',
+          'AWS infrastructure with Terraform: VPC, EC2, subnets, Security Groups, Elastic IP, and IAM.',
+        ],
+      },
+    ],
+    links: ['View infrastructure'],
+    options: ['Infrastructure in detail', 'View projects', 'Back with Aru'],
+    searchKeywords: ['devops', 'aws', 'terraform', 'docker', 'github actions', 'ci cd', 'cicd', 'infrastructure'],
+  },
+
+  experience: {
+    title: 'Professional experience',
+    statusLabel: 'Experience',
+    companionLine: 'Real experience in QA, fullstack, and applied AI.',
+    message: 'Kendall’s experience combines QA Automation in a banking context, QA leadership, and freelance fullstack development for clients in Costa Rica and the United States.',
+    sections: [
+      {
+        title: 'Novacomp / Davivienda Bank Costa Rica',
+        items: [
+          'QA Engineer / QA Lead between 2025 and 2026.',
+          'Automation with Playwright + TypeScript in an isolated staging environment.',
+          'CI/CD with GitHub Actions and around 40% reduction in the testing cycle.',
+          'REST API validation on AWS using Postman.',
+        ],
+      },
+      {
+        title: 'Freelance fullstack',
+        items: [
+          'Fullstack developer since 2023 for more than 10 clients in Costa Rica and the United States.',
+          'React + TypeScript applications, REST/GraphQL APIs, and Node/Express/NestJS backends.',
+          'Integrations with OpenAI API, Anthropic Claude SDK, RAG, Function Calling, and embeddings.',
+        ],
+      },
+    ],
+    options: ['QA and automation', 'Fullstack', 'Contact', 'Back with Aru'],
+    searchKeywords: ['experience', 'work', 'novacomp', 'davivienda', 'freelance', 'client', 'clients', 'qa', 'lead', 'bank'],
+  },
+
+  why_hire: {
+    title: 'Why hire Kendall',
+    statusLabel: 'Hire',
+    companionLine: 'Concrete reasons, without exaggerating.',
+    message: 'Kendall is a hybrid profile across fullstack, QA Automation, and applied AI. His public projects make it possible to evaluate code, architecture, product thinking, and technical judgment.',
+    summary: 'The strongest reason to consider him is the combination: he builds product, automates quality, applies AI, and understands deployment/DevOps.',
+    badges: ['Fullstack', 'QA Automation', 'Applied AI', 'DevOps', 'Public projects'],
+    sections: [
+      {
+        title: 'Verifiable strengths',
+        items: [
+          'Public projects: AruDev, DocuMente, QAPilot, OpenAI Bot, HR System, and AWS/Terraform infrastructure.',
+          'QA experience in a banking context with Playwright, Postman, and GitHub Actions.',
+          'Modern stack with React, TypeScript, Node.js, Docker, RAG, and agents.',
+        ],
+      },
+      {
+        title: 'Where he fits',
+        items: [
+          'Fullstack, frontend, QA Automation, or applied AI roles.',
+          'Teams that value product, testing, documentation, and technical demos.',
+          'Remote or onsite environments in Costa Rica, according to the local knowledge base.',
+        ],
+      },
+    ],
+    links: ['View full portfolio', 'Kendall’s GitHub', 'LinkedIn'],
+    options: ['View experience', 'View projects', 'Contact', 'Back with Aru'],
+    searchKeywords: ['hire', 'why hire', 'reasons', 'difference', 'strengths', 'recruiter', 'opportunity'],
+  },
+
+  certifications: {
+    title: 'Education and certifications',
+    statusLabel: 'Education',
+    companionLine: 'Education documented in the local knowledge base.',
+    message: 'Kendall records academic and complementary education in systems engineering, AI applied to the SDLC, and key technologies for fullstack, QA, and DevOps.',
+    sections: [
+      {
+        title: 'Academic education',
+        items: [
+          'Bachelor’s degree in Information Systems Engineering from Universidad Internacional de las Américas.',
+          'AI 360: AI-Augmented Software Engineering at Universidad CENFOTEC.',
+          'Advanced English B2+ completed at CCCN.',
+        ],
+      },
+      {
+        title: 'Complementary education',
+        items: [
+          'TypeScript, React, Node.js, NestJS, Playwright, Docker, and MySQL.',
+          'The local knowledge base does not register an official AWS certification; therefore Aru must not claim one.',
+        ],
+      },
+    ],
+    links: ['Verify certificates', 'View full portfolio'],
+    options: ['View skills', 'Why hire him', 'Back with Aru'],
+    searchKeywords: ['certification', 'certifications', 'certificate', 'education', 'training', 'studies', 'university', 'cenfotec', 'uia', 'devtalles', 'udemy'],
+  },
+
+  contact: {
+    title: 'Contact and official links',
+    statusLabel: 'Contact',
+    companionLine: 'Registered public channels.',
+    message: 'You can contact Kendall through his public professional channels and visit AruDev as the official portfolio.',
+    sections: [
+      {
+        title: 'Public channels',
+        items: [
+          'GitHub: AruHonshou.',
+          'LinkedIn: Kendall Valverde Díaz.',
+          'Professional email: kendallavd@gmail.com.',
+          'Official portfolio: AruDev.',
+        ],
+      },
+    ],
+    links: ['View full portfolio', 'Kendall’s GitHub', 'Aru repository', 'LinkedIn', 'Email'],
+    options: ['View full portfolio', 'Back with Aru'],
+    searchKeywords: ['contact', 'email', 'linkedin', 'github', 'portfolio', 'arudev'],
+  },
+
+  free_question: {
+    title: 'Local search',
+    statusLabel: 'Local search',
+    companionLine: 'I will only search my local knowledge base.',
+    message: 'You can also search for something specific about Kendall. Try DocuMente, QAPilot, React, QA, AI, experience, contact, or Terraform.',
+    options: ['View projects', 'View skills', 'Back with Aru'],
+    searchKeywords: ['ask', 'question', 'search', 'specific topic', 'specific'],
+  },
+
+  not_found: {
+    title: 'Detail not registered',
+    statusLabel: 'No data',
+    companionLine: 'If it is not in the local knowledge base, I do not invent it.',
+    message: 'Hmm... I don’t have that detail registered yet. I can help with public information about Kendall, his projects, skills, experience, education, certifications, and contact.',
+    options: ['Deep summary', 'Projects in detail', 'QA and automation', 'Contact', 'Back with Aru'],
+  },
+};
+
+function localizeText(es, en) {
+  return en ? { es, en } : es;
+}
+
+function localizeStringArray(values = [], translations = []) {
+  return values.map((value, index) => localizeText(value, translations[index]));
+}
+
+function localizeSections(sections = [], translations = []) {
+  return sections.map((section, index) => ({
+    ...section,
+    title: localizeText(section.title, translations[index]?.title),
+    items: localizeStringArray(section.items || [], translations[index]?.items || []),
+  }));
+}
+
+function localizeLabeledItems(items = [], translations = []) {
+  return items.map((item, index) => ({
+    ...item,
+    label: localizeText(item.label, translations[index]),
+  }));
+}
+
+function mergeNodeTranslation(node, translation = {}) {
+  return {
+    ...node,
+    title: localizeText(node.title, translation.title),
+    statusLabel: localizeText(node.statusLabel, translation.statusLabel),
+    companionLine: localizeText(node.companionLine, translation.companionLine),
+    message: localizeText(node.message, translation.message),
+    summary: node.summary ? localizeText(node.summary, translation.summary) : node.summary,
+    badges: localizeStringArray(node.badges || [], translation.badges || []),
+    sections: localizeSections(node.sections || [], translation.sections || []),
+    links: localizeLabeledItems(node.links || [], translation.links || []),
+    options: localizeLabeledItems(node.options || [], translation.options || []),
+    searchKeywords: [
+      ...(node.searchKeywords || []),
+      ...(translation.searchKeywords || []),
+    ],
+  };
+}
+
+export const deepGuideNodes = Object.fromEntries(
+  Object.entries(deepGuideNodesEs).map(([nodeId, node]) => [
+    nodeId,
+    mergeNodeTranslation(node, deepGuideTranslationsEn[nodeId]),
+  ]),
+);
 
 export const deepGuideMeta = {
   sourceNote,

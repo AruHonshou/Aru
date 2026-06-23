@@ -43,6 +43,7 @@ export default function AruAvatar({
   expression = null,
   motion = 'idle-breathe',
   actionBubble = null,
+  language = 'es',
 }) {
   const avatarRef = React.useRef(null);
   const [pressed, setPressed] = React.useState(false);
@@ -172,18 +173,19 @@ export default function AruAvatar({
 
       {moodEnabled && mood !== 'normal' ? (
         <div className="aru-avatar__bubble">
-          <div className="aru-avatar__mood-text">{moodMessage(mood)}</div>
+          <div className="aru-avatar__mood-text">{moodMessage(mood, language)}</div>
           {mood === 'annoyed' ? (
             <button
               type="button"
               className="aru-avatar__sorry"
+              aria-label={language === 'en' ? 'Sorry' : 'Lo siento'}
               onClick={(event) => {
                 event.stopPropagation();
                 setMood('normal');
                 setClickCount(0);
               }}
             >
-              Lo siento
+              {language === 'en' ? 'Sorry' : 'Lo siento'}
             </button>
           ) : null}
         </div>

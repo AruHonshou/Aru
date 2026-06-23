@@ -14,6 +14,10 @@ dist/
 .env.*
 .dev.vars
 public/*
+!public/audio/
+!public/audio/**
+!public/imagenes/
+!public/imagenes/**
 !public/slices2/
 !public/slices2/**
 .DS_Store

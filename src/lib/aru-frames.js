@@ -73,10 +73,23 @@ export function avatarSheets({ includeMouthFrames = false, includeSpecial = fals
   return Array.from(new Set(sheets));
 }
 
-export function moodMessage(mood) {
-  if (mood === 'bored') return '¿Sigues aquí? Me estoy aburriendo...';
-  if (mood === 'locked') return 'Ya déjame en paz, ahora refresca la página.';
-  return '💢 💢 ¡Deja de darme clics!';
+export function moodMessage(mood, language = 'es') {
+  const messages = {
+    es: {
+      bored: '¿Sigues aquí? Me estoy aburriendo...',
+      locked: 'Ya déjame en paz, ahora refresca la página.',
+      annoyed: '💢 💢 ¡Deja de darme clics!',
+    },
+    en: {
+      bored: 'Are you still here? I am getting bored...',
+      locked: 'Leave me alone now, then refresh the page.',
+      annoyed: '💢 💢 Stop clicking me!',
+    },
+  };
+  const localized = messages[language] || messages.es;
+  if (mood === 'bored') return localized.bored;
+  if (mood === 'locked') return localized.locked;
+  return localized.annoyed;
 }
 
 export function mouthLabel(mouth) {

@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AruAvatar from './components/AruAvatar';
+import LanguageToggle from './components/LanguageToggle';
 import { useAruExpressionController } from './hooks/useAruExpressionController';
+import { useAruLanguage } from './hooks/useAruLanguage';
 import { useAruMotionController } from './hooks/useAruMotionController';
 import { ARU_EXPRESSION_PRIORITY } from './lib/aru-expression-map';
 import { getAruAction } from './lib/aru-actions';
+import { installAruSfxUnlock, playAruSfx } from './lib/aru-sfx';
+import { localize, translate } from './i18n/aru-i18n';
 import {
   clearConversation as clearStoredConversation,
   clearVisitorMemory,
@@ -24,7 +28,26 @@ import { deepGuideMeta } from './data/aru-deep-knowledge';
 import './styles/aru-pages.css';
 import './styles/voz-page.css';
 
-const SIMPLE_PAGE = `${import.meta.env.BASE_URL}index.html`;
+const PUBLIC_BASE = import.meta.env.BASE_URL;
+const SIMPLE_PAGE = `${PUBLIC_BASE}index.html`;
+const GUIDE_LOADER_DURATION_MS = 1500;
+const GUIDE_LOADER_EXIT_MS = 280;
+const GUIDE_LOADER_FRAME_MS = 320;
+const GUIDE_LOADING_FRAMES = [
+  `${PUBLIC_BASE}imagenes/loading1.png`,
+  `${PUBLIC_BASE}imagenes/loading2.png`,
+];
+const UNFORTUNATE_ACTION_ID = 'unfortunateAngry';
+const UNFORTUNATE_TRIGGERS = [
+  'salada',
+  'salado',
+  'mala suerte',
+  'desafortunada',
+  'desafortunado',
+  'unfortunate',
+  'unlucky',
+  'bad luck',
+];
 
 function createMessage(role, content, meta = {}) {
   return {
@@ -36,14 +59,35 @@ function createMessage(role, content, meta = {}) {
   };
 }
 
+function normalizeTriggerText(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}\s]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isUnfortunateTrigger(text) {
+  const normalized = normalizeTriggerText(text);
+  if (!normalized) return false;
+
+  return UNFORTUNATE_TRIGGERS.some((trigger) => {
+    const normalizedTrigger = normalizeTriggerText(trigger);
+    if (normalizedTrigger.includes(' ')) return normalized.includes(normalizedTrigger);
+    return new RegExp(`(^|\\s)${normalizedTrigger}(?=\\s|$)`).test(normalized);
+  });
+}
+
 function expressionForNode(node) {
   if (!node) return 'A';
   if (node.id === NOT_FOUND_NODE_ID || node.id === 'free_question') return 'H';
   return node.expression || 'G';
 }
 
-function createNodeMessage(nodeId) {
-  const node = getGuidedNode(nodeId);
+function createNodeMessage(nodeId, language = 'es') {
+  const node = getGuidedNode(nodeId, language);
   return createMessage('assistant', node.message, {
     nodeId: node.id,
     emotion: node.emotion,
@@ -52,13 +96,13 @@ function createNodeMessage(nodeId) {
   });
 }
 
-function initialMessages() {
-  return [createNodeMessage(HOME_NODE_ID)];
+function initialMessages(language = 'es') {
+  return [createNodeMessage(HOME_NODE_ID, language)];
 }
 
-function loadMessages() {
+function loadMessages(language = 'es') {
   const stored = getConversation();
-  return stored.length ? stored : initialMessages();
+  return stored.length ? stored : initialMessages(language);
 }
 
 function lastAssistantNodeId(messages) {
@@ -86,16 +130,16 @@ function latestAssistantIndex(messages) {
   return -1;
 }
 
-function compactStatusForNode(node) {
-  if (!node) return 'Lista';
-  if (node.id === HOME_NODE_ID) return 'Lista';
-  if (node.id === NOT_FOUND_NODE_ID) return 'Sin datos';
+function compactStatusForNode(node, language = 'es') {
+  if (!node) return translate('guide.ready', language);
+  if (node.id === HOME_NODE_ID) return translate('guide.ready', language);
+  if (node.id === NOT_FOUND_NODE_ID) return translate('guide.noData', language);
   return node.statusLabel || node.title;
 }
 
-function companionLineForNode(node) {
-  if (!node || node.id === HOME_NODE_ID) return 'Aru explica lo que AruDev resume.';
-  return node.companionLine || 'Guiando el perfil de Kendall ✨';
+function companionLineForNode(node, language = 'es') {
+  if (!node || node.id === HOME_NODE_ID) return translate('guide.companionHome', language);
+  return node.companionLine || translate('guide.companionFallback', language);
 }
 
 function optionClassName(kind = 'secondary') {
@@ -108,13 +152,13 @@ function optionClassName(kind = 'secondary') {
 function externalLinkLabel(link) {
   const text = `${link.label} ${link.url}`.toLowerCase();
   if (text.includes('demo') || text.includes('abrir') || text.includes('portfolio')) return `🌐 ${link.label}`;
-  if (text.includes('github') || text.includes('repositorio')) return `🔗 ${link.label}`;
+  if (text.includes('github') || text.includes('repositorio') || text.includes('repository')) return `🔗 ${link.label}`;
   if (text.includes('mailto')) return `✉ ${link.label}`;
   if (text.includes('wa.me')) return `💬 ${link.label}`;
   return `↗ ${link.label}`;
 }
 
-function optionsForNode(node, backNodeId) {
+function optionsForNode(node, backNodeId, language = 'es') {
   const options = node.options || [];
   if (!backNodeId || node.id === HOME_NODE_ID || options.some((option) => option.next === backNodeId)) {
     return options;
@@ -122,7 +166,7 @@ function optionsForNode(node, backNodeId) {
 
   return [
     {
-      label: `Volver a ${getGuidedNode(backNodeId).title}`,
+      label: translate('common.backTo', language, { title: getGuidedNode(backNodeId, language).title }),
       next: backNodeId,
       kind: 'backSmart',
     },
@@ -130,10 +174,14 @@ function optionsForNode(node, backNodeId) {
   ];
 }
 
-function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAction }) {
-  const options = isLatest ? optionsForNode(node, backNodeId) : [];
+function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onExternalAction }) {
+  const options = isLatest ? optionsForNode(node, backNodeId, language) : [];
   const isProject = node.id.startsWith('project_');
-  const kicker = node.id === HOME_NODE_ID ? 'Aru Deep Guide' : isProject ? 'Ficha técnica guiada' : 'Aru explica';
+  const kicker = node.id === HOME_NODE_ID
+    ? translate('common.sourceKicker', language)
+    : isProject
+      ? translate('common.projectKicker', language)
+      : translate('common.explainKicker', language);
 
   return (
     <div className={isProject ? 'flow-card flow-card--project' : 'flow-card'}>
@@ -141,7 +189,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAct
         <span className="flow-card__kicker">{kicker}</span>
         <div className="flow-card__title-row">
           <h3>{node.title}</h3>
-          <span className="flow-card__tag">{isProject ? 'Proyecto' : 'Guía local'}</span>
+          <span className="flow-card__tag">{isProject ? translate('common.project', language) : translate('common.localGuide', language)}</span>
         </div>
       </div>
 
@@ -151,9 +199,9 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAct
       {node.badges?.length ? (
         <section
           className={isProject ? 'flow-feature-strip flow-feature-strip--project' : 'flow-feature-strip'}
-          aria-label="Tecnologías y temas"
+          aria-label={translate('common.featureTopics', language)}
         >
-          <h4>{isProject ? 'Stack y enfoque' : 'Temas clave'}</h4>
+          <h4>{isProject ? translate('common.projectStack', language) : translate('common.featureTopics', language)}</h4>
           <div className="flow-badges">
             {node.badges.map((badge) => <span key={badge}>{badge}</span>)}
           </div>
@@ -176,8 +224,8 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAct
       ) : null}
 
       {node.links?.length ? (
-        <section className="flow-link-panel" aria-label="Enlaces">
-          <h4>{isProject ? 'Enlaces destacados' : 'Enlaces oficiales'}</h4>
+        <section className="flow-link-panel" aria-label={translate('common.links', language)}>
+          <h4>{isProject ? translate('common.projectLinks', language) : translate('common.links', language)}</h4>
           <div className="flow-links">
             {node.links.map((link) => (
               <a
@@ -198,7 +246,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAct
       {options.length ? (
         <div
           className={isProject ? 'flow-options flow-options--project-nav' : 'flow-options'}
-          aria-label="Opciones de Aru"
+          aria-label={translate('common.flowOptions', language)}
         >
           {options.map((option) => (
             option.url ? (
@@ -226,28 +274,69 @@ function GuidedNodeContent({ node, backNodeId, isLatest, onSelect, onExternalAct
         </div>
       ) : null}
 
-      <p className="flow-card__source">{deepGuideMeta.sourceNote}</p>
+      <p className="flow-card__source">{localize(deepGuideMeta.sourceNote, language)}</p>
     </div>
   );
 }
 
 function App() {
-  const [messages, setMessages] = React.useState(loadMessages);
+  const [language, setLanguage] = useAruLanguage();
+  const [messages, setMessages] = React.useState(() => loadMessages(language));
   const [input, setInput] = React.useState('');
   const [visitorMemory, setVisitorMemory] = React.useState(getVisitorMemory);
   const [avatarMood, setAvatarMood] = React.useState('normal');
+  const [pageShakeActive, setPageShakeActive] = React.useState(false);
+  const [guideLoading, setGuideLoading] = React.useState(true);
+  const [guideLoaderLeaving, setGuideLoaderLeaving] = React.useState(false);
+  const [guideLoaderFrame, setGuideLoaderFrame] = React.useState(0);
   const expressionController = useAruExpressionController();
-  const motionController = useAruMotionController('idle');
+  const motionController = useAruMotionController('idle', language);
   const messagesListRef = React.useRef(null);
-  const currentNode = getGuidedNode(lastAssistantNodeId(messages));
+  const shakeTimerRef = React.useRef(0);
+  const shakeFrameRef = React.useRef(0);
+  const loaderIntervalRef = React.useRef(0);
+  const loaderHideTimerRef = React.useRef(0);
+  const loaderRemoveTimerRef = React.useRef(0);
+  const lastUnfortunateSubmitRef = React.useRef({ text: '', at: 0 });
+  const currentNode = getGuidedNode(lastAssistantNodeId(messages), language);
   const backNodeId = previousAssistantNodeId(messages);
   const lastAssistantIndex = latestAssistantIndex(messages);
-  const currentStatus = compactStatusForNode(currentNode);
-  const companionLine = companionLineForNode(currentNode);
+  const currentStatus = compactStatusForNode(currentNode, language);
+  const companionLine = companionLineForNode(currentNode, language);
+  const latestAssistantMessage = messages[lastAssistantIndex] || null;
 
   React.useEffect(() => {
     saveConversation(messages);
   }, [messages]);
+
+  React.useEffect(() => {
+    installAruSfxUnlock();
+  }, []);
+
+  React.useEffect(() => {
+    loaderIntervalRef.current = window.setInterval(() => {
+      setGuideLoaderFrame((frame) => (frame + 1) % GUIDE_LOADING_FRAMES.length);
+    }, GUIDE_LOADER_FRAME_MS);
+
+    loaderHideTimerRef.current = window.setTimeout(() => {
+      setGuideLoaderLeaving(true);
+      loaderRemoveTimerRef.current = window.setTimeout(() => {
+        window.clearInterval(loaderIntervalRef.current);
+        setGuideLoading(false);
+      }, GUIDE_LOADER_EXIT_MS);
+    }, GUIDE_LOADER_DURATION_MS);
+
+    return () => {
+      window.clearInterval(loaderIntervalRef.current);
+      window.clearTimeout(loaderHideTimerRef.current);
+      window.clearTimeout(loaderRemoveTimerRef.current);
+    };
+  }, []);
+
+  React.useEffect(() => () => {
+    window.clearTimeout(shakeTimerRef.current);
+    window.cancelAnimationFrame(shakeFrameRef.current);
+  }, []);
 
   React.useEffect(() => {
     saveVisitorMemory({ lastVisitAt: new Date().toISOString() });
@@ -256,6 +345,11 @@ function App() {
   React.useEffect(() => {
     const list = messagesListRef.current;
     if (!list) return;
+    if (messages[messages.length - 1]?.role !== 'assistant') {
+      list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+      return;
+    }
+
     const latestAssistant = list.querySelector('[data-latest-assistant="true"]');
     if (latestAssistant) {
       latestAssistant.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -268,6 +362,11 @@ function App() {
   React.useEffect(() => {
     const action = getAruAction(currentNode.action || (currentNode.id === NOT_FOUND_NODE_ID ? 'notFound' : 'explainFocus'));
     motionController.runAction(action.id, { force: true });
+    if (action.sfx && latestAssistantMessage?.id && !guideLoading) {
+      playAruSfx(action.sfx, `${action.id}:${latestAssistantMessage.id}`, {
+        queueOnBlock: action.sfx !== 'greeting',
+      });
+    }
     expressionController.setTemporaryExpression(action.expression || expressionForNode(currentNode), {
       durationMs: action.durationMs || 2400,
       resetToIdle: action.resetToIdle ?? true,
@@ -275,10 +374,10 @@ function App() {
       priority: currentNode.id === NOT_FOUND_NODE_ID ? ARU_EXPRESSION_PRIORITY.error : ARU_EXPRESSION_PRIORITY.system,
       force: true,
     });
-  }, [currentNode.id]);
+  }, [currentNode.id, latestAssistantMessage?.id, guideLoading]);
 
   function showNode(nodeId, userLabel = null) {
-    const node = getGuidedNode(nodeId);
+    const node = getGuidedNode(nodeId, language);
 
     setMessages((currentMessages) => {
       const currentNodeId = lastAssistantNodeId(currentMessages);
@@ -287,7 +386,7 @@ function App() {
       return [
         ...currentMessages.filter((message) => message.role !== 'error'),
         ...(userLabel ? [createMessage('user', userLabel)] : []),
-        createNodeMessage(node.id),
+        createNodeMessage(node.id, language),
       ];
     });
   }
@@ -297,6 +396,53 @@ function App() {
     showNode(option.next, option.label);
   }
 
+  function triggerAngryPageShake() {
+    window.clearTimeout(shakeTimerRef.current);
+    window.cancelAnimationFrame(shakeFrameRef.current);
+    setPageShakeActive(false);
+
+    shakeFrameRef.current = window.requestAnimationFrame(() => {
+      setPageShakeActive(true);
+      shakeTimerRef.current = window.setTimeout(() => setPageShakeActive(false), 760);
+    });
+  }
+
+  function isDuplicateUnfortunateSubmit(content) {
+    const normalized = normalizeTriggerText(content);
+    const now = Date.now();
+    const last = lastUnfortunateSubmitRef.current;
+    if (last.text === normalized && now - last.at < 900) return true;
+
+    lastUnfortunateSubmitRef.current = { text: normalized, at: now };
+    return false;
+  }
+
+  function runUnfortunateReaction(content) {
+    const action = getAruAction(UNFORTUNATE_ACTION_ID);
+    const userMessage = createMessage('user', content, { action: action.id });
+
+    setInput('');
+    setMessages((currentMessages) => [
+      ...currentMessages.filter((message) => message.role !== 'error'),
+      userMessage,
+    ]);
+
+    motionController.runAction(action.id, { force: true });
+    expressionController.setTemporaryExpression(action.expression, {
+      durationMs: action.durationMs || 2600,
+      resetToIdle: action.resetToIdle ?? true,
+      source: 'error',
+      priority: ARU_EXPRESSION_PRIORITY.error + 1,
+      force: true,
+    });
+
+    if (action.sfx) {
+      playAruSfx(action.sfx, `${action.id}:${userMessage.id}`);
+    }
+
+    triggerAngryPageShake();
+  }
+
   function submitContent(rawContent) {
     const content = String(rawContent || '').trim();
     if (!content) return;
@@ -304,8 +450,16 @@ function App() {
     rememberVisitorFromText(content);
     setVisitorMemory(getVisitorMemory());
 
-    const result = searchGuidedFlow(content);
-    const node = result || getGuidedNode(NOT_FOUND_NODE_ID);
+    if (isUnfortunateTrigger(content)) {
+      setInput('');
+      if (!isDuplicateUnfortunateSubmit(content)) {
+        runUnfortunateReaction(content);
+      }
+      return;
+    }
+
+    const result = searchGuidedFlow(content, language);
+    const node = result || getGuidedNode(NOT_FOUND_NODE_ID, language);
 
     setInput('');
     setMessages((currentMessages) => {
@@ -314,7 +468,7 @@ function App() {
       return [
         ...currentMessages.filter((message) => message.role !== 'error'),
         createMessage('user', content),
-        createNodeMessage(node.id),
+        createNodeMessage(node.id, language),
       ];
     });
   }
@@ -326,7 +480,7 @@ function App() {
 
   function startNewConversation() {
     clearStoredConversation();
-    setMessages(initialMessages());
+    setMessages(initialMessages(language));
     setInput('');
     expressionController.resetToIdle();
     motionController.runAction('home', { force: true });
@@ -344,7 +498,29 @@ function App() {
       data-mode="guided"
       data-avatar-mood={avatarMood}
       data-aru-action={motionController.action.id}
+      data-shake={pageShakeActive ? 'angry' : undefined}
+      aria-busy={guideLoading ? 'true' : undefined}
     >
+      {guideLoading ? (
+        <div
+          className="aru-guide-loader"
+          data-state={guideLoaderLeaving ? 'leaving' : 'active'}
+          role="status"
+          aria-label="Loading Aru guide"
+        >
+          <div className="aru-guide-loader__spark aru-guide-loader__spark--one" aria-hidden="true" />
+          <div className="aru-guide-loader__spark aru-guide-loader__spark--two" aria-hidden="true" />
+          <div className="aru-guide-loader__content">
+            <img
+              className="aru-guide-loader__image"
+              src={GUIDE_LOADING_FRAMES[guideLoaderFrame]}
+              alt="Aru loading"
+            />
+            <p className="aru-guide-loader__text">WA HA HA !!!</p>
+          </div>
+        </div>
+      ) : null}
+
       <div className="voz-bg" aria-hidden="true">
         <div className="voz-bg__blob voz-bg__blob--rose" />
         <div className="voz-bg__blob voz-bg__blob--mint" />
@@ -378,6 +554,7 @@ function App() {
             onMoodChange={setAvatarMood}
             lookEnabled
             autoBlink
+            language={language}
             expression={expressionController.overrideExpression}
             motion={motionController.motion}
             actionBubble={motionController.bubble}
@@ -390,37 +567,38 @@ function App() {
 
         <div className="mini-status">
           <div className="mini-status__item">
-            <span>Estado</span>
+            <span>{translate('guide.status', language)}</span>
             <strong>{currentStatus}</strong>
           </div>
           <div className="mini-status__item">
-            <span>Sección</span>
+            <span>{translate('guide.section', language)}</span>
             <strong>{currentNode.title}</strong>
           </div>
           {visitorMemory.name ? (
             <div className="mini-status__item">
-              <span>Visitante</span>
+              <span>{translate('guide.visitor', language)}</span>
               <strong>{visitorMemory.name}</strong>
             </div>
           ) : null}
-          <a className="nav-link companion-back" href={SIMPLE_PAGE}>Volver al avatar</a>
+          <a className="nav-link companion-back" href={SIMPLE_PAGE}>{translate('guide.backToAvatar', language)}</a>
         </div>
       </aside>
 
-      <section className="chat-panel" aria-label="Guía con Aru">
+      <section className="chat-panel" aria-label={translate('guide.panelAria', language)}>
         <header className="chat-header">
           <div>
-            <h2 className="chat-title">Guía con Aru</h2>
+            <h2 className="chat-title">{translate('guide.title', language)}</h2>
             <p className="chat-subtitle">
-              Aru explica lo que AruDev resume, usando conocimiento local.
+              {translate('guide.subtitle', language)}
             </p>
           </div>
           <div className="chat-header__actions">
+            <LanguageToggle language={language} onChange={setLanguage} />
             <button type="button" className="soft-button chat-reset-button" onClick={startNewConversation}>
-              Nueva conversación
+              {translate('guide.newConversation', language)}
             </button>
             <button type="button" className="soft-button chat-memory-button" onClick={clearLocalMemory}>
-              Borrar memoria local
+              {translate('guide.clearMemory', language)}
             </button>
           </div>
         </header>
@@ -428,7 +606,7 @@ function App() {
         <div className="chat-messages" aria-live="polite" ref={messagesListRef}>
           <div className="chat-thread">
             {messages.map((message, index) => {
-              const node = message.nodeId ? getGuidedNode(message.nodeId) : null;
+              const node = message.nodeId ? getGuidedNode(message.nodeId, language) : null;
               const isLatestAssistant = message.role === 'assistant' && index === lastAssistantIndex;
               return (
                 <div
@@ -443,6 +621,7 @@ function App() {
                         node={node}
                         backNodeId={backNodeId}
                         isLatest={isLatestAssistant}
+                        language={language}
                         onSelect={selectOption}
                         onExternalAction={(actionId) => motionController.runAction(actionId, { force: true })}
                       />
@@ -450,7 +629,7 @@ function App() {
                       <p>{message.content}</p>
                     )}
                   </div>
-                  {message.role === 'user' ? <span className="message-avatar message-avatar--user" aria-hidden="true">Tu</span> : null}
+                  {message.role === 'user' ? <span className="message-avatar message-avatar--user" aria-hidden="true">{translate('common.userBadge', language)}</span> : null}
                 </div>
               );
             })}
@@ -463,8 +642,8 @@ function App() {
               className="chat-input"
               value={input}
               rows={1}
-              placeholder="Busca en la base local de Kendall..."
-              aria-label="Búsqueda local sobre Kendall"
+              placeholder={translate('guide.searchPlaceholder', language)}
+              aria-label={translate('guide.searchAria', language)}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
@@ -474,7 +653,7 @@ function App() {
               }}
             />
             <button type="submit" className="primary-button" disabled={!input.trim()}>
-              Buscar
+              {translate('guide.searchButton', language)}
             </button>
           </div>
         </form>

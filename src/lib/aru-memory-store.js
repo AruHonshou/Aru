@@ -71,7 +71,7 @@ export function clearVisitorMemory() {
 }
 
 export function rememberVisitorFromText(text) {
-  const match = String(text || '').match(/\b(?:me llamo|mi nombre es)\s+([a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s'-]{1,40})/i);
+  const match = String(text || '').match(/\b(?:me llamo|mi nombre es|my name is|i am|i'm)\s+([a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s'-]{1,40})/i);
   if (!match) return;
 
   saveVisitorMemory({

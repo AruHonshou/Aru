@@ -1,110 +1,109 @@
 # Aru
 
-**Aru** es una asistente PNGTuber web interactiva que complementa el portfolio oficial de Kendall Valverde Díaz.
+**Aru** is an interactive web PNGTuber assistant that complements Kendall Valverde Diaz's official portfolio.
 
-La idea central:
+**Aru** es una asistente PNGTuber web interactiva que complementa el portfolio oficial de Kendall Valverde Diaz.
 
 ```text
-AruDev muestra el resumen profesional.
-Aru explica la historia completa.
+EN: AruDev shows the professional summary. Aru explains the full story.
+ES: AruDev muestra el resumen profesional. Aru explica la historia completa.
 ```
 
-Aru no es otro portfolio oficial. El portfolio visual y resumido vive en:
+Official portfolio / Portfolio oficial:
 
 ```text
 https://aruhonshou.github.io/AruDev/
 ```
 
-## Qué Es Aru
+## What Aru Is
 
-Aru es:
+Aru is:
 
-- una companion PNGTuber web hecha con React y Vite;
-- una entrada interactiva con avatar, moods, AFK, parpadeo, mouse tracking, micrófono y audio;
-- una guía local profunda que explica proyectos, experiencia, skills, QA, IA y DevOps;
-- una demo de UI anime/chibi, motion design y estados visuales;
-- un complemento de AruDev.
+- a React + Vite PNGTuber companion;
+- a static GitHub Pages app with no backend;
+- a bilingual ES/EN local guide;
+- an anime/chibi UI demo with avatar moods, AFK, blinking, mouse tracking, microphone/audio mouth sync, and motion states;
+- a deeper explanation layer for AruDev.
 
-Aru no es:
+Aru is not:
 
-- otro portfolio oficial;
-- un chatbot con IA externa;
-- una app con backend;
-- una integración con DeepSeek;
-- un Worker;
-- un proyecto que requiera API keys.
+- another official portfolio;
+- a generative AI chatbot;
+- a DeepSeek, Worker, OpenAI, or Google Translate integration;
+- a backend project;
+- an app that requires API keys.
 
-## Páginas
+## Pages
 
 ```text
 /Aru/
 /Aru/index.html
 ```
 
-Modo avatar PNGTuber. Incluye:
-
-- seguimiento del mouse;
-- parpadeo;
-- moods por clic;
-- AFK;
-- botón "Lo siento";
-- micrófono;
-- carga de archivo de audio;
-- sincronización de boca;
-- panel de ajustes visuales;
-- CTA hacia la guía profunda;
-- CTA hacia AruDev.
+Avatar mode. Includes mouse tracking, blinking, click moods, AFK, "Lo siento/Sorry", microphone, audio file loading, mouth sync, visual settings, and CTAs to the guide and AruDev.
 
 ```text
 /Aru/guia.html
 ```
 
-Guía interactiva profunda basada en `src/data/kendall-profile.md`.
+Deep local guide based on `src/data/kendall-profile.md`. It explains projects, QA Automation, applied AI, fullstack work, DevOps, experience, certifications, contact, and why Kendall may fit a role.
 
-Explica con más detalle:
-
-- resumen profundo de Kendall;
-- proyectos;
-- QA Automation;
-- IA aplicada, RAG, agentes y OpenAI API;
-- fullstack React/Node/TypeScript;
-- DevOps, AWS, Docker, Terraform y GitHub Actions;
-- razones para contratar a Kendall;
-- enlaces oficiales.
-
-Aliases antiguos:
+Legacy aliases:
 
 ```text
 /Aru/simple.html -> /Aru/index.html
 /Aru/voz.html    -> /Aru/guia.html
 ```
 
-## Fuente Local De Verdad
+## Bilingual Local i18n
 
-La base principal de conocimiento es:
+Aru supports:
+
+- Spanish (`ES`);
+- English (`EN`);
+- a visible ES/EN selector on `index.html` and `guia.html`;
+- persistence through `localStorage`;
+- browser-language fallback: English browsers start in EN, otherwise ES;
+- Spanish fallback when a translation is missing.
+
+Main files:
+
+```text
+src/i18n/aru-i18n.js
+src/hooks/useAruLanguage.js
+src/components/LanguageToggle.jsx
+```
+
+No translation service is used. All copy is local and bundled by Vite.
+
+## Local Source Of Truth
+
+The main knowledge source is:
 
 ```text
 src/data/kendall-profile.md
 ```
 
-La capa estructurada de la guía vive en:
+The structured guide lives in:
 
 ```text
 src/data/aru-deep-knowledge.js
 src/data/aru-guided-flow.js
 ```
 
-Reglas:
+Rules:
 
-- Aru no debe inventar datos.
-- Aru no debe crear experiencia, certificaciones, proyectos o métricas falsas.
-- Si falta información, responde que ese dato no está registrado todavía.
-- Todo el flujo es local y se incluye en el bundle de Vite.
-- No se usa `fetch` hacia APIs, backend, Worker, DeepSeek ni claves.
+- Aru must not invent data.
+- Aru must not create fake projects, fake experience, fake certifications, or private information.
+- If a detail is missing:
+  - ES: "Mmm... ese dato no lo tengo registrado todavia."
+  - EN: "Hmm... I don't have that detail registered yet."
+- The guide is fully local and static.
+- No `fetch` to APIs, backend, Worker, DeepSeek, or secret keys.
 
 ## Motion System
 
-Las acciones PNGTuber están en:
+The PNGTuber action system lives in:
 
 ```text
 src/lib/aru-actions.js
@@ -112,7 +111,7 @@ src/hooks/useAruMotionController.js
 src/styles/aru-motion.css
 ```
 
-Acciones disponibles:
+Actions:
 
 - `idle`
 - `home`
@@ -129,35 +128,26 @@ Acciones disponibles:
 - `tired`
 - `explainFocus`
 
-Cada acción puede definir:
+Each action can define expression, motion, localized bubble, duration, idle reset, and priority. Internal moods keep priority over temporary guide actions.
 
-- expresión A-K;
-- animación;
-- burbuja temporal;
-- duración;
-- reset a idle;
-- prioridad.
+## Install
 
-Los moods internos de Aru tienen prioridad sobre acciones temporales para no romper enojo por clics, AFK ni el botón "Lo siento".
+Requirements:
 
-## Instalación
-
-Requisitos:
-
-- Node.js 22 LTS recomendado.
-- Node.js 20.19+ o 22.12+ como mínimo para Vite 8.
+- Node.js 22 LTS recommended.
+- Node.js 20.19+ or 22.12+ minimum for Vite 8.
 
 ```bash
 npm install
 ```
 
-## Ejecutar En Local
+## Run Locally
 
 ```bash
 npm run dev
 ```
 
-Entradas:
+Local entries:
 
 ```text
 http://localhost:5173/
@@ -173,77 +163,66 @@ npm run verify:pages
 npm run preview
 ```
 
-El build usa base path `/Aru/`, listo para GitHub Pages.
+The production build uses the `/Aru/` base path for GitHub Pages.
 
-## Generar Frames Del Personaje
+## Character Frames
 
-Las hojas fuente están en `imagenes/` y no se suben a Git porque son pesadas.
+Source sheets live in `imagenes/` and are not committed because they are heavy.
 
 ```bash
 npm run generate:character
 ```
 
-El generador crea frames WebP en:
+Generated WebP frames are placed in:
 
 ```text
 public/slices2/A/r0c0.webp ... r4c4.webp
 ...
-public/slices2/F/r0c0.webp ... r4c4.webp
+public/slices2/K/r0c0.webp ... r4c4.webp
 ```
 
-Cada carpeta `A-F` debe contener 25 archivos. Las expresiones especiales `G-K` también se verifican en el build.
-
-## Estructura
+## Structure
 
 ```text
 .
-|-- index.html        # modo avatar PNGTuber
-|-- guia.html         # guía profunda local
-|-- simple.html       # redirect antiguo hacia index.html
-|-- voz.html          # redirect antiguo hacia guia.html
+|-- index.html
+|-- guia.html
+|-- simple.html
+|-- voz.html
 |-- scripts/
-|   |-- generate-character-slices.mjs
-|   `-- verify-pages-build.mjs
 |-- src/
 |   |-- app.jsx
 |   |-- talk-app.jsx
 |   |-- components/
 |   |-- hooks/
+|   |-- i18n/
 |   |-- lib/
 |   |-- styles/
-|   |-- data/
-|   |   |-- kendall-profile.md
-|   |   |-- aru-deep-knowledge.js
-|   |   `-- aru-guided-flow.js
-|   |-- ajustes-panel.jsx
-|   `-- character-config.js
+|   `-- data/
+|       |-- kendall-profile.md
+|       |-- aru-deep-knowledge.js
+|       `-- aru-guided-flow.js
 |-- public/
-|   `-- slices2/
-`-- imagenes/      # fuente local ignorada por Git
+`-- imagenes/
 ```
 
-## Publicación
+## Publishing
 
-GitHub Pages debe abrir el avatar en:
+GitHub Pages target:
 
 ```text
 https://aruhonshou.github.io/Aru/
-```
-
-La guía profunda queda en:
-
-```text
 https://aruhonshou.github.io/Aru/guia.html
 ```
 
-El portfolio oficial queda en:
+Official portfolio:
 
 ```text
 https://aruhonshou.github.io/AruDev/
 ```
 
-## Licencia
+## License
 
-El código está bajo MIT. Los assets de Aru pertenecen al usuario del proyecto y no se pueden reutilizar sin permiso.
+Code is MIT. Aru assets belong to the project owner and cannot be reused without permission.
 
-Consulta `ASSET_LICENSE.md` para más detalle.
+See `ASSET_LICENSE.md` for details.

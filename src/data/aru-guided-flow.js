@@ -1,4 +1,5 @@
 import { deepGuideNodes } from './aru-deep-knowledge';
+import { localize } from '../i18n/aru-i18n';
 
 export const HOME_NODE_ID = 'home';
 export const NOT_FOUND_NODE_ID = 'not_found';
@@ -9,8 +10,11 @@ const NODE_ALIASES = {
 };
 const STOP_WORDS = new Set([
   'a',
+  'about',
   'al',
+  'and',
   'como',
+  'can',
   'con',
   'cual',
   'cuales',
@@ -19,12 +23,16 @@ const STOP_WORDS = new Set([
   'de',
   'del',
   'dime',
+  'does',
   'el',
   'en',
   'es',
   'esta',
   'este',
   'hablame',
+  'he',
+  'his',
+  'how',
   'la',
   'las',
   'le',
@@ -33,6 +41,7 @@ const STOP_WORDS = new Set([
   'me',
   'mi',
   'o',
+  'of',
   'para',
   'por',
   'que',
@@ -40,15 +49,24 @@ const STOP_WORDS = new Set([
   'sobre',
   'su',
   'sus',
+  'tell',
+  'the',
   'tiene',
+  'to',
   'un',
   'una',
+  'what',
+  'with',
   'y',
 ]);
 const GENERIC_ENTITY_TERMS = new Set(['kendall', 'valverde', 'diaz', 'díaz']);
 
-export function getGuidedNode(nodeId) {
+export function getRawGuidedNode(nodeId) {
   return guidedFlowNodes[nodeId] || guidedFlowNodes[NODE_ALIASES[nodeId]] || guidedFlowNodes[HOME_NODE_ID];
+}
+
+export function getGuidedNode(nodeId, language = 'es') {
+  return localize(getRawGuidedNode(nodeId), language);
 }
 
 export function normalizeSearchText(text) {
@@ -61,8 +79,8 @@ export function normalizeSearchText(text) {
     .trim();
 }
 
-function searchableText(node) {
-  return normalizeSearchText([
+function nodeTextParts(node) {
+  return [
     node.title,
     node.message,
     node.summary,
@@ -77,10 +95,19 @@ function searchableText(node) {
       section.title,
       ...(section.items || []),
     ]),
-  ].filter(Boolean).join(' '));
+  ].filter(Boolean);
 }
 
-export function searchGuidedFlow(query) {
+function searchableText(node, language) {
+  const primary = localize(node, language);
+  const secondary = localize(node, language === 'en' ? 'es' : 'en');
+  return normalizeSearchText([
+    ...nodeTextParts(primary),
+    ...nodeTextParts(secondary),
+  ].join(' '));
+}
+
+export function searchGuidedFlow(query, language = 'es') {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return null;
 
@@ -91,7 +118,7 @@ export function searchGuidedFlow(query) {
 
   const ranked = nodes
     .map((node) => {
-      const haystack = searchableText(node);
+      const haystack = searchableText(node, language);
       const keywords = (node.searchKeywords || []).map(normalizeSearchText);
       let score = 0;
 

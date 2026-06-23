@@ -1,5 +1,6 @@
 import React from 'react';
 import { getAruAction } from '../lib/aru-actions';
+import { localize } from '../i18n/aru-i18n';
 
 const IDLE_ACTION = getAruAction('idle');
 
@@ -9,7 +10,7 @@ function clampDuration(durationMs) {
   return Math.min(8000, Math.max(500, Math.round(value)));
 }
 
-export function useAruMotionController(initialAction = 'idle') {
+export function useAruMotionController(initialAction = 'idle', language = 'es') {
   const [action, setAction] = React.useState(() => getAruAction(initialAction));
   const timerRef = React.useRef(0);
   const actionRef = React.useRef(action);
@@ -44,7 +45,7 @@ export function useAruMotionController(initialAction = 'idle') {
   return {
     action,
     motion: action.motion,
-    bubble: action.bubble,
+    bubble: localize(action.bubble, language),
     runAction,
     resetToIdle,
   };
