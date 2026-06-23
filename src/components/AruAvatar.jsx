@@ -11,11 +11,12 @@ import {
   sheetForMouth,
   SHEETS,
 } from '../lib/aru-frames';
+import { playAruSfx } from '../lib/aru-sfx';
 import '../styles/aru-avatar.css';
 import '../styles/aru-motion.css';
 
 const RAGE_CLICK_LIMIT = 10;
-const AFK_MS = 240_000;
+const AFK_MS = 30_000;
 
 function debugFrames(activeCell) {
   const frames = [];
@@ -44,6 +45,7 @@ export default function AruAvatar({
   motion = 'idle-breathe',
   actionBubble = null,
   language = 'es',
+  onHardLock,
 }) {
   const avatarRef = React.useRef(null);
   const [pressed, setPressed] = React.useState(false);
@@ -51,6 +53,8 @@ export default function AruAvatar({
   const [clickCount, setClickCount] = React.useState(0);
   const moodRef = React.useRef(mood);
   const resetAfkRef = React.useRef(() => {});
+  const hardLockNotifiedRef = React.useRef(false);
+  const hasPlayedAfkSfxRef = React.useRef(false);
   moodRef.current = mood;
 
   const locked = mood === 'locked';
@@ -71,6 +75,12 @@ export default function AruAvatar({
   }, [mood, onMoodChange]);
 
   React.useEffect(() => {
+    if (mood !== 'locked' || hardLockNotifiedRef.current) return;
+    hardLockNotifiedRef.current = true;
+    onHardLock?.();
+  }, [mood, onHardLock]);
+
+  React.useEffect(() => {
     if (!moodEnabled) return undefined;
 
     let timer = 0;
@@ -86,14 +96,31 @@ export default function AruAvatar({
 
     window.addEventListener('keydown', resetAfk, { passive: true });
     window.addEventListener('pointerdown', resetAfk, { passive: true });
+    window.addEventListener('pointermove', resetAfk, { passive: true });
+    window.addEventListener('touchstart', resetAfk, { passive: true });
     resetAfk();
     return () => {
       clearTimeout(timer);
       window.removeEventListener('keydown', resetAfk);
       window.removeEventListener('pointerdown', resetAfk);
+      window.removeEventListener('pointermove', resetAfk);
+      window.removeEventListener('touchstart', resetAfk);
       resetAfkRef.current = () => {};
     };
   }, [moodEnabled]);
+
+  React.useEffect(() => {
+    if (!moodEnabled) return;
+
+    if (mood === 'bored') {
+      if (hasPlayedAfkSfxRef.current) return;
+      hasPlayedAfkSfxRef.current = true;
+      playAruSfx('afk', `afk-${Date.now()}`, { queueOnBlock: false });
+      return;
+    }
+
+    hasPlayedAfkSfxRef.current = false;
+  }, [mood, moodEnabled]);
 
   const frames = React.useMemo(() => frameGrid(avatarSheets({
     includeMouthFrames: enableAudioMouthSync,

@@ -29,7 +29,7 @@ import './styles/aru-pages.css';
 import './styles/voz-page.css';
 
 const PUBLIC_BASE = import.meta.env.BASE_URL;
-const SIMPLE_PAGE = `${PUBLIC_BASE}index.html`;
+const PORTFOLIO_PAGE = `${PUBLIC_BASE}portfolio.html`;
 const GUIDE_LOADER_DURATION_MS = 1500;
 const GUIDE_LOADER_EXIT_MS = 280;
 const GUIDE_LOADER_FRAME_MS = 320;
@@ -174,9 +174,12 @@ function optionsForNode(node, backNodeId, language = 'es') {
   ];
 }
 
-function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onExternalAction }) {
-  const options = isLatest ? optionsForNode(node, backNodeId, language) : [];
+function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onExternalAction, disabled = false }) {
+  const options = isLatest
+    ? optionsForNode(node, backNodeId, language).filter((option) => option.next !== node.id)
+    : [];
   const isProject = node.id.startsWith('project_');
+  const sourceText = localize(deepGuideMeta.sourceNote, language);
   const kicker = node.id === HOME_NODE_ID
     ? translate('common.sourceKicker', language)
     : isProject
@@ -234,7 +237,15 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => onExternalAction?.(link.action || 'portfolio')}
+                aria-disabled={disabled ? 'true' : undefined}
+                tabIndex={disabled ? -1 : undefined}
+                onClick={(event) => {
+                  if (disabled) {
+                    event.preventDefault();
+                    return;
+                  }
+                  onExternalAction?.(link.action || 'portfolio');
+                }}
               >
                 {externalLinkLabel(link)}
               </a>
@@ -256,7 +267,15 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
                 href={option.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => onExternalAction?.(option.action || 'portfolio')}
+                aria-disabled={disabled ? 'true' : undefined}
+                tabIndex={disabled ? -1 : undefined}
+                onClick={(event) => {
+                  if (disabled) {
+                    event.preventDefault();
+                    return;
+                  }
+                  onExternalAction?.(option.action || 'portfolio');
+                }}
               >
                 {option.label}
               </a>
@@ -265,7 +284,11 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
                 type="button"
                 key={`${option.label}-${option.next}`}
                 className={optionClassName(option.kind)}
-                onClick={() => onSelect(option)}
+                disabled={disabled}
+                onClick={() => {
+                  if (disabled) return;
+                  onSelect(option);
+                }}
               >
                 {option.label}
               </button>
@@ -274,7 +297,7 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
         </div>
       ) : null}
 
-      <p className="flow-card__source">{localize(deepGuideMeta.sourceNote, language)}</p>
+      {sourceText ? <p className="flow-card__source">{sourceText}</p> : null}
     </div>
   );
 }
@@ -285,6 +308,7 @@ function App() {
   const [input, setInput] = React.useState('');
   const [visitorMemory, setVisitorMemory] = React.useState(getVisitorMemory);
   const [avatarMood, setAvatarMood] = React.useState('normal');
+  const [isAruHardLocked, setIsAruHardLocked] = React.useState(false);
   const [pageShakeActive, setPageShakeActive] = React.useState(false);
   const [guideLoading, setGuideLoading] = React.useState(true);
   const [guideLoaderLeaving, setGuideLoaderLeaving] = React.useState(false);
@@ -304,6 +328,7 @@ function App() {
   const currentStatus = compactStatusForNode(currentNode, language);
   const companionLine = companionLineForNode(currentNode, language);
   const latestAssistantMessage = messages[lastAssistantIndex] || null;
+  const hardLocked = isAruHardLocked || avatarMood === 'locked';
 
   React.useEffect(() => {
     saveConversation(messages);
@@ -377,6 +402,7 @@ function App() {
   }, [currentNode.id, latestAssistantMessage?.id, guideLoading]);
 
   function showNode(nodeId, userLabel = null) {
+    if (hardLocked) return;
     const node = getGuidedNode(nodeId, language);
 
     setMessages((currentMessages) => {
@@ -392,6 +418,7 @@ function App() {
   }
 
   function selectOption(option) {
+    if (hardLocked) return;
     if (!option?.next) return;
     showNode(option.next, option.label);
   }
@@ -444,6 +471,7 @@ function App() {
   }
 
   function submitContent(rawContent) {
+    if (hardLocked) return;
     const content = String(rawContent || '').trim();
     if (!content) return;
 
@@ -479,6 +507,7 @@ function App() {
   }
 
   function startNewConversation() {
+    if (hardLocked) return;
     clearStoredConversation();
     setMessages(initialMessages(language));
     setInput('');
@@ -487,6 +516,7 @@ function App() {
   }
 
   function clearLocalMemory() {
+    if (hardLocked) return;
     clearVisitorMemory();
     setVisitorMemory({});
     startNewConversation();
@@ -494,11 +524,12 @@ function App() {
 
   return (
     <main
-      className="page chat-page voz-page"
+      className={['page chat-page voz-page', hardLocked ? 'aru-page--hard-locked' : ''].filter(Boolean).join(' ')}
       data-mode="guided"
       data-avatar-mood={avatarMood}
       data-aru-action={motionController.action.id}
       data-shake={pageShakeActive ? 'angry' : undefined}
+      data-hard-locked={hardLocked ? 'true' : 'false'}
       aria-busy={guideLoading ? 'true' : undefined}
     >
       {guideLoading ? (
@@ -552,6 +583,7 @@ function App() {
             smoothing={0.24}
             moodEnabled
             onMoodChange={setAvatarMood}
+            onHardLock={() => setIsAruHardLocked(true)}
             lookEnabled
             autoBlink
             language={language}
@@ -580,7 +612,17 @@ function App() {
               <strong>{visitorMemory.name}</strong>
             </div>
           ) : null}
-          <a className="nav-link companion-back" href={SIMPLE_PAGE}>{translate('guide.backToAvatar', language)}</a>
+          <a
+            className="nav-link companion-back"
+            href={PORTFOLIO_PAGE}
+            aria-disabled={hardLocked ? 'true' : undefined}
+            tabIndex={hardLocked ? -1 : undefined}
+            onClick={(event) => {
+              if (hardLocked) event.preventDefault();
+            }}
+          >
+            {translate('guide.backToAvatar', language)}
+          </a>
         </div>
       </aside>
 
@@ -593,11 +635,11 @@ function App() {
             </p>
           </div>
           <div className="chat-header__actions">
-            <LanguageToggle language={language} onChange={setLanguage} />
-            <button type="button" className="soft-button chat-reset-button" onClick={startNewConversation}>
+            <LanguageToggle language={language} onChange={setLanguage} disabled={hardLocked} />
+            <button type="button" className="soft-button chat-reset-button" onClick={startNewConversation} disabled={hardLocked}>
               {translate('guide.newConversation', language)}
             </button>
-            <button type="button" className="soft-button chat-memory-button" onClick={clearLocalMemory}>
+            <button type="button" className="soft-button chat-memory-button" onClick={clearLocalMemory} disabled={hardLocked}>
               {translate('guide.clearMemory', language)}
             </button>
           </div>
@@ -624,6 +666,7 @@ function App() {
                         language={language}
                         onSelect={selectOption}
                         onExternalAction={(actionId) => motionController.runAction(actionId, { force: true })}
+                        disabled={hardLocked}
                       />
                     ) : (
                       <p>{message.content}</p>
@@ -644,6 +687,7 @@ function App() {
               rows={1}
               placeholder={translate('guide.searchPlaceholder', language)}
               aria-label={translate('guide.searchAria', language)}
+              disabled={hardLocked}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
@@ -652,7 +696,7 @@ function App() {
                 }
               }}
             />
-            <button type="submit" className="primary-button" disabled={!input.trim()}>
+            <button type="submit" className="primary-button" disabled={hardLocked || !input.trim()}>
               {translate('guide.searchButton', language)}
             </button>
           </div>

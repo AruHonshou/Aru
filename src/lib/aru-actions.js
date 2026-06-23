@@ -98,8 +98,8 @@ export const ARU_ACTIONS = {
     expression: 'G',
     motion: 'selected-pop',
     bubble: {
-      es: 'El resumen profesional completo está en AruDev 🌐',
-      en: 'The full professional summary is on AruDev 🌐',
+      es: 'El portfolio principal ahora vive en Aru ✨',
+      en: 'The main portfolio now lives in Aru ✨',
     },
     durationMs: 2600,
     resetToIdle: true,

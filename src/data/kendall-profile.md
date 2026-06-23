@@ -102,7 +102,7 @@ Kendall Valverde Díaz es un Software Engineer de Costa Rica especializado en AI
 
 ### Resumen profesional para visitantes
 
-Kendall crea software con IA y QA. Construye productos fullstack con React, TypeScript y Node.js, integra APIs de IA generativa, desarrolla agentes inteligentes y diseña soluciones con automatización de pruebas, CI/CD y buenas prácticas de seguridad. Sus proyectos destacados incluyen DocuMente, QAPilot, Aru.Dev, OpenAI Chatbot, un sistema de Recursos Humanos y proyectos de infraestructura con Terraform y AWS.
+Kendall crea software con IA y QA. Construye productos fullstack con React, TypeScript y Node.js, integra APIs de IA generativa, desarrolla agentes inteligentes y diseña soluciones con automatización de pruebas, CI/CD y buenas prácticas de seguridad. Sus proyectos destacados incluyen DocuMente, QAPilot, Aru Portfolio, OpenAI Chatbot, un sistema de Recursos Humanos y proyectos de infraestructura con Terraform y AWS.
 
 ### Resumen estilo portfolio
 
@@ -175,7 +175,7 @@ Aru puede compartir estos contactos si el usuario pregunta cómo contactar a Ken
 
 ### Portfolio
 
-- URL principal: https://aruhonshou.github.io/AruDev/
+- URL principal: https://aruhonshou.github.io/Aru/portfolio.html
 
 ### LinkedIn
 
@@ -196,7 +196,7 @@ Puedes contactar a Kendall por GitHub, LinkedIn, email o WhatsApp. Sus enlaces p
 - GitHub: https://github.com/AruHonshou
 - LinkedIn: https://www.linkedin.com/in/kendall-valverde-diaz-aru/
 - Email: kendallavd@gmail.com
-- Portfolio: https://aruhonshou.github.io/AruDev/
+- Portfolio: https://aruhonshou.github.io/Aru/portfolio.html
 
 ---
 
@@ -326,7 +326,7 @@ Kendall ha trabajado en proyectos independientes para más de 10 clientes en Cos
 - Desarrolló aplicaciones React + TypeScript.
 - Consumió APIs REST y GraphQL.
 - Implementó manejo de estado y diseño responsive con TailwindCSS.
-- Integró OpenAI API para chat, vision y completions.
+- Integró OpenAI API para chat, visión y completions.
 - Integró Anthropic Claude SDK en proyectos con arquitectura RAG.
 - Trabajó con Function Calling y embeddings vectoriales.
 - Construyó APIs REST con Node.js/Express y NestJS.
@@ -430,7 +430,7 @@ Kendall trabaja con:
 - OpenAI API.
 - Anthropic Claude SDK.
 - Chat completions.
-- Vision.
+- Visión.
 - Completions.
 - RAG.
 - Embeddings.
@@ -502,19 +502,19 @@ Kendall trabaja con:
 
 ## 8. Proyectos destacados
 
-# 8.1 Aru.Dev — Portfolio personal interactivo
+# 8.1 Aru — Portfolio personal interactivo
 
 ### Nombre
 
-Aru.Dev / Aru Portfolio.
+Aru / Aru Portfolio.
 
 ### Repositorio
 
-https://github.com/AruHonshou/AruDev
+https://github.com/AruHonshou/Aru
 
 ### Demo
 
-https://aruhonshou.github.io/AruDev/
+https://aruhonshou.github.io/Aru/portfolio.html
 
 ### Tipo de proyecto
 
@@ -522,11 +522,11 @@ Portfolio personal interactivo con estética anime/chibi y asistente virtual.
 
 ### Descripción corta
 
-Aru.Dev es el portfolio personal de Kendall. Presenta su perfil profesional, skills, experiencia, proyectos, certificaciones y contacto mediante una experiencia visual anime/chibi con Aru como personaje protagonista.
+Aru es el portfolio principal de Kendall. Presenta su perfil profesional, skills, experiencia, proyectos, certificaciones y contacto mediante una experiencia visual anime/chibi con Aru como personaje protagonista.
 
 ### Descripción extendida
 
-Aru.Dev está diseñado como un portfolio técnico con una identidad visual diferente a un CV tradicional. En lugar de ser una página estática genérica, usa una estética anime/chibi, navegación por secciones y una presentación orientada a reclutadores técnicos. El sitio resume el perfil de Kendall como Software Engineer especializado en AI-Augmented Development, React, TypeScript, Node.js, QA Automation y agentes IA.
+Aru está diseñado como un portfolio técnico con una identidad visual diferente a un CV tradicional. En lugar de ser una página estática genérica, usa una estética anime/chibi, navegación por secciones y una presentación orientada a reclutadores técnicos. El sitio resume el perfil de Kendall como Software Engineer especializado en AI-Augmented Development, React, TypeScript, Node.js, QA Automation y agentes IA.
 
 ### Tecnologías indicadas
 
@@ -535,8 +535,8 @@ Aru.Dev está diseñado como un portfolio técnico con una identidad visual dife
 - JavaScript.
 - Vite.
 - GitHub Pages.
-- Guia local interactiva para presentar informacion del perfil.
-- Arquitectura de portfolio publicada bajo `/AruDev/`.
+- Guía local interactiva para presentar información del perfil.
+- Arquitectura de portfolio publicada bajo `/Aru/portfolio.html`.
 
 ### Secciones principales del portfolio
 
@@ -554,20 +554,20 @@ Aru.Dev está diseñado como un portfolio técnico con una identidad visual dife
 - Presentación profesional orientada a oportunidades.
 - Diseño de interfaz con identidad anime/chibi.
 - Publicación en GitHub Pages.
-- Integracion de guia interactiva como capa diferenciadora del portfolio.
+- Integración de guía interactiva como capa diferenciadora del portfolio.
 - Capacidad para convertir el CV en una experiencia interactiva.
 
 ### Respuesta recomendada
 
-Aru.Dev es el portfolio personal de Kendall. Es una página con estética anime/chibi donde presenta sus skills, experiencia, proyectos, certificaciones y contacto. El objetivo es diferenciar su perfil profesional con una experiencia más interactiva y visual, usando a Aru como asistente virtual y personaje principal del portfolio.
+Aru es el portfolio principal de Kendall. Es una página con estética anime/chibi donde presenta sus skills, experiencia, proyectos, certificaciones y contacto. El objetivo es diferenciar su perfil profesional con una experiencia más interactiva y visual, usando a Aru como asistente virtual y personaje principal del portfolio.
 
 ### Preguntas relacionadas
 
-- ¿Qué es Aru.Dev?
+- ¿Qué es Aru?
 - ¿Cuál es el portfolio de Kendall?
 - ¿Dónde puedo ver el portfolio?
 - ¿Por qué el portfolio tiene estética anime?
-- ¿Qué tecnologías usa Aru.Dev?
+- ¿Qué tecnologías usa Aru?
 - ¿Qué es Aru en el portfolio?
 
 ---
@@ -588,7 +588,7 @@ Aru es una asistente virtual anime/chibi diseñada para acompañar el portfolio 
 
 ### Descripción extendida
 
-Aru funciona como una interfaz guiada y visual. Su proposito es ayudar a visitantes del portfolio a conocer a Kendall, sus proyectos, skills, experiencia y formas de contacto. En lugar de un chatbot generico, Aru esta pensada como una asistente personal local: muestra informacion controlada desde datos del frontend y se integra con expresiones visuales, personalidad, UI anime/chibi y experiencia interactiva.
+Aru funciona como una interfaz guiada y visual. Su propósito es ayudar a visitantes del portfolio a conocer a Kendall, sus proyectos, skills, experiencia y formas de contacto. En lugar de un chatbot genérico, Aru esta pensada como una asistente personal local: muestra información controlada desde datos del frontend y se integra con expresiones visuales, personalidad, UI anime/chibi y experiencia interactiva.
 
 ### Objetivo
 
@@ -605,19 +605,19 @@ Aru funciona como una interfaz guiada y visual. Su proposito es ayudar a visitan
 - Mostrar personalidad anime/chibi.
 - Cambiar expresiones visuales según estado o respuesta.
 - Funcionar sin backend externo ni API keys.
-- Evitar dependencias externas para la guia del portfolio.
+- Evitar dependencias externas para la guía del portfolio.
 
 ### Respuesta recomendada
 
-Aru es la asistente virtual personal de Kendall. Su funcion es guiar al visitante por su perfil profesional, proyectos, tecnologias, experiencia y contacto usando informacion local controlada. Ademas, tiene una estetica anime/chibi que hace que el portfolio se sienta mas vivo y diferente.
+Aru es la asistente virtual personal de Kendall. Su función es guiar al visitante por su perfil profesional, proyectos, tecnologías, experiencia y contacto usando información local controlada. Además, tiene una estética anime/chibi que hace que el portfolio se sienta más vivo y diferente.
 
 ### Alias importantes
 
 Si el usuario escribe cualquiera de estos términos, Aru debe entender que se refiere al proyecto Aru o al portfolio:
 
 - Aru.
-- Aru Dev.
-- Aru.Dev.
+- Aru Portfolio.
+- Aru Portfolio.
 - Aru portfolio.
 - asistente virtual.
 - asistente de Kendall.
@@ -1001,7 +1001,7 @@ El backend actúa como intermediario entre el frontend y OpenAI.
 - Configuración por variables de entorno.
 - Protección de `.env` para no subir API keys.
 - Comparativa de modelos.
-- Vision / imagen a texto.
+- Visión / imagen a texto.
 
 ### Qué demuestra este proyecto
 
@@ -1233,7 +1233,7 @@ Kendall también tiene experiencia DevOps. En su proyecto de Infraestructura Aut
 
 | Proyecto | Tipo | Tecnologías principales | Estado | Enfoque |
 |---|---|---|---|---|
-| Aru.Dev | Portfolio interactivo | HTML, CSS, JavaScript, Vite, GitHub Pages | Activo | Marca personal + asistente |
+| Aru Portfolio | Portfolio interactivo | HTML, CSS, JavaScript, Vite, GitHub Pages | Activo | Marca personal + asistente |
 | Aru Assistant | Asistente virtual | React/Vite, FAQ local, UI anime/chibi | Activo | Portfolio assistant |
 | DocuMente | RAG fullstack | React, TypeScript, Node, Express, SQLite, OpenAI, Docker | Completado | IA + documentos |
 | QAPilot | QA agent | React, TypeScript, Node, OpenAI, Playwright, SQLite, Docker | En desarrollo | QA automation + IA |
@@ -1269,7 +1269,7 @@ Kendall no usa IA solo como herramienta de conversación. La aplica en sistemas 
 - Asistentes virtuales para portfolio.
 - Function Calling.
 - Embeddings.
-- Vision.
+- Visión.
 - Prompt Engineering.
 
 ### 10.3 Orientación a calidad
@@ -1290,7 +1290,7 @@ Kendall tiene experiencia real en QA Automation y liderazgo QA, incluyendo:
 
 Kendall tiene proyectos públicos y demos que permiten evaluar código, arquitectura y producto:
 
-- Portfolio Aru.Dev.
+- Aru Portfolio.
 - DocuMente.
 - OpenAI Bot.
 - Sistema RRHH.
@@ -1323,7 +1323,7 @@ Kendall usa React, TypeScript, JavaScript, Node.js, Express, NestJS, TailwindCSS
 
 ### ¿Qué proyectos tiene Kendall?
 
-Sus proyectos destacados son Aru.Dev, Aru Assistant, DocuMente, QAPilot, OpenAI Chatbot Fullstack, Sistema de Recursos Humanos e Infraestructura Automatizada con Terraform + AWS.
+Sus proyectos destacados son Aru Portfolio, Aru Assistant, DocuMente, QAPilot, OpenAI Chatbot Fullstack, Sistema de Recursos Humanos e Infraestructura Automatizada con Terraform + AWS.
 
 ### ¿Cuál es su proyecto más avanzado de IA?
 
@@ -1337,9 +1337,9 @@ DocuMente es un sistema RAG fullstack para subir documentos PDF/TXT, generar emb
 
 QAPilot es un agente de QA automatizado con IA que convierte requerimientos funcionales en casos de prueba, ejecuta pruebas UI y API, analiza fallos y genera reportes.
 
-### ¿Qué es Aru.Dev?
+### ¿Qué es Aru?
 
-Aru.Dev es el portfolio personal interactivo de Kendall con estética anime/chibi, secciones de skills, experiencia, proyectos, certificaciones, contacto y un asistente virtual.
+Aru es el portfolio principal interactivo de Kendall con estética anime/chibi, secciones de skills, experiencia, proyectos, certificaciones, contacto y un asistente virtual.
 
 ### ¿Qué es Aru?
 
@@ -1355,7 +1355,7 @@ Kendall ha trabajado como desarrollador fullstack freelance desde 2023 para más
 
 ### ¿Kendall sabe React?
 
-Sí. Kendall usa React en varios proyectos, incluyendo Aru.Dev, DocuMente, QAPilot, OpenAI Bot Frontend y el Sistema de Recursos Humanos.
+Sí. Kendall usa React en varios proyectos, incluyendo Aru Portfolio, DocuMente, QAPilot, OpenAI Bot Frontend y el Sistema de Recursos Humanos.
 
 ### ¿Kendall sabe TypeScript?
 
@@ -1388,7 +1388,7 @@ Puedes contactar a Kendall por:
 - GitHub: https://github.com/AruHonshou
 - LinkedIn: https://www.linkedin.com/in/kendall-valverde-diaz-aru/
 - Email: kendallavd@gmail.com
-- Portfolio: https://aruhonshou.github.io/AruDev/
+- Portfolio: https://aruhonshou.github.io/Aru/portfolio.html
 
 ### ¿Kendall está disponible para oportunidades?
 
@@ -1411,7 +1411,7 @@ Puedes contactar a Kendall por GitHub, LinkedIn o email:
 - GitHub: https://github.com/AruHonshou
 - LinkedIn: https://www.linkedin.com/in/kendall-valverde-diaz-aru/
 - Email: kendallavd@gmail.com
-- Portfolio: https://aruhonshou.github.io/AruDev/
+- Portfolio: https://aruhonshou.github.io/Aru/portfolio.html
 
 ### Si preguntan por "proyectos"
 
@@ -1419,7 +1419,7 @@ Usar:
 
 Kendall tiene varios proyectos destacados:
 
-1. Aru.Dev: portfolio interactivo anime/chibi con asistente virtual.
+1. Aru Portfolio: portfolio interactivo anime/chibi con asistente virtual.
 2. DocuMente: sistema RAG fullstack para conversar con documentos.
 3. QAPilot: agente de QA con IA que genera y ejecuta pruebas.
 4. OpenAI Chatbot Fullstack: chatbot con frontend React y backend NestJS.
@@ -1436,7 +1436,7 @@ Kendall trabaja principalmente con React, TypeScript, Node.js, Express, NestJS, 
 
 Usar:
 
-Kendall aplica IA generativa en proyectos concretos: DocuMente usa RAG, embeddings y fuentes citables; QAPilot usa IA para transformar requerimientos en pruebas; OpenAI Chatbot integra chat y vision. Aru, en su estado actual, funciona como una guia local del portfolio sin backend ni modelo generativo activo.
+Kendall aplica IA generativa en proyectos concretos: DocuMente usa RAG, embeddings y fuentes citables; QAPilot usa IA para transformar requerimientos en pruebas; OpenAI Chatbot integra chat y visión. Aru, en su estado actual, funciona como una guía local del portfolio sin backend ni modelo generativo activo.
 
 ### Si preguntan por "QA"
 
@@ -1454,13 +1454,13 @@ Kendall ha construido APIs con Node.js, Express y NestJS, usando JWT, validacion
 
 Usar:
 
-Kendall trabaja con React, TypeScript, Vite, TailwindCSS y UI responsive. Sus proyectos frontend incluyen Aru.Dev, DocuMente, QAPilot, OpenAI Bot Frontend y el Sistema de Recursos Humanos.
+Kendall trabaja con React, TypeScript, Vite, TailwindCSS y UI responsive. Sus proyectos frontend incluyen Aru Portfolio, DocuMente, QAPilot, OpenAI Bot Frontend y el Sistema de Recursos Humanos.
 
-### Si preguntan por "Aru Dev" o "AruDev"
+### Si preguntan por "Aru" o "portfolio"
 
 Usar:
 
-Aru.Dev es el portfolio personal de Kendall. Presenta sus skills, experiencia, proyectos, certificaciones y contacto con una estética anime/chibi y una asistente virtual llamada Aru.
+Aru es el portfolio principal de Kendall. Presenta sus skills, experiencia, proyectos, certificaciones y contacto con una estética anime/chibi y una asistente virtual llamada Aru.
 
 ### Si preguntan algo fuera de alcance
 
@@ -1488,9 +1488,9 @@ Aru debe reconocer estos términos como equivalentes o relacionados:
 
 - portfolio.
 - portafolio.
-- AruDev.
-- Aru.Dev.
-- Aru Dev.
+- Aru Portfolio.
+- Aru Portfolio.
+- Aru Portfolio.
 - página de Kendall.
 - sitio de Kendall.
 - portfolio anime.
@@ -1651,7 +1651,7 @@ Aru debe distinguir entre:
 - "Kendall trabaja con React, TypeScript y Node.js."
 - "Kendall tiene proyectos con IA como DocuMente y QAPilot."
 - "Kendall tiene experiencia en QA Automation con Playwright."
-- "Kendall tiene un portfolio llamado Aru.Dev."
+- "Kendall tiene un portfolio llamado Aru Portfolio."
 - "Kendall ha trabajado como QA Engineer / Líder de QA en Novacomp para Davivienda Bank Costa Rica."
 
 ### No puede decir
@@ -1678,7 +1678,7 @@ Kendall Valverde Díaz es un Software Engineer de Costa Rica especializado en AI
 
 ### Elevator pitch para reclutador
 
-Kendall es un perfil híbrido entre fullstack, QA Automation e IA aplicada. Ha liderado automatización QA en un entorno bancario, ha desarrollado software para clientes de Costa Rica y EE.UU., y cuenta con proyectos públicos como DocuMente, QAPilot, Aru.Dev y OpenAI Chatbot, donde demuestra React, TypeScript, Node.js, RAG, Playwright, Docker, CI/CD y arquitectura fullstack.
+Kendall es un perfil híbrido entre fullstack, QA Automation e IA aplicada. Ha liderado automatización QA en un entorno bancario, ha desarrollado software para clientes de Costa Rica y EE.UU., y cuenta con proyectos públicos como DocuMente, QAPilot, Aru Portfolio y OpenAI Chatbot, donde demuestra React, TypeScript, Node.js, RAG, Playwright, Docker, CI/CD y arquitectura fullstack.
 
 ### Elevator pitch para visitante no técnico
 
@@ -1694,7 +1694,7 @@ Recomendar:
 
 1. DocuMente, porque demuestra arquitectura fullstack + IA.
 2. QAPilot, porque demuestra QA Automation + IA.
-3. Aru.Dev, porque resume su perfil.
+3. Aru Portfolio, porque resume su perfil.
 4. Sistema RRHH, porque demuestra impacto real en procesos administrativos.
 
 ### Si el visitante es desarrollador
@@ -1710,7 +1710,7 @@ Recomendar:
 
 Recomendar:
 
-- Aru.Dev.
+- Aru Portfolio.
 - DocuMente frontend.
 - OpenAI Bot Frontend.
 - Sistema RRHH frontend.
@@ -1746,10 +1746,10 @@ Recomendar:
 
 ## 19. Enlaces oficiales por proyecto
 
-### Aru.Dev
+### Aru Portfolio
 
-- Repo: https://github.com/AruHonshou/AruDev
-- Demo: https://aruhonshou.github.io/AruDev/
+- Repo: https://github.com/AruHonshou/Aru
+- Demo: https://aruhonshou.github.io/Aru/portfolio.html
 
 ### DocuMente
 
@@ -1775,7 +1775,7 @@ Recomendar:
 
 ### Portfolio
 
-- https://aruhonshou.github.io/AruDev/
+- https://aruhonshou.github.io/Aru/portfolio.html
 
 ---
 
@@ -1787,7 +1787,7 @@ Recomendar:
 
 ### Pregunta: "¿Qué proyectos tiene Kendall?"
 
-Kendall tiene varios proyectos destacados: Aru.Dev, su portfolio interactivo con asistente virtual; DocuMente, un sistema RAG fullstack para conversar con documentos; QAPilot, un agente de QA automatizado con IA; OpenAI Chatbot Fullstack; un Sistema de Recursos Humanos con React, Node y MySQL; e Infraestructura Automatizada con Terraform + AWS.
+Kendall tiene varios proyectos destacados: Aru Portfolio, su portfolio interactivo con asistente virtual; DocuMente, un sistema RAG fullstack para conversar con documentos; QAPilot, un agente de QA automatizado con IA; OpenAI Chatbot Fullstack; un Sistema de Recursos Humanos con React, Node y MySQL; e Infraestructura Automatizada con Terraform + AWS.
 
 ### Pregunta: "¿Cómo contacto a Kendall?"
 
@@ -1796,7 +1796,7 @@ Puedes contactar a Kendall por estos canales:
 - GitHub: https://github.com/AruHonshou
 - LinkedIn: https://www.linkedin.com/in/kendall-valverde-diaz-aru/
 - Email: kendallavd@gmail.com
-- Portfolio: https://aruhonshou.github.io/AruDev/
+- Portfolio: https://aruhonshou.github.io/Aru/portfolio.html
 
 ### Pregunta: "¿Qué es DocuMente?"
 
@@ -1806,9 +1806,9 @@ DocuMente es un sistema RAG fullstack creado por Kendall. Permite subir document
 
 QAPilot es un agente de QA automatizado con IA. Convierte requerimientos funcionales en casos de prueba, ejecuta pruebas UI con Playwright y pruebas API con Fetch/Axios, analiza fallos con IA y genera reportes HTML, PDF y JSON.
 
-### Pregunta: "¿Qué es Aru.Dev?"
+### Pregunta: "¿Qué es Aru?"
 
-Aru.Dev es el portfolio personal de Kendall. Presenta sus skills, experiencia, proyectos, certificaciones y contacto con una estética anime/chibi y una asistente virtual llamada Aru.
+Aru es el portfolio principal de Kendall. Presenta sus skills, experiencia, proyectos, certificaciones y contacto con una estética anime/chibi y una asistente virtual llamada Aru.
 
 ### Pregunta: "¿Kendall sabe IA?"
 
@@ -1824,7 +1824,7 @@ Kendall usa React, TypeScript, JavaScript, Node.js, Express, NestJS, TailwindCSS
 
 ### Pregunta: "¿Cuál proyecto debería ver primero?"
 
-Si quieres ver IA aplicada y arquitectura fullstack, mira DocuMente. Si te interesa QA Automation con IA, mira QAPilot. Si quieres conocer el perfil general de Kendall, empieza por Aru.Dev.
+Si quieres ver IA aplicada y arquitectura fullstack, mira DocuMente. Si te interesa QA Automation con IA, mira QAPilot. Si quieres conocer el perfil general de Kendall, empieza por Aru Portfolio.
 
 ---
 

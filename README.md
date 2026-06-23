@@ -1,37 +1,8 @@
 # Aru
 
-**Aru** is an interactive web PNGTuber assistant that complements Kendall Valverde Diaz's official portfolio.
+**Aru** is Kendall Valverde Díaz's main interactive portfolio and local PNGTuber guide.
 
-**Aru** es una asistente PNGTuber web interactiva que complementa el portfolio oficial de Kendall Valverde Diaz.
-
-```text
-EN: AruDev shows the professional summary. Aru explains the full story.
-ES: AruDev muestra el resumen profesional. Aru explica la historia completa.
-```
-
-Official portfolio / Portfolio oficial:
-
-```text
-https://aruhonshou.github.io/AruDev/
-```
-
-## What Aru Is
-
-Aru is:
-
-- a React + Vite PNGTuber companion;
-- a static GitHub Pages app with no backend;
-- a bilingual ES/EN local guide;
-- an anime/chibi UI demo with avatar moods, AFK, blinking, mouse tracking, microphone/audio mouth sync, and motion states;
-- a deeper explanation layer for AruDev.
-
-Aru is not:
-
-- another official portfolio;
-- a generative AI chatbot;
-- a DeepSeek, Worker, OpenAI, or Google Translate integration;
-- a backend project;
-- an app that requires API keys.
+**Aru** es el portfolio principal interactivo de Kendall Valverde Díaz y una guía local con estética anime/chibi.
 
 ## Pages
 
@@ -40,110 +11,49 @@ Aru is not:
 /Aru/index.html
 ```
 
-Avatar mode. Includes mouse tracking, blinking, click moods, AFK, "Lo siento/Sorry", microphone, audio file loading, mouth sync, visual settings, and CTAs to the guide and AruDev.
+GitHub Pages entry. `index.html` is a minimal redirect/alias to `portfolio.html`.
+
+```text
+/Aru/portfolio.html
+```
+
+Main interactive portfolio with Aru, ES/EN, sections, avatar moods, mouse tracking, blinking, local SFX, visual settings, and GitHub Pages deployment.
 
 ```text
 /Aru/guia.html
 ```
 
-Deep local guide based on `src/data/kendall-profile.md`. It explains projects, QA Automation, applied AI, fullstack work, DevOps, experience, certifications, contact, and why Kendall may fit a role.
+Deep local guide based on `src/data/kendall-profile.md`. It explains Kendall's projects, QA Automation, applied AI, fullstack work, DevOps, experience, certifications, and contact.
 
 Legacy aliases:
 
 ```text
-/Aru/simple.html -> /Aru/index.html
+/Aru/simple.html -> /Aru/portfolio.html
 /Aru/voz.html    -> /Aru/guia.html
 ```
 
-## Bilingual Local i18n
+## Local Data
 
-Aru supports:
-
-- Spanish (`ES`);
-- English (`EN`);
-- a visible ES/EN selector on `index.html` and `guia.html`;
-- persistence through `localStorage`;
-- browser-language fallback: English browsers start in EN, otherwise ES;
-- Spanish fallback when a translation is missing.
-
-Main files:
-
-```text
-src/i18n/aru-i18n.js
-src/hooks/useAruLanguage.js
-src/components/LanguageToggle.jsx
-```
-
-No translation service is used. All copy is local and bundled by Vite.
-
-## Local Source Of Truth
-
-The main knowledge source is:
+The source of truth is:
 
 ```text
 src/data/kendall-profile.md
 ```
 
-The structured guide lives in:
+Structured portfolio and guide data live in:
 
 ```text
+src/data/portfolio-sections.js
 src/data/aru-deep-knowledge.js
 src/data/aru-guided-flow.js
 ```
 
-Rules:
+The portfolio and guide are static. They do not use backend services, external APIs, fetch, Workers, DeepSeek, or generative AI at runtime.
 
-- Aru must not invent data.
-- Aru must not create fake projects, fake experience, fake certifications, or private information.
-- If a detail is missing:
-  - ES: "Mmm... ese dato no lo tengo registrado todavia."
-  - EN: "Hmm... I don't have that detail registered yet."
-- The guide is fully local and static.
-- No `fetch` to APIs, backend, Worker, DeepSeek, or secret keys.
-
-## Motion System
-
-The PNGTuber action system lives in:
-
-```text
-src/lib/aru-actions.js
-src/hooks/useAruMotionController.js
-src/styles/aru-motion.css
-```
-
-Actions:
-
-- `idle`
-- `home`
-- `deepProjects`
-- `deepSkills`
-- `deepQA`
-- `deepAI`
-- `deepDevops`
-- `whyHire`
-- `portfolio`
-- `thinking`
-- `notFound`
-- `angry`
-- `tired`
-- `explainFocus`
-
-Each action can define expression, motion, localized bubble, duration, idle reset, and priority. Internal moods keep priority over temporary guide actions.
-
-## Install
-
-Requirements:
-
-- Node.js 22 LTS recommended.
-- Node.js 20.19+ or 22.12+ minimum for Vite 8.
+## Run
 
 ```bash
 npm install
-```
-
-## Run Locally
-
-```bash
 npm run dev
 ```
 
@@ -151,7 +61,7 @@ Local entries:
 
 ```text
 http://localhost:5173/
-http://localhost:5173/index.html
+http://localhost:5173/portfolio.html
 http://localhost:5173/guia.html
 ```
 
@@ -165,27 +75,12 @@ npm run preview
 
 The production build uses the `/Aru/` base path for GitHub Pages.
 
-## Character Frames
-
-Source sheets live in `imagenes/` and are not committed because they are heavy.
-
-```bash
-npm run generate:character
-```
-
-Generated WebP frames are placed in:
-
-```text
-public/slices2/A/r0c0.webp ... r4c4.webp
-...
-public/slices2/K/r0c0.webp ... r4c4.webp
-```
-
 ## Structure
 
 ```text
 .
 |-- index.html
+|-- portfolio.html
 |-- guia.html
 |-- simple.html
 |-- voz.html
@@ -200,6 +95,7 @@ public/slices2/K/r0c0.webp ... r4c4.webp
 |   |-- styles/
 |   `-- data/
 |       |-- kendall-profile.md
+|       |-- portfolio-sections.js
 |       |-- aru-deep-knowledge.js
 |       `-- aru-guided-flow.js
 |-- public/
@@ -212,13 +108,8 @@ GitHub Pages target:
 
 ```text
 https://aruhonshou.github.io/Aru/
+https://aruhonshou.github.io/Aru/portfolio.html
 https://aruhonshou.github.io/Aru/guia.html
-```
-
-Official portfolio:
-
-```text
-https://aruhonshou.github.io/AruDev/
 ```
 
 ## License

@@ -3,9 +3,10 @@ import { join, posix } from 'node:path';
 
 const DIST = 'dist';
 const BASE = '/Aru/';
-const APP_HTML_FILES = ['index.html', 'guia.html'];
+const APP_HTML_FILES = ['portfolio.html', 'guia.html'];
 const REDIRECT_HTML_FILES = {
-  'simple.html': 'index.html',
+  'index.html': 'portfolio.html',
+  'simple.html': 'portfolio.html',
   'voz.html': 'guia.html',
 };
 const SHEETS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];

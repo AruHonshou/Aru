@@ -1,12 +1,17 @@
-﻿import React from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AruAvatar from './components/AruAvatar';
 import LanguageToggle from './components/LanguageToggle';
-import { useAudioMouthSync } from './hooks/useAudioMouthSync';
+import { useAruExpressionController } from './hooks/useAruExpressionController';
 import { useAruLanguage } from './hooks/useAruLanguage';
-import { createAudioEngine } from './lib/audio-engine';
-import { mouthLabel } from './lib/aru-frames';
-import { translate } from './i18n/aru-i18n';
+import { useAruMotionController } from './hooks/useAruMotionController';
+import { ARU_EXPRESSION_PRIORITY } from './lib/aru-expression-map';
+import { localize, translate } from './i18n/aru-i18n';
+import {
+  getPortfolioSection,
+  portfolioCta,
+  portfolioSections,
+} from './data/portfolio-sections';
 import './styles/aru-pages.css';
 
 const {
@@ -38,137 +43,257 @@ const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#FDE7EF', '#EAF4FF'];
-const CHAT_PAGE = `${import.meta.env.BASE_URL}guia.html`;
-const PORTFOLIO_PAGE = 'https://aruhonshou.github.io/AruDev/';
 
-function micErrorMessage(error) {
-  if (error?.message === 'MIC_UNSUPPORTED') return 'Este navegador no permite usar el micrÃ³fono aquÃ­.';
-  if (error?.message === 'AUDIO_CONTEXT_UNSUPPORTED') return 'Este navegador no soporta AudioContext.';
-  if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
-    return 'Permiso de micrÃ³fono denegado. Revisa los permisos del navegador.';
-  }
-  return 'No se puede usar el micrÃ³fono ahora.';
+function PortfolioTags({ tags }) {
+  if (!tags?.length) return null;
+  return (
+    <div className="portfolio-tags">
+      {tags.map((tag) => <span key={tag}>{tag}</span>)}
+    </div>
+  );
 }
 
-function displayMouthLabel(mouth) {
-  const label = mouthLabel(mouth);
-  if (label === 'semiabierta') return 'Media';
-  return label.charAt(0).toUpperCase() + label.slice(1);
+function SectionHighlights({ items, language }) {
+  if (!items?.length) return null;
+  return (
+    <ul className="portfolio-highlights">
+      {items.map((item) => <li key={localize(item, language)}>{localize(item, language)}</li>)}
+    </ul>
+  );
 }
 
-function localizedMicErrorMessage(error, language) {
-  if (error?.message === 'MIC_UNSUPPORTED') return translate('index.errors.micUnsupported', language);
-  if (error?.message === 'AUDIO_CONTEXT_UNSUPPORTED') return translate('index.errors.audioContextUnsupported', language);
-  if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') return translate('index.errors.micDenied', language);
-  return translate('index.errors.micUnavailable', language);
+function SkillGroups({ groups, language }) {
+  if (!groups?.length) return null;
+  return (
+    <div className="portfolio-skill-grid">
+      {groups.map((group) => (
+        <section className="portfolio-mini-card" key={localize(group.title, language)}>
+          <h4>{localize(group.title, language)}</h4>
+          {group.description ? <p>{localize(group.description, language)}</p> : null}
+          <div className="portfolio-chip-list">
+            {group.items.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
 }
 
-function localizedMouthLabel(mouth, language) {
-  const label = mouthLabel(mouth);
-  if (label === 'semiabierta') return translate('index.halfOpen', language);
-  if (label === 'abierta') return translate('index.open', language);
-  return translate('index.closed', language);
+function ExperienceTimeline({ timeline, language }) {
+  if (!timeline?.length) return null;
+  return (
+    <div className="portfolio-timeline">
+      {timeline.map((entry) => (
+        <section className="portfolio-timeline__item" key={`${localize(entry.role, language)}-${localize(entry.period, language)}`}>
+          <div>
+            <div className="portfolio-timeline__meta">
+              {entry.index ? <span>{entry.index}</span> : null}
+              <span className="portfolio-timeline__period">{localize(entry.period, language)}</span>
+            </div>
+            <h4>{localize(entry.role, language)}</h4>
+            <p>{localize(entry.place, language)}</p>
+          </div>
+          {entry.description ? <p>{localize(entry.description, language)}</p> : null}
+          <ul>
+            {entry.items.map((item) => <li key={localize(item, language)}>{localize(item, language)}</li>)}
+          </ul>
+          <PortfolioTags tags={entry.stack} />
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function ActionButtons({ actions, language, onSelectSection, compact = false, disabled = false }) {
+  if (!actions?.length) return null;
+  return (
+    <div className={compact ? 'portfolio-actions portfolio-actions--compact' : 'portfolio-actions'}>
+      {actions.map((action) => {
+        const label = localize(action.label, language);
+        const className = [
+          'portfolio-action',
+          action.variant ? `portfolio-action--${action.variant}` : '',
+        ].filter(Boolean).join(' ');
+
+        if (action.section) {
+          return (
+            <button
+              type="button"
+              className={className}
+              disabled={disabled}
+              onClick={() => {
+                if (disabled) return;
+                onSelectSection(action.section);
+              }}
+              key={`${label}-${action.section}`}
+            >
+              {label}
+            </button>
+          );
+        }
+
+        return (
+          <a
+            className={className}
+            href={action.href}
+            target={action.href?.startsWith('mailto:') || action.href?.includes('guia.html') ? undefined : '_blank'}
+            rel={action.href?.startsWith('mailto:') || action.href?.includes('guia.html') ? undefined : 'noopener noreferrer'}
+            aria-disabled={disabled ? 'true' : undefined}
+            tabIndex={disabled ? -1 : undefined}
+            onClick={(event) => {
+              if (disabled) event.preventDefault();
+            }}
+            key={`${label}-${action.href}`}
+          >
+            {label}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function ProjectCards({ projects, language, onSelectSection, disabled = false }) {
+  if (!projects?.length) return null;
+  return (
+    <div className="portfolio-project-grid">
+      {projects.map((project) => (
+          <article className="portfolio-project-card" key={project.name}>
+            <span className="portfolio-project-card__category">{localize(project.category, language)}</span>
+            <h4>{project.name}</h4>
+            <p>{localize(project.description, language)}</p>
+            {project.impact ? <strong className="portfolio-project-card__impact">{localize(project.impact, language)}</strong> : null}
+            <div className="portfolio-project-card__stack">
+              {project.stack.map((item) => <span key={item}>{item}</span>)}
+            </div>
+            <ActionButtons actions={project.actions} language={language} onSelectSection={onSelectSection} compact disabled={disabled} />
+          </article>
+      ))}
+    </div>
+  );
+}
+
+function ContactLinks({ links, language, disabled = false }) {
+  if (!links?.length) return null;
+  return (
+    <div className="portfolio-contact-grid">
+      {links.map((link) => {
+        const label = localize(link.label, language);
+        const value = localize(link.value, language);
+        const content = (
+          <>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </>
+        );
+
+        return link.href ? (
+          <a
+            className="portfolio-contact-card"
+            href={link.href}
+            target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+            rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+            aria-disabled={disabled ? 'true' : undefined}
+            tabIndex={disabled ? -1 : undefined}
+            onClick={(event) => {
+              if (disabled) event.preventDefault();
+            }}
+            key={`${label}-${value}`}
+          >
+            {content}
+          </a>
+        ) : (
+          <div className="portfolio-contact-card" key={`${label}-${value}`}>
+            {content}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PortfolioPanel({ section, language, onSelectSection, disabled = false }) {
+  const cta = section.cta ? portfolioCta[section.cta] : null;
+
+  return (
+    <article className="portfolio-card" key={section.id}>
+      <div className="portfolio-card__header">
+        <span className="portfolio-card__eyebrow">{localize(section.eyebrow, language)}</span>
+        <h2>{localize(section.title, language)}</h2>
+        <p>{localize(section.summary, language)}</p>
+      </div>
+
+      <SectionHighlights items={section.highlights} language={language} />
+      <PortfolioTags tags={section.tags} />
+      <SkillGroups groups={section.groups} language={language} />
+      <ExperienceTimeline timeline={section.timeline} language={language} />
+      <ProjectCards projects={section.projects} language={language} onSelectSection={onSelectSection} disabled={disabled} />
+      <ContactLinks links={section.contactLinks} language={language} disabled={disabled} />
+      <ActionButtons actions={section.actions} language={language} onSelectSection={onSelectSection} disabled={disabled} />
+
+      {cta ? (
+        <div className="portfolio-card__footer">
+          <a
+            className="portfolio-guide-link"
+            href={cta.href}
+            aria-disabled={disabled ? 'true' : undefined}
+            tabIndex={disabled ? -1 : undefined}
+            onClick={(event) => {
+              if (disabled) event.preventDefault();
+            }}
+          >
+            {localize(cta.label, language)}
+          </a>
+        </div>
+      ) : null}
+    </article>
+  );
 }
 
 function App() {
   const [language, setLanguage] = useAruLanguage();
   const [t, setTweak] = useAjustes(SIMPLE_DEFAULTS);
-  const [micOn, setMicOn] = React.useState(false);
-  const [fileName, setFileName] = React.useState('');
-  const [audioError, setAudioError] = React.useState('');
   const [mood, setMood] = React.useState('normal');
-  const audioElRef = React.useRef(null);
-  const fileUrlRef = React.useRef('');
-  const engine = React.useMemo(() => createAudioEngine(), []);
-  const getLevel = React.useCallback(() => engine.level(), [engine]);
-  const { level, mouth } = useAudioMouthSync({
-    getLevel,
-    enabled: true,
-    gain: t.micGain,
-    halfThreshold: t.thHalf,
-    fullThreshold: t.thFull,
-    release: t.release,
-  });
+  const [activeSectionId, setActiveSectionId] = React.useState('about');
+  const [hoverExpression, setHoverExpression] = React.useState(null);
+  const [isAruHardLocked, setIsAruHardLocked] = React.useState(false);
+  const expressionController = useAruExpressionController();
+  const motionController = useAruMotionController('home', language);
 
-  React.useEffect(() => () => {
-    engine.destroy();
-    if (fileUrlRef.current) URL.revokeObjectURL(fileUrlRef.current);
-  }, [engine]);
-
-  async function startMic() {
-    setAudioError('');
-    try {
-      await engine.startMic();
-      setMicOn(true);
-    } catch (error) {
-      setMicOn(false);
-      setAudioError(localizedMicErrorMessage(error, language));
-    }
-  }
-
-  function stopMic() {
-    engine.stopMic();
-    setMicOn(false);
-  }
-
-  async function onFilePick(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setAudioError('');
-    if (!file.type.startsWith('audio/')) {
-      setFileName('');
-      setAudioError(translate('index.errors.invalidAudio', language));
-      return;
-    }
-
-    const element = audioElRef.current;
-    if (!element) return;
-
-    try {
-      engine.attachAudioElement(element);
-      await engine.resume();
-      if (fileUrlRef.current) URL.revokeObjectURL(fileUrlRef.current);
-      const url = URL.createObjectURL(file);
-      fileUrlRef.current = url;
-      element.src = url;
-      setFileName(file.name);
-      await element.play();
-    } catch (error) {
-      // Autoplay may be blocked; the native audio controls remain available.
-    }
-  }
-
-  const listening = micOn || level > 0.04;
+  const activeSection = getPortfolioSection(activeSectionId);
   const locked = mood === 'locked';
-  const fileLoaded = Boolean(fileName);
-  const audioIsActive = fileLoaded && !micOn && level > 0.04;
-  const panelState = micOn ? 'listening' : audioIsActive ? 'playing' : fileLoaded ? 'loaded' : 'idle';
-  const micStatus = micOn ? translate('index.active', language) : translate('index.waiting', language);
-  const audioStatus = audioIsActive
-    ? translate('index.playing', language)
-    : fileLoaded
-      ? translate('index.loaded', language)
-      : translate('index.noFile', language);
-  const overallStatus = micOn
-    ? translate('index.listening', language)
-    : audioIsActive
-      ? translate('index.playing', language)
-      : fileLoaded
-        ? translate('index.audioLoaded', language)
-        : translate('index.ready', language);
-  const mouthStatus = localizedMouthLabel(mouth, language);
-  const panelTitle = micOn
-    ? translate('index.panelTitle.listening', language)
-    : audioIsActive
-      ? translate('index.panelTitle.playing', language)
-      : translate('index.panelTitle.ready', language);
+  const hardLocked = isAruHardLocked || locked;
+  const avatarExpression = mood === 'normal' && hoverExpression
+    ? hoverExpression
+    : expressionController.overrideExpression;
+
+  function selectSection(sectionId) {
+    if (hardLocked) return;
+    setActiveSectionId(sectionId);
+  }
+
+  React.useEffect(() => {
+    setHoverExpression(null);
+    motionController.runAction(activeSection.motion || 'home', { force: true });
+    expressionController.setTemporaryExpression(activeSection.expression || 'G', {
+      durationMs: 2400,
+      resetToIdle: true,
+      source: 'system',
+      priority: ARU_EXPRESSION_PRIORITY.system,
+      force: true,
+    });
+  }, [activeSection.id]);
+
+  React.useEffect(() => {
+    if (mood !== 'normal') setHoverExpression(null);
+  }, [mood]);
 
   return (
     <main
-      className="page simple-page"
+      className={['page simple-page portfolio-page', hardLocked ? 'aru-page--hard-locked' : ''].filter(Boolean).join(' ')}
       data-decor={t.bgDecorEnabled ? 'on' : 'off'}
-      data-audio-state={panelState}
+      data-section={activeSection.id}
+      data-hard-locked={hardLocked ? 'true' : 'false'}
       style={{
         '--page-bg': t.bgColor,
         '--page-bg-soft': t.bgSoftColor,
@@ -197,7 +322,8 @@ function App() {
         <div className="anime-bg__petal anime-bg__petal--two" />
         <div className="anime-bg__petal anime-bg__petal--three" />
       </div>
-      <header className="topbar">
+
+      <header className="topbar portfolio-topbar">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">A</div>
           <div>
@@ -206,35 +332,31 @@ function App() {
           </div>
         </div>
         <nav className="topbar-actions" aria-label={translate('index.navLabel', language)}>
-          <LanguageToggle language={language} onChange={setLanguage} />
+          <LanguageToggle language={language} onChange={setLanguage} disabled={hardLocked} />
           <a
             className="nav-link nav-link--primary"
-            href={locked ? undefined : CHAT_PAGE}
-            aria-disabled={locked}
-            aria-label={translate('index.talkWithAru', language)}
+            href={portfolioCta.guide.href}
+            aria-label={localize(portfolioCta.guide.label, language)}
+            aria-disabled={hardLocked ? 'true' : undefined}
+            tabIndex={hardLocked ? -1 : undefined}
+            onClick={(event) => {
+              if (hardLocked) event.preventDefault();
+            }}
           >
-            {translate('index.talkWithAru', language)}
-          </a>
-          <a
-            className="nav-link nav-link--portfolio"
-            href={PORTFOLIO_PAGE}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={translate('index.viewPortfolio', language)}
-          >
-            {translate('index.viewPortfolio', language)}
+            {localize(portfolioCta.guide.label, language)}
           </a>
         </nav>
       </header>
 
-      <section className="simple-main" aria-label={translate('index.mainAria', language)}>
-        <div className="avatar-stage">
+      <section className="portfolio-shell" aria-label={translate('index.mainAria', language)}>
+        <div className="portfolio-content-wrap">
+          <PortfolioPanel section={activeSection} language={language} onSelectSection={selectSection} disabled={hardLocked} />
+        </div>
+
+        <div className="avatar-stage portfolio-avatar-stage">
           <AruAvatar
             mode="simple"
-            className="simple-avatar"
-            enableAudioMouthSync
-            audioLevel={level}
-            mouth={mouth}
+            className="simple-avatar portfolio-avatar"
             charSize={t.charSize}
             followRange={t.followRange}
             smoothing={t.smoothing}
@@ -242,101 +364,58 @@ function App() {
             moodEnabled
             autoBlink={t.autoBlink}
             onMoodChange={setMood}
+            onHardLock={() => setIsAruHardLocked(true)}
             language={language}
+            expression={avatarExpression}
+            motion={motionController.motion}
+            actionBubble={localize(activeSection.bubble, language)}
           />
         </div>
 
-        <aside className="simple-panel" data-audio-state={panelState} aria-label={translate('index.panelAria', language)}>
-          <div className="panel-heading">
-            <span className="panel-badge">{translate('index.audioMode', language)}</span>
-            <h2 className="panel-title">{panelTitle}</h2>
-            <p className="panel-copy">{translate('index.panelCopy', language)}</p>
-          </div>
-
-          <div className="status-grid" aria-live="polite">
-            <div className="status-card status-card--mic" data-active={micOn ? 'true' : 'false'}>
-              <span className="status-label">{translate('index.microphone', language)}</span>
-              <span className="status-value">{micStatus}</span>
-            </div>
-            <div className="status-card status-card--audio" data-active={fileLoaded ? 'true' : 'false'} title={fileName || translate('index.noFile', language)}>
-              <span className="status-label">{translate('index.audio', language)}</span>
-              <span className="status-value">{audioStatus}</span>
-            </div>
-            <div className="status-card status-card--mouth" data-active={listening ? 'true' : 'false'}>
-              <span className="status-label">{translate('index.mouth', language)}</span>
-              <span className="status-value">{mouthStatus}</span>
-            </div>
-            <div className="status-card status-card--mood" data-active={listening || fileLoaded ? 'true' : 'false'}>
-              <span className="status-label">{translate('index.status', language)}</span>
-              <span className="status-value">{overallStatus}</span>
-            </div>
-          </div>
-
-          <div className="voice-controls">
-            <div className="control-row">
-              <button type="button" className="primary-button" onClick={startMic} disabled={micOn || locked}
-                aria-label={translate('index.startMicAria', language)}>
-                <span className="button-icon button-icon--mic" aria-hidden="true" />
-                {translate('index.startMic', language)}
+        <nav className="portfolio-section-nav" aria-label={translate('index.sectionsNav', language)}>
+          {portfolioSections.map((section, index) => {
+            const isActive = section.id === activeSection.id;
+            const hoverValue = index % 2 === 0 ? 'B' : 'C';
+            const clearHover = () => setHoverExpression(null);
+            const showHover = () => {
+              if (!hardLocked && mood === 'normal') setHoverExpression(hoverValue);
+            };
+            return (
+              <button
+                type="button"
+                className="portfolio-section-button"
+                data-active={isActive ? 'true' : 'false'}
+                disabled={hardLocked}
+                onPointerEnter={showHover}
+                onPointerLeave={clearHover}
+                onFocus={showHover}
+                onBlur={clearHover}
+                onClick={() => {
+                  clearHover();
+                  selectSection(section.id);
+                }}
+                key={section.id}
+              >
+                <span>{localize(section.navLabel, language)}</span>
               </button>
-              <button type="button" className="soft-button" onClick={stopMic} disabled={!micOn}
-                aria-label={translate('index.stopMicAria', language)}>
-                <span className="button-icon button-icon--stop" aria-hidden="true" />
-                {translate('index.stopMic', language)}
-              </button>
-            </div>
-
-            <label className="file-button">
-              <span className="button-icon button-icon--audio" aria-hidden="true" />
-              {translate('index.loadAudio', language)}
-              <input className="file-input" type="file" accept="audio/*" onChange={onFilePick} />
-            </label>
-
-            <div className="audio-meter" aria-label={`${translate('index.mouth', language)} ${mouthStatus}`}>
-              <div className="meter-header">
-                <span>{translate('index.volume', language)}</span>
-                <span>{mouthStatus}</span>
-              </div>
-              <div className="meter-track">
-                <div className="meter-fill" style={{ '--meter-level': level }} />
-              </div>
-            </div>
-
-            <audio
-              ref={audioElRef}
-              className="audio-player"
-              controls={Boolean(fileName)}
-              hidden={!fileName}
-              onPlay={() => engine.resume()}
-            />
-          </div>
-
-          {audioError ? <p className="error-note" role="alert">{audioError}</p> : null}
-        </aside>
+            );
+          })}
+        </nav>
       </section>
 
-      {!locked ? (
+      {!hardLocked ? (
         <PanelAjustes
           title={translate('index.settingsTitle', language)}
           buttonLabel={`⚙ ${translate('index.settingsButton', language)}`}
           closeLabel={translate('index.closeSettings', language)}
         >
-          <TweakSection label={translate('index.settings.mouth', language)} />
-          <TweakSlider label={translate('index.settings.micSensitivity', language)} value={t.micGain} min={0.3} max={5} step={0.1}
-            onChange={(value) => setTweak('micGain', value)} />
-          <TweakSlider label={translate('index.settings.halfThreshold', language)} value={t.thHalf} min={0.01} max={0.3} step={0.005}
-            onChange={(value) => setTweak('thHalf', value)} />
-          <TweakSlider label={translate('index.settings.fullThreshold', language)} value={t.thFull} min={0.05} max={0.4} step={0.005}
-            onChange={(value) => setTweak('thFull', value)} />
-          <TweakSlider label={translate('index.settings.releaseSpeed', language)} value={t.release} min={0.03} max={0.4} step={0.01}
-            onChange={(value) => setTweak('release', value)} />
-          <TweakToggle label={translate('index.settings.autoBlink', language)} value={t.autoBlink}
-            onChange={(value) => setTweak('autoBlink', value)} />
           <TweakSection label={translate('index.settings.movement', language)} />
           <TweakSlider label={translate('index.settings.followRange', language)} value={t.followRange} min={120} max={1200} step={10} unit="px"
             onChange={(value) => setTweak('followRange', value)} />
           <TweakSlider label={translate('index.settings.followSpeed', language)} value={t.smoothing} min={0.04} max={0.5} step={0.01}
             onChange={(value) => setTweak('smoothing', value)} />
+          <TweakToggle label={translate('index.settings.autoBlink', language)} value={t.autoBlink}
+            onChange={(value) => setTweak('autoBlink', value)} />
           <TweakSection label={translate('index.settings.appearance', language)} />
           <TweakSlider label={translate('index.settings.characterSize', language)} value={t.charSize} min={30} max={92} unit="vmin"
             onChange={(value) => setTweak('charSize', value)} />

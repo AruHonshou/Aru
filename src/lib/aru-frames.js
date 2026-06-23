@@ -76,12 +76,12 @@ export function avatarSheets({ includeMouthFrames = false, includeSpecial = fals
 export function moodMessage(mood, language = 'es') {
   const messages = {
     es: {
-      bored: '¿Sigues aquí? Me estoy aburriendo...',
+      bored: 'No pierdas Aru... Brilla Aru...',
       locked: 'Ya déjame en paz, ahora refresca la página.',
       annoyed: '💢 💢 ¡Deja de darme clics!',
     },
     en: {
-      bored: 'Are you still here? I am getting bored...',
+      bored: 'Don’t lose Aru... Shine, Aru...',
       locked: 'Leave me alone now, then refresh the page.',
       annoyed: '💢 💢 Stop clicking me!',
     },

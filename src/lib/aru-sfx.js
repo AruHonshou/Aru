@@ -4,6 +4,7 @@ const SFX_FILES = {
   greeting: 'audio/gambare-beam.mp3',
   notFound: 'audio/god-damn.mp3',
   angry: 'audio/angry.mp3',
+  afk: 'audio/aruAFK.mp3',
 };
 
 const audioCache = new Map();
