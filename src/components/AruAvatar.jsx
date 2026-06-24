@@ -8,10 +8,9 @@ import {
   frameGrid,
   frameSrc,
   moodMessage,
-  sheetForMouth,
   SHEETS,
 } from '../lib/aru-frames';
-import { playAruSfx } from '../lib/aru-sfx';
+import { primeAruAfkAudio, startAruAfkLipSync } from '../lib/aru-afk-lipsync';
 import '../styles/aru-avatar.css';
 import '../styles/aru-motion.css';
 
@@ -28,9 +27,6 @@ function debugFrames(activeCell) {
 
 export default function AruAvatar({
   mode = 'simple',
-  enableAudioMouthSync = false,
-  audioLevel = 0,
-  mouth = 0,
   charSize = 64,
   followRange = 340,
   smoothing = 0.3,
@@ -55,6 +51,8 @@ export default function AruAvatar({
   const resetAfkRef = React.useRef(() => {});
   const hardLockNotifiedRef = React.useRef(false);
   const hasPlayedAfkSfxRef = React.useRef(false);
+  const afkLipSyncRef = React.useRef(null);
+  const [afkExpression, setAfkExpression] = React.useState('A');
   moodRef.current = mood;
 
   const locked = mood === 'locked';
@@ -84,9 +82,10 @@ export default function AruAvatar({
     if (!moodEnabled) return undefined;
 
     let timer = 0;
-    function resetAfk() {
+    function resetAfk(options = {}) {
       clearTimeout(timer);
       if (moodRef.current === 'locked') return;
+      if (options.prime !== false) primeAruAfkAudio();
       if (moodRef.current === 'bored') setMood('normal');
       timer = window.setTimeout(() => {
         if (moodRef.current === 'normal') setMood('bored');
@@ -95,16 +94,20 @@ export default function AruAvatar({
     resetAfkRef.current = resetAfk;
 
     window.addEventListener('keydown', resetAfk, { passive: true });
+    window.addEventListener('click', resetAfk, { passive: true });
+    window.addEventListener('mousedown', resetAfk, { passive: true });
     window.addEventListener('pointerdown', resetAfk, { passive: true });
-    window.addEventListener('pointermove', resetAfk, { passive: true });
     window.addEventListener('touchstart', resetAfk, { passive: true });
-    resetAfk();
+    window.addEventListener('input', resetAfk, { passive: true });
+    resetAfk({ prime: false });
     return () => {
       clearTimeout(timer);
       window.removeEventListener('keydown', resetAfk);
+      window.removeEventListener('click', resetAfk);
+      window.removeEventListener('mousedown', resetAfk);
       window.removeEventListener('pointerdown', resetAfk);
-      window.removeEventListener('pointermove', resetAfk);
       window.removeEventListener('touchstart', resetAfk);
+      window.removeEventListener('input', resetAfk);
       resetAfkRef.current = () => {};
     };
   }, [moodEnabled]);
@@ -115,22 +118,35 @@ export default function AruAvatar({
     if (mood === 'bored') {
       if (hasPlayedAfkSfxRef.current) return;
       hasPlayedAfkSfxRef.current = true;
-      playAruSfx('afk', `afk-${Date.now()}`, { queueOnBlock: false });
+      setAfkExpression('A');
+      afkLipSyncRef.current?.stop();
+      afkLipSyncRef.current = startAruAfkLipSync({
+        onExpression: setAfkExpression,
+      });
       return;
     }
 
+    afkLipSyncRef.current?.stop();
+    afkLipSyncRef.current = null;
+    setAfkExpression('A');
     hasPlayedAfkSfxRef.current = false;
   }, [mood, moodEnabled]);
 
-  const frames = React.useMemo(() => frameGrid(avatarSheets({
-    includeMouthFrames: enableAudioMouthSync,
-    includeSpecial: moodEnabled,
-    includeAllExpressions: Boolean(forcedExpression),
-  })), [enableAudioMouthSync, forcedExpression, moodEnabled]);
+  React.useEffect(() => () => {
+    afkLipSyncRef.current?.stop();
+  }, []);
 
-  const activeSheet = moodEnabled && mood !== 'normal'
-    ? SHEETS.special[mood]
-    : forcedExpression || sheetForMouth({ eyesClosed: blink, mouth: enableAudioMouthSync ? mouth : 0 });
+  const frames = React.useMemo(() => frameGrid(avatarSheets({
+    includeSpecial: moodEnabled,
+    includeAfkSinging: moodEnabled,
+    includeAllExpressions: Boolean(forcedExpression),
+  })), [forcedExpression, moodEnabled]);
+
+  const activeSheet = moodEnabled && mood === 'bored'
+    ? afkExpression
+    : moodEnabled && mood !== 'normal'
+      ? SHEETS.special[mood]
+      : forcedExpression || (blink ? SHEETS.eyesClosed[0] : SHEETS.eyesOpen[0]);
 
   const moodMotion = mood === 'bored'
     ? 'tired-sway'
@@ -161,7 +177,6 @@ export default function AruAvatar({
       style={{
         '--aru-size': size,
         '--aru-press-scale': pressed && !locked ? 0.94 : 1,
-        '--aru-audio-level': audioLevel,
       }}
       onPointerDown={() => {
         if (!moodEnabled) return;

@@ -4,8 +4,6 @@ export const ROWS = charConfig.rows;
 export const COLS = charConfig.cols;
 export const CENTER_CELL = { r: 2, c: 2 };
 
-export const MOUTH_LABELS = ['cerrada', 'semiabierta', 'abierta'];
-
 export const SHEETS = {
   eyesOpen: [
     charConfig.sheets.eyesOpen.close,
@@ -37,10 +35,6 @@ export function frameSrc(sheet, row, col) {
   return charConfig.src(sheet, row, col);
 }
 
-export function sheetForMouth({ eyesClosed = false, mouth = 0 }) {
-  return (eyesClosed ? SHEETS.eyesClosed : SHEETS.eyesOpen)[clamp(mouth, 0, 2)];
-}
-
 export function frameGrid(sheets) {
   const frames = [];
   for (const sheet of sheets) {
@@ -53,7 +47,7 @@ export function frameGrid(sheets) {
   return frames;
 }
 
-export function avatarSheets({ includeMouthFrames = false, includeSpecial = false, includeAllExpressions = false } = {}) {
+export function avatarSheets({ includeSpecial = false, includeAfkSinging = false, includeAllExpressions = false } = {}) {
   if (includeAllExpressions) {
     const sheets = [...EXPRESSION_SHEETS];
     if (includeSpecial) {
@@ -62,9 +56,11 @@ export function avatarSheets({ includeMouthFrames = false, includeSpecial = fals
     return Array.from(new Set(sheets));
   }
 
-  const sheets = includeMouthFrames
-    ? [...SHEETS.eyesOpen, ...SHEETS.eyesClosed]
-    : [SHEETS.eyesOpen[0], SHEETS.eyesClosed[0]];
+  const sheets = [SHEETS.eyesOpen[0], SHEETS.eyesClosed[0]];
+
+  if (includeAfkSinging) {
+    sheets.push('B', 'C');
+  }
 
   if (includeSpecial) {
     sheets.push(SHEETS.special.bored, SHEETS.special.annoyed, SHEETS.special.locked);
@@ -90,8 +86,4 @@ export function moodMessage(mood, language = 'es') {
   if (mood === 'bored') return localized.bored;
   if (mood === 'locked') return localized.locked;
   return localized.annoyed;
-}
-
-export function mouthLabel(mouth) {
-  return MOUTH_LABELS[clamp(mouth, 0, 2)];
 }

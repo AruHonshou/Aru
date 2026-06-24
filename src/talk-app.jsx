@@ -24,7 +24,6 @@ import {
   NOT_FOUND_NODE_ID,
   searchGuidedFlow,
 } from './data/aru-guided-flow';
-import { deepGuideMeta } from './data/aru-deep-knowledge';
 import './styles/aru-pages.css';
 import './styles/voz-page.css';
 
@@ -179,7 +178,6 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
     ? optionsForNode(node, backNodeId, language).filter((option) => option.next !== node.id)
     : [];
   const isProject = node.id.startsWith('project_');
-  const sourceText = localize(deepGuideMeta.sourceNote, language);
   const kicker = node.id === HOME_NODE_ID
     ? translate('common.sourceKicker', language)
     : isProject
@@ -297,7 +295,6 @@ function GuidedNodeContent({ node, backNodeId, isLatest, language, onSelect, onE
         </div>
       ) : null}
 
-      {sourceText ? <p className="flow-card__source">{sourceText}</p> : null}
     </div>
   );
 }
@@ -337,6 +334,12 @@ function App() {
   React.useEffect(() => {
     installAruSfxUnlock();
   }, []);
+
+  React.useEffect(() => {
+    document.title = language === 'en'
+      ? "Aru - Kendall's Deep Guide"
+      : 'Aru - Guía profunda de Kendall';
+  }, [language]);
 
   React.useEffect(() => {
     loaderIntervalRef.current = window.setInterval(() => {
@@ -702,6 +705,7 @@ function App() {
           </div>
         </form>
       </section>
+      {hardLocked ? <div className="aru-hard-lock-overlay" aria-hidden="true" /> : null}
     </main>
   );
 }

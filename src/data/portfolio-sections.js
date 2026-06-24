@@ -1,11 +1,3 @@
-import kendallProfileSource from './kendall-profile.md?raw';
-
-export const portfolioSourceMeta = {
-  source: 'kendall-profile.md',
-  reference: 'https://aruhonshou.github.io/Aru/portfolio.html',
-  characters: kendallProfileSource.length,
-};
-
 export const portfolioCta = {
   guide: {
     label: { es: 'Aru lo explica mejor', en: 'Aru explains it better' },
@@ -18,29 +10,42 @@ export const portfolioSections = [
     id: 'about',
     navLabel: { es: 'Sobre mí', en: 'About me' },
     title: {
-      es: 'Kendall Valverde Díaz crea software con IA y QA.',
-      en: 'Kendall Valverde Díaz builds software with AI and QA.',
+      es: 'Construyo software fullstack con IA, QA Automation y experiencias web interactivas.',
+      en: 'I build fullstack software with AI, QA Automation, and interactive web experiences.',
     },
-    eyebrow: { es: 'Portafolio interactivo', en: 'Interactive portfolio' },
+    eyebrow: { es: 'Perfil profesional', en: 'Professional profile' },
     status: { es: 'Perfil', en: 'Profile' },
     expression: 'G',
     motion: 'talking-bounce',
     bubble: {
-      es: 'Te presento a Kendall de forma rápida y clara ✨',
-      en: 'Let me introduce Kendall clearly and quickly ✨',
+      es: 'Primero lo importante: quién es Kendall y qué construye ✨',
+      en: 'First things first: who Kendall is and what he builds ✨',
     },
+    identity: [
+      { label: { es: 'Nombre', en: 'Name' }, value: 'Kendall Valverde Díaz' },
+      { label: { es: 'Rol', en: 'Role' }, value: 'Software Engineer / Fullstack Engineer' },
+      {
+        label: { es: 'Foco', en: 'Focus' },
+        value: 'AI-Augmented Development · React · TypeScript · QA Automation',
+      },
+    ],
+    tags: ['React', 'TypeScript', 'Node.js', 'QA Automation', 'IA aplicada', 'RAG', 'Agentes'],
     summary: {
-      es: 'Software Engineer / Fullstack Engineer especializado en AI-Augmented Development. Tiene 3+ años creando productos con React, TypeScript y Node.js, con experiencia en agentes IA, RAG y automatización QA.',
-      en: 'Software Engineer / Fullstack Engineer specialized in AI-Augmented Development. He has 3+ years building products with React, TypeScript, and Node.js, with experience in AI agents, RAG, and QA automation.',
+      es: 'Kendall Valverde Díaz es Software Engineer / Fullstack Engineer de Costa Rica, especializado en AI-Augmented Development, frontend moderno, backend y automatización de calidad.',
+      en: 'Kendall Valverde Díaz is a Software Engineer / Fullstack Engineer from Costa Rica, specialized in AI-Augmented Development, modern frontend, backend, and quality automation.',
     },
     highlights: [
       {
-        es: 'Enfoque en productos mantenibles, calidad técnica, buenas prácticas y automatización.',
-        en: 'Focused on maintainable products, technical quality, good practices, and automation.',
+        es: 'Crea productos fullstack mantenibles con React, TypeScript, Node.js y APIs claras.',
+        en: 'Builds maintainable fullstack products with React, TypeScript, Node.js, and clear APIs.',
       },
       {
-        es: 'Combina frontend moderno, backend, IA aplicada, QA Automation y despliegues reproducibles.',
-        en: 'Combines modern frontend, backend, applied AI, QA Automation, and reproducible delivery.',
+        es: 'Integra IA aplicada, RAG y agentes para flujos útiles, no solo demos.',
+        en: 'Integrates applied AI, RAG, and agents into useful workflows, not just demos.',
+      },
+      {
+        es: 'Refuerza calidad con QA Automation, pruebas API/UI y pipelines reproducibles.',
+        en: 'Strengthens quality with QA Automation, API/UI testing, and reproducible pipelines.',
       },
     ],
     groups: [
@@ -71,7 +76,7 @@ export const portfolioSections = [
     ],
     actions: [
       { label: { es: 'Ver proyectos', en: 'View projects' }, section: 'projects', variant: 'primary' },
-      { label: { es: 'Hablemos', en: 'Contact me' }, section: 'contact', variant: 'secondary' },
+      { label: { es: 'Contactarme', en: 'Contact me' }, section: 'contact', variant: 'secondary' },
       { label: { es: 'Aru lo explica mejor', en: 'Aru explains it better' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
     ],
   },
@@ -79,8 +84,8 @@ export const portfolioSections = [
     id: 'skills',
     navLabel: { es: 'Skills', en: 'Skills' },
     title: {
-      es: 'Stack que combina producto, IA y calidad.',
-      en: 'A stack that combines product, AI, and quality.',
+      es: 'Tecnologías para crear, probar y entregar producto.',
+      en: 'Technologies for building, testing, and shipping product.',
     },
     eyebrow: { es: 'Skill board', en: 'Skill board' },
     status: { es: 'Skills', en: 'Skills' },
@@ -91,9 +96,24 @@ export const portfolioSections = [
       en: 'These skills come from real projects, not just theory.',
     },
     summary: {
-      es: 'Kendall trabaja en la intersección entre interfaces modernas, servicios fullstack, IA aplicada, automatización QA, datos y entrega reproducible.',
-      en: 'Kendall works at the intersection of modern interfaces, fullstack services, applied AI, QA automation, data, and reproducible delivery.',
+      es: 'Un stack práctico para interfaces, servicios, IA aplicada, automatización QA, datos y entrega reproducible.',
+      en: 'A practical stack for interfaces, services, applied AI, QA automation, data, and reproducible delivery.',
     },
+    highlights: [
+      {
+        es: 'Frontend fuerte: React, TypeScript, Vite, TailwindCSS y estado moderno.',
+        en: 'Strong frontend: React, TypeScript, Vite, TailwindCSS, and modern state.',
+      },
+      {
+        es: 'Backend y datos: Node.js, Express, NestJS, REST, GraphQL, MySQL y SQLite.',
+        en: 'Backend and data: Node.js, Express, NestJS, REST, GraphQL, MySQL, and SQLite.',
+      },
+      {
+        es: 'Calidad e IA: Playwright, Postman, RAG, embeddings, agentes y CI/CD.',
+        en: 'Quality and AI: Playwright, Postman, RAG, embeddings, agents, and CI/CD.',
+      },
+    ],
+    tags: ['React', 'TypeScript', 'Node.js', 'Playwright', 'RAG', 'Docker', 'AWS'],
     groups: [
       {
         title: { es: 'Frontend / Interfaces modernas', en: 'Frontend / Modern interfaces' },
@@ -146,13 +166,14 @@ export const portfolioSections = [
     ],
     actions: [
       { label: { es: 'Ver experiencia', en: 'View experience' }, section: 'experience', variant: 'primary' },
-      { label: { es: 'Ver guía profunda', en: 'View deep guide' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
+      { label: { es: 'Ver proyectos', en: 'View projects' }, section: 'projects', variant: 'secondary' },
+      { label: { es: 'Aru lo explica mejor', en: 'Aru explains it better' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
     ],
   },
   {
     id: 'experience',
     navLabel: { es: 'Experiencia', en: 'Experience' },
-    title: { es: 'Experiencia reciente.', en: 'Recent experience.' },
+    title: { es: 'Experiencia aplicada en QA Automation y fullstack.', en: 'Applied experience in QA Automation and fullstack.' },
     eyebrow: { es: 'Arco profesional', en: 'Professional arc' },
     status: { es: 'Experiencia', en: 'Experience' },
     expression: 'A',
@@ -165,6 +186,21 @@ export const portfolioSections = [
       es: 'Experiencia reciente en QA Automation bancaria y desarrollo fullstack freelance para clientes de Costa Rica y Estados Unidos.',
       en: 'Recent experience in banking QA Automation and freelance fullstack development for clients in Costa Rica and the United States.',
     },
+    highlights: [
+      {
+        es: 'QA Automation en sistemas bancarios críticos con Playwright, TypeScript y Postman.',
+        en: 'QA Automation for critical banking systems with Playwright, TypeScript, and Postman.',
+      },
+      {
+        es: 'Desarrollo fullstack freelance desde requerimientos hasta despliegue.',
+        en: 'Freelance fullstack development from requirements to deployment.',
+      },
+      {
+        es: 'Orientación a trazabilidad, reducción de tiempos y automatización útil.',
+        en: 'Focused on traceability, time reduction, and useful automation.',
+      },
+    ],
+    tags: ['QA Automation', 'Banking QA', 'Fullstack', 'CI/CD', 'React', 'TypeScript'],
     timeline: [
       {
         index: '01',
@@ -219,13 +255,13 @@ export const portfolioSections = [
     ],
     actions: [
       { label: { es: 'Ver proyectos', en: 'View projects' }, section: 'projects', variant: 'primary' },
-      { label: { es: 'Hablemos', en: 'Contact me' }, section: 'contact', variant: 'secondary' },
+      { label: { es: 'Contactarme', en: 'Contact me' }, section: 'contact', variant: 'secondary' },
     ],
   },
   {
     id: 'projects',
     navLabel: { es: 'Proyectos', en: 'Projects' },
-    title: { es: 'Proyectos destacados.', en: 'Featured projects.' },
+    title: { es: 'Proyectos que prueban el stack.', en: 'Projects that prove the stack.' },
     eyebrow: { es: 'Estante de proyectos manga', en: 'Project manga shelf' },
     status: { es: 'Proyectos', en: 'Projects' },
     expression: 'G',
@@ -235,9 +271,24 @@ export const portfolioSections = [
       en: 'These projects show applied AI, QA, fullstack work, and infrastructure.',
     },
     summary: {
-      es: 'Una selección escaneable de proyectos públicos y demostrables. La guía de Aru conserva el detalle largo y el storytelling técnico.',
-      en: 'A scannable selection of public and demonstrable projects. Aru guide keeps the deeper technical storytelling.',
+      es: 'Una selección breve de proyectos públicos y demostrables. La guía de Aru conserva el detalle largo y el storytelling técnico.',
+      en: 'A brief selection of public and demonstrable projects. Aru guide keeps the deeper technical storytelling.',
     },
+    highlights: [
+      {
+        es: 'IA aplicada: QAPilot, DocuMente y chatbots fullstack con modelos reales.',
+        en: 'Applied AI: QAPilot, DocuMente, and fullstack chatbots with real models.',
+      },
+      {
+        es: 'Calidad: automatización UI/API, reportes, trazabilidad y pruebas reproducibles.',
+        en: 'Quality: UI/API automation, reports, traceability, and reproducible tests.',
+      },
+      {
+        es: 'Producto: interfaces interactivas, sistemas internos y despliegues en GitHub Pages/AWS.',
+        en: 'Product: interactive interfaces, internal systems, and deployments on GitHub Pages/AWS.',
+      },
+    ],
+    tags: ['QAPilot', 'DocuMente', 'OpenAI', 'Terraform', 'RRHH', 'Aru'],
     projects: [
       {
         name: 'QAPilot',
@@ -321,14 +372,14 @@ export const portfolioSections = [
       },
     ],
     actions: [
-      { label: { es: 'Ver experiencia', en: 'View experience' }, section: 'experience', variant: 'secondary' },
-      { label: { es: 'Preguntarle a Aru', en: 'Ask Aru' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
+      { label: { es: 'Ver GitHub', en: 'View GitHub' }, href: 'https://github.com/AruHonshou', variant: 'primary' },
+      { label: { es: 'Aru lo explica mejor', en: 'Aru explains it better' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
     ],
   },
   {
     id: 'certifications',
     navLabel: { es: 'Certificaciones', en: 'Certifications' },
-    title: { es: 'Certificaciones y aprendizaje.', en: 'Certifications and learning.' },
+    title: { es: 'Formación enfocada en software, IA y calidad.', en: 'Training focused on software, AI, and quality.' },
     eyebrow: { es: 'Credenciales', en: 'Credentials' },
     status: { es: 'Formación', en: 'Education' },
     expression: 'G',
@@ -341,6 +392,21 @@ export const portfolioSections = [
       es: 'Una base académica en sistemas, especialización actual en IA aplicada al SDLC, inglés avanzado y cursos técnicos alineados a proyectos reales.',
       en: 'An academic base in systems, current specialization in AI applied to the SDLC, advanced English, and technical courses aligned with real projects.',
     },
+    highlights: [
+      {
+        es: 'Ingeniería en Sistemas de Información, titulado y colegiado activo del CPIC.',
+        en: 'Information Systems Engineering graduate and active CPIC member.',
+      },
+      {
+        es: 'Especialización actual en Ingeniería del Software Aumentada con IA.',
+        en: 'Current specialization in AI-Augmented Software Engineering.',
+      },
+      {
+        es: 'Inglés B2+ y formación complementaria en TypeScript, React, Node.js, QA y DevOps.',
+        en: 'English B2+ and complementary training in TypeScript, React, Node.js, QA, and DevOps.',
+      },
+    ],
+    tags: ['UIA', 'CPIC', 'CENFOTEC', 'English B2+', 'DevTalles', 'Playwright'],
     groups: [
       {
         title: { es: 'Académico', en: 'Academic' },
@@ -377,15 +443,15 @@ export const portfolioSections = [
     ],
     actions: [
       { label: { es: 'Ver skills', en: 'View skills' }, section: 'skills', variant: 'primary' },
-      { label: { es: 'Ver guía profunda', en: 'View deep guide' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
+      { label: { es: 'Contactarme', en: 'Contact me' }, section: 'contact', variant: 'secondary' },
     ],
   },
   {
     id: 'contact',
     navLabel: { es: 'Contacto', en: 'Contact' },
     title: {
-      es: 'Construyamos software que se pueda probar, mantener y mejorar.',
-      en: "Let's build software that can be tested, maintained, and improved.",
+      es: 'Contacto claro para roles fullstack, QA e IA.',
+      en: 'Clear contact for fullstack, QA, and AI roles.',
     },
     eyebrow: { es: 'Contacto', en: 'Contact' },
     status: { es: 'Contacto', en: 'Contact' },
@@ -399,6 +465,7 @@ export const portfolioSections = [
       es: 'Disponible para posiciones fullstack, frontend, QA o roles enfocados en IA. Remoto o presencial en Costa Rica.',
       en: 'Available for fullstack, frontend, QA, or AI-focused roles. Remote or onsite in Costa Rica.',
     },
+    tags: ['Costa Rica', 'Remote', 'Fullstack', 'QA Automation', 'AI'],
     highlights: [
       { es: 'Costa Rica.', en: 'Costa Rica.' },
       { es: 'Español nativo / Inglés B2+.', en: 'Native Spanish / English B2+.' },
@@ -411,11 +478,10 @@ export const portfolioSections = [
       { label: 'WhatsApp', value: '+506 8509-7920', href: 'https://wa.me/50685097920' },
     ],
     actions: [
-      { label: { es: 'Email', en: 'Email' }, href: 'mailto:kendallavd@gmail.com', variant: 'primary' },
-      { label: { es: 'GitHub', en: 'GitHub' }, href: 'https://github.com/AruHonshou', variant: 'secondary' },
+      { label: { es: 'Enviar correo', en: 'Send email' }, href: 'mailto:kendallavd@gmail.com', variant: 'primary' },
+      { label: { es: 'Ver GitHub', en: 'View GitHub' }, href: 'https://github.com/AruHonshou', variant: 'secondary' },
       { label: { es: 'LinkedIn', en: 'LinkedIn' }, href: 'https://www.linkedin.com/in/kendall-valverde-diaz-aru/', variant: 'secondary' },
-      { label: { es: 'WhatsApp', en: 'WhatsApp' }, href: 'https://wa.me/50685097920', variant: 'secondary' },
-      { label: { es: 'Preguntarle a Aru', en: 'Ask Aru' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
+      { label: { es: 'Aru lo explica mejor', en: 'Aru explains it better' }, href: `${import.meta.env.BASE_URL}guia.html`, variant: 'guide' },
     ],
   },
 ];

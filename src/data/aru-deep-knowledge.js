@@ -1,7 +1,3 @@
-import kendallProfileText from './kendall-profile.md?raw';
-
-export const KENDALL_PROFILE_SOURCE = kendallProfileText;
-
 export const OFFICIAL_LINKS = {
   portfolio: `${import.meta.env.BASE_URL}portfolio.html`,
   portfolioPublic: 'https://aruhonshou.github.io/Aru/portfolio.html',
@@ -18,8 +14,6 @@ export const OFFICIAL_LINKS = {
   email: 'mailto:kendallavd@gmail.com',
   whatsapp: 'https://wa.me/50685097920',
 };
-
-const sourceNote = { es: '', en: '' };
 
 function baseOptions() {
   return [
@@ -1154,8 +1148,5 @@ export const deepGuideNodes = {
 };
 
 export const deepGuideMeta = {
-  sourceNote,
-  profileCharacters: kendallProfileText.length,
-  hasAntiHallucinationRule: kendallProfileText.includes('Si tienes duda, no inventes'),
   nodeCount: Object.keys(deepGuideNodes).length,
 };

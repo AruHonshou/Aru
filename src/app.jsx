@@ -14,15 +14,6 @@ import {
 } from './data/portfolio-sections';
 import './styles/aru-pages.css';
 
-const {
-  useAjustes,
-  PanelAjustes,
-  TweakSection,
-  TweakSlider,
-  TweakColor,
-  TweakToggle,
-} = window;
-
 const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
   "followRange": 340,
   "smoothing": 0.3,
@@ -35,14 +26,8 @@ const SIMPLE_DEFAULTS = /*EDITMODE-BEGIN*/{
   "bgMotion": 0.7,
   "bgDensity": 0.75,
   "showDebug": false,
-  "micGain": 1.6,
-  "thHalf": 0.07,
-  "thFull": 0.2,
-  "release": 0.12,
   "autoBlink": true
 }/*EDITMODE-END*/;
-
-const BG_OPTIONS = ['#FFEAD3', '#FFF7EC', '#EAF6F0', '#FDE7EF', '#EAF4FF'];
 
 function PortfolioTags({ tags }) {
   if (!tags?.length) return null;
@@ -50,6 +35,23 @@ function PortfolioTags({ tags }) {
     <div className="portfolio-tags">
       {tags.map((tag) => <span key={tag}>{tag}</span>)}
     </div>
+  );
+}
+
+function PortfolioIdentity({ items, language }) {
+  if (!items?.length) return null;
+  return (
+    <dl
+      className="portfolio-identity"
+      aria-label={localize({ es: 'Datos profesionales principales', en: 'Main professional facts' }, language)}
+    >
+      {items.map((item) => (
+        <div className="portfolio-identity__item" key={localize(item.label, language)}>
+          <dt>{localize(item.label, language)}</dt>
+          <dd>{localize(item.value, language)}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -223,13 +225,14 @@ function PortfolioPanel({ section, language, onSelectSection, disabled = false }
         <p>{localize(section.summary, language)}</p>
       </div>
 
+      <PortfolioIdentity items={section.identity} language={language} />
       <SectionHighlights items={section.highlights} language={language} />
       <PortfolioTags tags={section.tags} />
+      <ActionButtons actions={section.actions} language={language} onSelectSection={onSelectSection} disabled={disabled} />
       <SkillGroups groups={section.groups} language={language} />
       <ExperienceTimeline timeline={section.timeline} language={language} />
       <ProjectCards projects={section.projects} language={language} onSelectSection={onSelectSection} disabled={disabled} />
       <ContactLinks links={section.contactLinks} language={language} disabled={disabled} />
-      <ActionButtons actions={section.actions} language={language} onSelectSection={onSelectSection} disabled={disabled} />
 
       {cta ? (
         <div className="portfolio-card__footer">
@@ -252,7 +255,7 @@ function PortfolioPanel({ section, language, onSelectSection, disabled = false }
 
 function App() {
   const [language, setLanguage] = useAruLanguage();
-  const [t, setTweak] = useAjustes(SIMPLE_DEFAULTS);
+  const t = SIMPLE_DEFAULTS;
   const [mood, setMood] = React.useState('normal');
   const [activeSectionId, setActiveSectionId] = React.useState('about');
   const [hoverExpression, setHoverExpression] = React.useState(null);
@@ -287,6 +290,12 @@ function App() {
   React.useEffect(() => {
     if (mood !== 'normal') setHoverExpression(null);
   }, [mood]);
+
+  React.useEffect(() => {
+    document.title = language === 'en'
+      ? "Aru - Kendall's Interactive Portfolio"
+      : 'Aru - Portfolio interactivo de Kendall';
+  }, [language]);
 
   return (
     <main
@@ -403,42 +412,7 @@ function App() {
         </nav>
       </section>
 
-      {!hardLocked ? (
-        <PanelAjustes
-          title={translate('index.settingsTitle', language)}
-          buttonLabel={`⚙ ${translate('index.settingsButton', language)}`}
-          closeLabel={translate('index.closeSettings', language)}
-        >
-          <TweakSection label={translate('index.settings.movement', language)} />
-          <TweakSlider label={translate('index.settings.followRange', language)} value={t.followRange} min={120} max={1200} step={10} unit="px"
-            onChange={(value) => setTweak('followRange', value)} />
-          <TweakSlider label={translate('index.settings.followSpeed', language)} value={t.smoothing} min={0.04} max={0.5} step={0.01}
-            onChange={(value) => setTweak('smoothing', value)} />
-          <TweakToggle label={translate('index.settings.autoBlink', language)} value={t.autoBlink}
-            onChange={(value) => setTweak('autoBlink', value)} />
-          <TweakSection label={translate('index.settings.appearance', language)} />
-          <TweakSlider label={translate('index.settings.characterSize', language)} value={t.charSize} min={30} max={92} unit="vmin"
-            onChange={(value) => setTweak('charSize', value)} />
-          <TweakSection label={translate('index.settings.animeBg', language)} />
-          <TweakColor label={translate('index.settings.bgBase', language)} value={t.bgColor} options={BG_OPTIONS}
-            onChange={(value) => setTweak('bgColor', value)} />
-          <TweakColor label={translate('index.settings.bgSoft', language)} value={t.bgSoftColor}
-            onChange={(value) => setTweak('bgSoftColor', value)} />
-          <TweakColor label={translate('index.settings.bgAccent', language)} value={t.bgAccentColor}
-            onChange={(value) => setTweak('bgAccentColor', value)} />
-          <TweakColor label={translate('index.settings.bgDecor', language)} value={t.bgDecorColor}
-            onChange={(value) => setTweak('bgDecorColor', value)} />
-          <TweakToggle label={translate('index.settings.bgDecorations', language)} value={t.bgDecorEnabled}
-            onChange={(value) => setTweak('bgDecorEnabled', value)} />
-          <TweakSlider label={translate('index.settings.ambience', language)} value={t.bgMotion} min={0} max={1} step={0.05}
-            onChange={(value) => setTweak('bgMotion', value)} />
-          <TweakSlider label={translate('index.settings.density', language)} value={t.bgDensity} min={0.25} max={1} step={0.05}
-            onChange={(value) => setTweak('bgDensity', value)} />
-          <TweakSection label={translate('index.settings.debug', language)} />
-          <TweakToggle label={translate('index.settings.showGrid', language)} value={t.showDebug}
-            onChange={(value) => setTweak('showDebug', value)} />
-        </PanelAjustes>
-      ) : null}
+      {hardLocked ? <div className="aru-hard-lock-overlay" aria-hidden="true" /> : null}
     </main>
   );
 }
