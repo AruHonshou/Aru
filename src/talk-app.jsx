@@ -380,7 +380,10 @@ function App() {
 
     const latestAssistant = list.querySelector('[data-latest-assistant="true"]');
     if (latestAssistant) {
-      latestAssistant.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      list.scrollTo({
+        top: latestAssistant.offsetTop - list.offsetTop,
+        behavior: 'smooth',
+      });
       return;
     }
 

@@ -1628,6 +1628,65 @@ input:focus-visible {
 
 }
 
+@media (max-width: 1180px), (pointer: coarse) and (max-width: 1180px) {
+  .portfolio-page {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .portfolio-shell {
+    grid-template-columns: 1fr;
+    gap: clamp(14px, 3vw, 22px);
+  }
+
+  .portfolio-content-wrap {
+    order: 1;
+  }
+
+  .portfolio-avatar-stage {
+    order: 2;
+    min-height: clamp(300px, 42vw, 420px);
+  }
+
+  .portfolio-avatar {
+    --aru-max-size: min(62vw, 380px, calc(100vh - 250px));
+    --aru-bubble-top: 18%;
+    --aru-bubble-width: min(76vw, 330px);
+    --aru-bubble-transform: translate(-50%, -82%);
+    --aru-bubble-pop-start: translate(-50%, -66%) scale(0.74) rotate(-4deg);
+    --aru-bubble-pop-overshoot: translate(-50%, -86%) scale(1.04) rotate(1.5deg);
+    --aru-bubble-pop-end: translate(-50%, -82%) scale(1) rotate(0);
+  }
+
+  .portfolio-section-nav {
+    order: 3;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
+  .portfolio-section-button {
+    min-height: 46px;
+    border-radius: 999px;
+    justify-content: center;
+    padding-inline: 12px;
+    text-align: center;
+  }
+
+  .portfolio-section-button:hover,
+  .portfolio-section-button[data-active="true"] {
+    transform: translateY(-2px);
+  }
+
+  .portfolio-card {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 @media (max-width: 900px) {
   .simple-page {
     position: relative;
@@ -1646,57 +1705,16 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .portfolio-page {
-    position: relative;
-    min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .portfolio-shell {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .portfolio-content-wrap {
-    order: 1;
-  }
-
   .portfolio-avatar-stage {
-    order: 2;
-    min-height: 420px;
+    min-height: clamp(300px, 56vw, 400px);
   }
 
   .portfolio-avatar {
-    --aru-bubble-top: 18%;
-    --aru-bubble-width: min(76vw, 330px);
-    --aru-bubble-transform: translate(-50%, -86%);
-    --aru-bubble-pop-start: translate(-50%, -70%) scale(0.74) rotate(-4deg);
-    --aru-bubble-pop-overshoot: translate(-50%, -90%) scale(1.04) rotate(1.5deg);
-    --aru-bubble-pop-end: translate(-50%, -86%) scale(1) rotate(0);
+    --aru-max-size: min(70vw, 350px, calc(100vh - 240px));
   }
 
   .portfolio-section-nav {
-    order: 3;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: 100%;
-  }
-
-  .portfolio-section-button {
-    min-height: 46px;
-    border-radius: 999px;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .portfolio-section-button:hover,
-  .portfolio-section-button[data-active="true"] {
-    transform: translateY(-2px);
-  }
-
-  .portfolio-card {
-    height: auto;
-    max-height: min(700px, 76vh);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .simple-avatar {
@@ -1753,23 +1771,22 @@ input:focus-visible {
   }
 
   .portfolio-avatar {
-    --aru-max-size: min(94vw, 430px);
+    --aru-max-size: min(78vw, 310px);
     --aru-bubble-top: 16%;
     --aru-bubble-width: min(86vw, 300px);
-    --aru-bubble-transform: translate(-50%, -64%);
-    --aru-bubble-pop-start: translate(-50%, -50%) scale(0.76) rotate(-4deg);
-    --aru-bubble-pop-overshoot: translate(-50%, -68%) scale(1.04) rotate(1.5deg);
-    --aru-bubble-pop-end: translate(-50%, -64%) scale(1) rotate(0);
+    --aru-bubble-transform: translate(-50%, -60%);
+    --aru-bubble-pop-start: translate(-50%, -46%) scale(0.76) rotate(-4deg);
+    --aru-bubble-pop-overshoot: translate(-50%, -64%) scale(1.04) rotate(1.5deg);
+    --aru-bubble-pop-end: translate(-50%, -60%) scale(1) rotate(0);
   }
 
   .portfolio-avatar-stage {
-    min-height: 360px;
+    min-height: clamp(292px, 72vw, 340px);
     padding-inline: 0;
   }
 
   .portfolio-card {
     border-radius: 22px 18px 24px 16px;
-    max-height: min(560px, 56vh);
     padding: 16px;
   }
 
@@ -1784,9 +1801,12 @@ input:focus-visible {
 
   .portfolio-skill-grid,
   .portfolio-project-grid,
-  .portfolio-contact-grid,
-  .portfolio-section-nav {
+  .portfolio-contact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-section-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .portfolio-actions {
@@ -1831,5 +1851,11 @@ input:focus-visible {
 
   .message-bubble {
     max-width: 92%;
+  }
+}
+
+@media (max-width: 380px) {
+  .portfolio-section-nav {
+    grid-template-columns: 1fr;
   }
 }

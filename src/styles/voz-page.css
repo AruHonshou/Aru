@@ -1385,30 +1385,69 @@ body {
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 980px), (pointer: coarse) and (max-width: 1180px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .voz-page {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(250px, 42%) minmax(0, 1fr);
-    overflow: hidden;
+    grid-template-rows: auto auto;
+    height: auto;
+    max-height: none;
+    min-height: 100dvh;
+    overflow: visible;
   }
 
   .voz-page:not([data-avatar-mood="normal"]) {
-    grid-template-rows: minmax(310px, 46%) minmax(0, 1fr);
+    grid-template-rows: auto auto;
   }
 
   .companion-card {
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
-    overflow: hidden;
+    grid-template-rows: auto auto auto auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .chat-avatar-wrap {
+    height: auto;
+    min-height: clamp(180px, 34vw, 260px);
+    overflow: visible;
   }
 
   .voz-page .chat-avatar {
-    --aru-size: min(40vw, 260px) !important;
+    --aru-size: min(46vw, 280px) !important;
+  }
+
+  .voz-page .chat-panel {
+    height: auto;
+    min-height: auto;
+    overflow: hidden;
+  }
+
+  .voz-page .chat-messages {
+    flex: 1 1 auto;
+    max-height: min(72dvh, 720px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: clamp(22px, 4vw, 34px) clamp(14px, 3vw, 22px) clamp(20px, 3vw, 30px);
+  }
+
+  .voz-page .chat-thread {
+    width: min(100%, 760px);
   }
 }
 
 @media (max-width: 620px) {
   .voz-page {
-    grid-template-rows: minmax(344px, 40%) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 12px;
     padding: 12px;
   }
 
@@ -1437,7 +1476,7 @@ body {
   }
 
   .voz-page:not([data-avatar-mood="normal"]) {
-    grid-template-rows: minmax(420px, 48%) minmax(0, 1fr);
+    grid-template-rows: auto auto;
   }
 
   .companion-card__header,
@@ -1454,16 +1493,20 @@ body {
 
   .companion-card__chip {
     align-self: flex-start;
+    max-width: 100%;
   }
 
   .companion-card {
-    grid-template-rows: auto 86px auto auto;
-    gap: 7px;
+    grid-template-rows: auto auto auto auto;
+    gap: 9px;
+    height: auto;
+    max-height: none;
     padding: 12px;
+    overflow: visible;
   }
 
   .companion-card:not([data-avatar-mood="normal"]) {
-    grid-template-rows: auto 154px auto auto;
+    grid-template-rows: auto auto auto auto;
   }
 
   .companion-card__line {
@@ -1486,26 +1529,29 @@ body {
   }
 
   .voz-page .chat-avatar {
-    --aru-size: min(26vw, 86px) !important;
+    --aru-size: min(48vw, 178px) !important;
   }
 
   .chat-avatar-wrap {
-    height: 86px;
-    overflow: hidden;
+    height: auto;
+    min-height: 190px;
+    overflow: visible;
   }
 
   .companion-card:not([data-avatar-mood="normal"]) .chat-avatar-wrap {
-    height: 154px;
+    height: auto;
+    min-height: 220px;
     overflow: visible;
   }
 
   .companion-card:not([data-avatar-mood="normal"]) .chat-avatar {
-    --aru-size: min(34vw, 126px) !important;
+    --aru-size: min(58vw, 220px) !important;
   }
 
   .voz-page .aru-avatar__bubble {
-    top: -2px;
-    width: min(280px, 96vw);
+    left: 80%;
+    top: 8%;
+    width: min(240px, 70vw);
   }
 
   .voz-page .aru-avatar__mood-text {
@@ -1527,6 +1573,10 @@ body {
   }
 
   .voz-page .chat-messages {
+    flex: 1 1 auto;
+    max-height: min(68dvh, 620px);
+    overflow-x: hidden;
+    overflow-y: auto;
     padding: 18px 14px 14px;
   }
 
